@@ -28,7 +28,6 @@ public class DashboardSession implements Session {
 	public DashboardSession(String username, String password) {
 		_username = username;
 		_password = password;
-		_client = new DefaultHttpClient();
 	}
 	
 	public DefaultHttpClient createClient()

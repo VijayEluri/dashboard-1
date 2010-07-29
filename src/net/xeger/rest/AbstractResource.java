@@ -34,12 +34,12 @@ abstract public class AbstractResource {
 		HttpResponse   response     = client.execute(get);
 		String         responseText = readResponse(response.getEntity());			
 
-		if(responseText.indexOf("New RightScale Sessions") == -1) {
+		if(response.getStatusLine().getStatusCode() == 200) {
 			Log.d("getJsonArray", responseText);
 			return new JSONArray(responseText);							
 		}
 		else {
-			throw new RestAuthException("Not logged in.");
+			throw new RestAuthException("Not logged in successfully.");
 		}
 	}	
     
@@ -48,6 +48,11 @@ abstract public class AbstractResource {
 	    String response = "";
 
 		int length = ( int ) entity.getContentLength();
+
+		if(length <= 0) {
+			length = (64*1024);
+		}
+		
 		StringBuffer sb = new StringBuffer( length );
 		InputStreamReader isr = new InputStreamReader( entity.getContent(), "UTF-8" );
 		char buff[] = new char[length];
