@@ -24,11 +24,11 @@ abstract public class AbstractResource {
     }
     
 	protected JSONArray getJsonArray(String resourceName)
-		throws JSONException, IOException, AuthenticationException
+		throws JSONException, IOException, RestAuthException
 	{
 		URI uri = getCollectionURI(resourceName);
 
-		DefaultHttpClient client    = _session.login();
+		DefaultHttpClient client    = _session.createClient();
 		
 		HttpGet        get          = new HttpGet(uri.toString());
 		HttpResponse   response     = client.execute(get);
@@ -39,7 +39,7 @@ abstract public class AbstractResource {
 			return new JSONArray(responseText);							
 		}
 		else {
-			throw new AuthenticationException("Not logged in.");
+			throw new RestAuthException("Not logged in.");
 		}
 	}	
     

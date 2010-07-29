@@ -12,7 +12,7 @@ class DeploymentsResource extends Resource {
 	}
 	
 	public Cursor index()
-		throws JSONException, IOException, AuthenticationException
+		throws JSONException, IOException, RestAuthException
 	{
 		MatrixCursor result = new MatrixCursor(Dashboard.DEPLOYMENT_COLUMNS);
 		
