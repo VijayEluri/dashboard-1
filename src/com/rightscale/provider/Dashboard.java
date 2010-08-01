@@ -29,9 +29,9 @@ public class Dashboard extends ContentProvider {
 	private static String HARDCODED_USER     = "someone@rightscale.com";
 	private static String HARDCODED_PASSWORD = "xxx";
 	
-	public static final Uri CONTENT_URI             = Uri.parse("content://com.rightscale.provider.dashboard");	
-	public static final Uri DEPLOYMENTS_URI         = Uri.withAppendedPath(CONTENT_URI, "deployments");
-	
+	public static final Uri      CONTENT_URI                = Uri.parse("content://com.rightscale.provider.dashboard");	
+
+	public static final Uri      DEPLOYMENTS_URI            = Uri.withAppendedPath(CONTENT_URI, "deployments");	
 	public static final String   DEPLOYMENT_MIME            = "vnd.rightscale.deployment";
 	public static final String   DEPLOYMENT_COLUMN_NICKNAME = "Nickname";
 	public static final String[] DEPLOYMENT_COLUMNS         = {"_ID", DEPLOYMENT_COLUMN_NICKNAME};
@@ -45,24 +45,21 @@ public class Dashboard extends ContentProvider {
 
 		String model = path.get(0); 
 
+		String mimePrefix, mimeType;
+		
 		if(path.size() % 2 == 1) {
-			//This is an index page (/deployments, /deployments/1/servers, ...)
-			if(model.equals("deployments"))
-				return  "vnd.android.cursor.dir/" + DEPLOYMENT_MIME;
-			else
-				throw new InvalidParameterException("Unknown URI: " + model);
-		}		
-		else if(path.size() % 2 == 0) {
-			//This is a specific object (/deployments/1, /deployments/1/servers/42, ...)
-			if(model.equals("deployments"))
-				return  "vnd.android.cursor.item/" + DEPLOYMENT_MIME;
-			else
-				throw new InvalidParameterException("Unknown URI: " + model);
-			
+			mimePrefix = "vnd.android.cursor.dir/"; 
 		}
 		else {
-			throw new InvalidParameterException("Unknown URI: " + model);			
+			mimePrefix = "vnd.android.cursor.item/";
 		}
+		
+		if(model.equals("deployments"))
+			mimeType = DEPLOYMENT_MIME;
+		else
+			throw new InvalidParameterException("Unknown URI: " + model);
+		
+		return mimePrefix + mimeType;
 	}
 
 	@Override
