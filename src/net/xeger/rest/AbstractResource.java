@@ -7,6 +7,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -22,6 +23,27 @@ abstract public class AbstractResource {
     public AbstractResource(Session session) {
     	_session = session;
     }
+    
+    
+	protected JSONObject getJsonObject(String resourceName)
+		throws JSONException, IOException, RestAuthException
+	{
+		URI uri = getCollectionURI(resourceName);
+
+		DefaultHttpClient client    = _session.createClient();
+		
+		HttpGet        get          = new HttpGet(uri.toString());
+		HttpResponse   response     = client.execute(get);
+		String         responseText = readResponse(response.getEntity());			
+
+		if(response.getStatusLine().getStatusCode() == 200) {
+			Log.d("getJsonObject", responseText);
+			return new JSONObject(responseText);							
+		}
+		else {
+			throw new RestAuthException("Not logged in successfully.");
+		}
+	}	
     
 	protected JSONArray getJsonArray(String resourceName)
 		throws JSONException, IOException, RestAuthException

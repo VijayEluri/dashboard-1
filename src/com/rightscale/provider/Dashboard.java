@@ -31,13 +31,23 @@ public class Dashboard extends ContentProvider {
 	
 	public static final Uri      CONTENT_URI                = Uri.parse("content://com.rightscale.provider.dashboard");	
 
+	public static final String   COLUMN_ID                  = "_ID";
+	public static final String   COLUMN_HREF                = "href";
+	
 	public static final Uri      DEPLOYMENTS_URI            = Uri.withAppendedPath(CONTENT_URI, "deployments");	
 	public static final String   DEPLOYMENT_MIME            = "vnd.rightscale.deployment";
 	public static final String   DEPLOYMENT_COLUMN_NICKNAME = "Nickname";
-	public static final String[] DEPLOYMENT_COLUMNS         = {"_ID", DEPLOYMENT_COLUMN_NICKNAME};
+	public static final String[] DEPLOYMENT_COLUMNS         = {COLUMN_ID, COLUMN_HREF, DEPLOYMENT_COLUMN_NICKNAME};
 
-	protected DashboardSession    _session  = null;
-	protected DeploymentsResource _resource = null;
+	public static final Uri      SERVERS_URI                = Uri.withAppendedPath(CONTENT_URI, "servers");	
+	public static final String   SERVER_MIME                = "vnd.rightscale.server";
+	public static final String   SERVER_COLUMN_NICKNAME     = "Nickname";
+	public static final String   SERVER_COLUMN_STATE        = "State";
+	public static final String[] SERVER_COLUMNS             = {COLUMN_ID, COLUMN_HREF, SERVER_COLUMN_NICKNAME, SERVER_COLUMN_STATE};
+
+	protected DashboardSession    _session     = null;
+	protected DeploymentsResource _deployments = null;
+	protected ServersResource     _servers     = null;
 	
 	@Override
 	public String getType(Uri uri) {
@@ -48,14 +58,19 @@ public class Dashboard extends ContentProvider {
 		String mimePrefix, mimeType;
 		
 		if(path.size() % 2 == 1) {
+			//Odd-sized paths (/deployments, /deployments/1/servers, ...) are an index page
+			//representing a collection of resources
 			mimePrefix = "vnd.android.cursor.dir/"; 
 		}
 		else {
+			//Even-sized paths are the page for an individual item
 			mimePrefix = "vnd.android.cursor.item/";
 		}
 		
 		if(model.equals("deployments"))
 			mimeType = DEPLOYMENT_MIME;
+		if(model.equals("servers"))
+			mimeType = SERVER_MIME;
 		else
 			throw new InvalidParameterException("Unknown URI: " + model);
 		
@@ -65,8 +80,9 @@ public class Dashboard extends ContentProvider {
 	@Override
 	public boolean onCreate() {
 		try {
-			_session  = new DashboardSession(HARDCODED_USER, HARDCODED_PASSWORD);
-			_resource = new DeploymentsResource(_session, 71);
+			_session     = new DashboardSession(HARDCODED_USER, HARDCODED_PASSWORD);
+			_deployments = new DeploymentsResource(_session, 71);
+			_servers     = new ServersResource(_session, 71);
 		}
 		catch(Exception e) {
 			Log.d("Dashboard", "Failed to login", e);
@@ -75,9 +91,27 @@ public class Dashboard extends ContentProvider {
 	}
 
 	@Override
-	public Cursor query(Uri uri, String[] columns, String where, String[] whereArgs, String sortBy) {		
+	public Cursor query(Uri uri, String[] columns, String where, String[] whereArgs, String sortBy) {
 		try {
-			return _resource.index();
+			if(uri.equals(DEPLOYMENTS_URI)) {
+				if(where != null && where.equals("deployment_id = ?") && whereArgs != null && whereArgs.length >= 1) {
+					int deploymentId = new Integer(whereArgs[0]).intValue();
+					return _deployments.show(deploymentId);
+				}
+				else {
+					return _deployments.index();
+				}
+			} else if(uri.equals(SERVERS_URI)) {
+				if(where != null && where.equals("deployment_id = ?") && whereArgs != null && whereArgs.length >= 1) {
+					int deploymentId = new Integer(whereArgs[0]).intValue();
+					return _servers.indexForDeployment(deploymentId);					
+				}
+				else {
+					return _servers.index();
+				}
+			} else {
+				throw new Error("Unknown content URI " + uri);
+			}
 		} catch (Exception e) {
 			throw new Error(e);
 		}
