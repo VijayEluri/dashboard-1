@@ -5,7 +5,8 @@ import java.net.URISyntaxException;
 import net.xeger.rest.*;
 
 public class Resource extends net.xeger.rest.AbstractResource {
-	public static String API_PREFIX = "https://my.rightscale.com/api";
+	public static String API_HOST   = "moo1.rightscale.com";
+	public static String API_PREFIX = "https://" + API_HOST + "/api";
 	public static String URI_SUFFIX = ".js?api_version=1.0";
 	
 	private int _accountId           = 0;

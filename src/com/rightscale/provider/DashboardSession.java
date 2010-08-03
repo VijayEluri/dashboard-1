@@ -34,7 +34,7 @@ public class DashboardSession implements Session {
 	{
 		if(_client == null) {
 			_client = new DefaultHttpClient();
-			AuthScope authScope = new AuthScope("my.rightscale.com", AuthScope.ANY_PORT, AuthScope.ANY_REALM);
+			AuthScope authScope = new AuthScope(Resource.API_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM);
 			Credentials creds = new UsernamePasswordCredentials(_username, _password);
 			_client.getCredentialsProvider().setCredentials(authScope, creds);
 			_client.addRequestInterceptor(createPreemptiveAuth(), 0);

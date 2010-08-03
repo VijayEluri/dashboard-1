@@ -37,7 +37,6 @@ abstract public class AbstractResource {
 		String         responseText = readResponse(response.getEntity());			
 
 		if(response.getStatusLine().getStatusCode() == 200) {
-			Log.d("getJsonObject", responseText);
 			return new JSONObject(responseText);							
 		}
 		else {
@@ -57,7 +56,6 @@ abstract public class AbstractResource {
 		String         responseText = readResponse(response.getEntity());			
 
 		if(response.getStatusLine().getStatusCode() == 200) {
-			Log.d("getJsonArray", responseText);
 			return new JSONArray(responseText);							
 		}
 		else {

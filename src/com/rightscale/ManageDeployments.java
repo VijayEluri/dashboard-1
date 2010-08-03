@@ -23,10 +23,10 @@ public class ManageDeployments extends ListActivity {
     }
 
     private void getDeployments() {
-    	ContentResolver cr = getContentResolver();
-    	Cursor cursor = cr.query(Dashboard.DEPLOYMENTS_URI, Dashboard.DEPLOYMENT_COLUMNS, null, null, null);
-    	startManagingCursor(cursor);
-    	showDeployments(cursor);
+		ContentResolver cr = getContentResolver();
+		Cursor cursor = cr.query(Dashboard.DEPLOYMENTS_URI, Dashboard.DEPLOYMENT_COLUMNS, null, null, null);
+		startManagingCursor(cursor);
+		showDeployments(cursor);
     }
     
     private void showDeployments(Cursor cursor) {

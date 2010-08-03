@@ -1,6 +1,7 @@
 package com.rightscale.provider;
 
 import android.database.*;
+
 import java.io.*;
 import org.json.*;
 
@@ -38,7 +39,6 @@ class DeploymentsResource extends Resource {
 	{
 		MatrixCursor result = new MatrixCursor(Dashboard.DEPLOYMENT_COLUMNS);		
 		JSONObject deployment = getJsonObject("deployments/" + id);				
-
 		String href = deployment.getString("href");		
 		String nickname = deployment.getString("nickname"); 
 

@@ -1,6 +1,7 @@
 package com.rightscale.provider;
 
 import android.database.*;
+
 import java.io.*;
 import org.json.*;
 
@@ -33,14 +34,20 @@ class ServersResource extends Resource {
 		for(int i = 0; i < array.length(); i++) {
 			JSONObject object = array.getJSONObject(i);
 			
-			String href = object.getString("href");
-			int id = new Integer(href.substring(href.lastIndexOf('/')+1)).intValue(); //TODO error handling			
-			String nickname = object.getString("nickname");
-			
-			MatrixCursor.RowBuilder row = result.newRow();
-			row.add(id);
-			row.add(href);
-			row.add(nickname);
+			/* 
+			 * The API is glitchy for non-EC2 servers and returns an incomplete JSON object.
+			 * If the object lacks an href property, it is one of these and we skip it...
+			 */
+			if(object.has("href")) {
+				String href = object.getString("href");
+				int id = new Integer(href.substring(href.lastIndexOf('/')+1)).intValue(); //TODO error handling			
+				String nickname = object.getString("nickname");
+				
+				MatrixCursor.RowBuilder row = result.newRow();
+				row.add(id);
+				row.add(href);
+				row.add(nickname);
+			}
 		}
 		
 		return result;			
