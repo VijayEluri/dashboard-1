@@ -39,14 +39,16 @@ class ServersResource extends Resource {
 			 * If the object lacks an href property, it is one of these and we skip it...
 			 */
 			if(object.has("href")) {
-				String href = object.getString("href");
-				int id = new Integer(href.substring(href.lastIndexOf('/')+1)).intValue(); //TODO error handling			
+				String href     = object.getString("href");
+				int    id       = new Integer(href.substring(href.lastIndexOf('/')+1)).intValue(); //TODO error handling			
 				String nickname = object.getString("nickname");
-				
+                String state    = object.getString("state");
+                
 				MatrixCursor.RowBuilder row = result.newRow();
 				row.add(id);
 				row.add(href);
 				row.add(nickname);
+				row.add(state);
 			}
 		}
 		

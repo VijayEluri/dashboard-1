@@ -3,4 +3,5 @@
 	<string name="app_name">RightScale Dashboard</string>
 	<string name="no_deployments">No deployments.</string>
 	<string name="manage_deployment_servers">Show Deployment</string>
+	<string name="no_deployment_servers">No servers.</string>
 </resources>

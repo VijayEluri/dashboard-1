@@ -33,8 +33,8 @@ import android.util.Log;
  * 
  */
 public class Dashboard extends ContentProvider {
-	private static String HARDCODED_USER       = "someone@rightscale.com";
-	private static String HARDCODED_PASSWORD   = "xxx";
+	private static String HARDCODED_USER       = "tony@rightscale.com";
+	private static String HARDCODED_PASSWORD   = "Abcd1234";
     private static int    HARDCODED_ACCOUNT_ID = 2951;
     
 	public static final Uri CONTENT_URI = Uri

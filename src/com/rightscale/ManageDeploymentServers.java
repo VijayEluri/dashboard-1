@@ -1,15 +1,21 @@
 package com.rightscale;
 
 import java.util.List;
+import java.util.Map;
 
 import com.rightscale.provider.Dashboard;
+
+import android.app.Activity;
 import android.app.ListActivity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.SimpleCursorAdapter;
+import android.widget.*;
+import android.view.*;
 
 /**
  * Activity for viewing the servers in a Deployment. This activity expects to be started with an Intent
@@ -20,15 +26,15 @@ import android.widget.SimpleCursorAdapter;
  *   </code>
  */
 public class ManageDeploymentServers extends ListActivity {
-	private static String[] FROM = {Dashboard.SERVER_COLUMN_NICKNAME};
-	private static int[]    TO   = {R.id.server_name};
+	private static String[] FROM = {Dashboard.SERVER_COLUMN_NICKNAME, Dashboard.SERVER_COLUMN_STATE};
+	private static int[]    TO   = {R.id.server_name, R.id.server_state};
 
 	private int _deploymentId = 0;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.manage_servers);
         getDeploymentIdToView();
         getDeployment();
         getServers();
@@ -64,7 +70,40 @@ public class ManageDeploymentServers extends ListActivity {
     }
     
     private void showServers(Cursor cursor) {
-    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.server_item, cursor, FROM, TO);
-    	setListAdapter(adapter);
+    	//SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.server_item, cursor, FROM, TO);
+    	ServersArrayAdapter adapter = new ServersArrayAdapter(this, R.layout.server_item, cursor, FROM, TO);
+    	setListAdapter(adapter);    	
     }
+
+    class ServersArrayAdapter extends SimpleCursorAdapter {
+        private String[] _itemStates;
+        private Context _context;
+        
+        public ServersArrayAdapter (Context context, int layout, Cursor cursor, String[] from, int[] to) {
+                super(context, layout, cursor, from, to);                
+                _context = context;
+        }
+
+        public void  setViewText(TextView v, String text) {
+        	v.setText(text);
+        }
+        
+        public void setViewImage(ImageView v, String text) {
+        	v.setImageDrawable(getDrawableForState(text));
+        }
+
+		private Drawable getDrawableForState(String state) {
+        	int resourceId = 0;
+        	
+        	if(state.equals("operational")) {
+        		resourceId = R.drawable.state_operational;
+        	}
+        	else {
+        		resourceId = R.drawable.state_inactive;        		
+        	}
+        	
+        	return _context.getResources().getDrawable(resourceId);
+		}
+    }
+    
 }
