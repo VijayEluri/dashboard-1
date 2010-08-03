@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>    
+<resources>
 	<string name="app_name">RightScale Dashboard</string>
+
+    <string name="email">Email</string>    
+    <string name="password">Password</string>
+
+	<string name="deployments">Deployments</string>
+	<string name="deployments_shortcut">d</string>
+	<string name="settings">Settings</string>
+	<string name="settings_shortcut">s</string>
+		
 	<string name="no_deployments">No deployments.</string>
+
 	<string name="manage_deployment_servers">Show Deployment</string>
 	<string name="no_deployment_servers">No servers.</string>
+	
+	<string name="authentication_error">Authentication Error</string>
+	<string name="authentication_error_description">Unknown email/password; change them in Settings and try again.</string>
 </resources>

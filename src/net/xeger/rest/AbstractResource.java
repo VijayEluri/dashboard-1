@@ -11,8 +11,6 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import android.util.Log;
-
 abstract public class AbstractResource {
     abstract protected URI getBaseURI();
     abstract protected URI getResourceURI(String resource, int id);

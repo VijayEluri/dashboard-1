@@ -1,12 +1,9 @@
 package com.rightscale;
 
 import java.util.List;
-import java.util.Map;
-
 import com.rightscale.provider.Dashboard;
+import com.rightscale.provider.DashboardError;
 
-import android.app.Activity;
-import android.app.ListActivity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +12,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.*;
-import android.view.*;
 
 /**
  * Activity for viewing the servers in a Deployment. This activity expects to be started with an Intent
@@ -25,58 +21,56 @@ import android.view.*;
  *   startActivity(
  *   </code>
  */
-public class ManageDeploymentServers extends ListActivity {
+public class ManageDeploymentServers extends DashboardListActivity {
 	private static String[] FROM = {Dashboard.SERVER_COLUMN_NICKNAME, Dashboard.SERVER_COLUMN_STATE};
 	private static int[]    TO   = {R.id.server_name, R.id.server_state};
 
-	private int _deploymentId = 0;
-	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.manage_servers);
-        getDeploymentIdToView();
-        getDeployment();
-        getServers();
+        loadTitle();
     }
 
-    private void getDeploymentIdToView() {
-        Intent intent = getIntent();
-        Uri contentUri = intent.getData();
-		List<String> path = contentUri.getPathSegments();
-		String id = path.get(path.size() - 1);         
-        _deploymentId = new Integer(id).intValue();
-    }
-
-    private void getDeployment() {
+    protected Cursor loadContent() {
     	ContentResolver cr = getContentResolver();
 
-    	String[] whereArgs = { new Integer(_deploymentId).toString() };
-    	Cursor cursor = cr.query(Dashboard.DEPLOYMENTS_URI, Dashboard.DEPLOYMENT_COLUMNS, "deployment_id = ?", whereArgs, null);
-    	int col = cursor.getColumnIndex("nickname");
-    	if(cursor.moveToNext()) {
-	    	String nickname = cursor.getString(col);
-	    	this.setTitle(nickname);
-    	}
+		String[] whereArgs = { getDeploymentId() };
+    	return cr.query(Dashboard.SERVERS_URI, Dashboard.SERVER_COLUMNS, "deployment_id = ?", whereArgs, null);
     }
     
-    private void getServers() {
-    	ContentResolver cr = getContentResolver();
-
-    	String[] whereArgs = { new Integer(_deploymentId).toString() };
-    	Cursor cursor = cr.query(Dashboard.SERVERS_URI, Dashboard.SERVER_COLUMNS, "deployment_id = ?", whereArgs, null);
+    protected void consumeContent(Cursor cursor) {
     	startManagingCursor(cursor);
-    	showServers(cursor);
-    }
-    
-    private void showServers(Cursor cursor) {
-    	//SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.server_item, cursor, FROM, TO);
     	ServersArrayAdapter adapter = new ServersArrayAdapter(this, R.layout.server_item, cursor, FROM, TO);
     	setListAdapter(adapter);    	
     }
 
+    private String getDeploymentId() {
+        Intent intent      = getIntent();
+    	Uri contentUri      = intent.getData();
+		List<String> path   = contentUri.getPathSegments();
+		return path.get(path.size() - 1);             	
+    }
+    
+    private void loadTitle() {
+    	try {
+	    	ContentResolver cr = getContentResolver();
+	
+			String[] whereArgs = { getDeploymentId() };
+	    	Cursor cursor = cr.query(Dashboard.DEPLOYMENTS_URI, Dashboard.DEPLOYMENT_COLUMNS, "deployment_id = ?", whereArgs, null);
+	    	int col = cursor.getColumnIndex("nickname");
+	    	if(cursor.moveToNext()) {
+		    	String nickname = cursor.getString(col);
+		    	this.setTitle(nickname);
+	    	}
+    	}
+    	catch(DashboardError e) {
+    		//Need to handle errors manually since we're outside of loadContent
+    		consumeError(e);
+    	}
+    }
+    
     class ServersArrayAdapter extends SimpleCursorAdapter {
-        private String[] _itemStates;
         private Context _context;
         
         public ServersArrayAdapter (Context context, int layout, Cursor cursor, String[] from, int[] to) {

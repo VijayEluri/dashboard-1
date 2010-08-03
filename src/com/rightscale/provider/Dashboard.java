@@ -3,11 +3,12 @@ package com.rightscale.provider;
 import java.security.InvalidParameterException;
 import java.util.List;
 
+import com.rightscale.Settings;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 
 /**
  * The Android content provider used to retrieve REST resources from the
@@ -33,8 +34,6 @@ import android.util.Log;
  * 
  */
 public class Dashboard extends ContentProvider {
-	private static String HARDCODED_USER       = "tony@rightscale.com";
-	private static String HARDCODED_PASSWORD   = "Abcd1234";
     private static int    HARDCODED_ACCOUNT_ID = 2951;
     
 	public static final Uri CONTENT_URI = Uri
@@ -57,10 +56,6 @@ public class Dashboard extends ContentProvider {
 	public static final String SERVER_COLUMN_STATE = "State";
 	public static final String[] SERVER_COLUMNS = { COLUMN_ID, COLUMN_HREF,
 			SERVER_COLUMN_NICKNAME, SERVER_COLUMN_STATE };
-
-	protected DashboardSession _session = null;
-	protected DeploymentsResource _deployments = null;
-	protected ServersResource _servers = null;
 
 	@Override
 	public String getType(Uri uri) {
@@ -92,13 +87,6 @@ public class Dashboard extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-		try {
-			_session = new DashboardSession(HARDCODED_USER, HARDCODED_PASSWORD);
-			_deployments = new DeploymentsResource(_session, HARDCODED_ACCOUNT_ID);
-			_servers = new ServersResource(_session, HARDCODED_ACCOUNT_ID);
-		} catch (Exception e) {
-			Log.d("Dashboard", "Failed to login", e);
-		}
 		return false;
 	}
 
@@ -106,26 +94,38 @@ public class Dashboard extends ContentProvider {
 	public Cursor query(Uri uri, String[] columns, String where,
 			String[] whereArgs, String sortBy) {
 		try {
+			//TODO cache the session if it becomes stateful? use a pool?
+			DashboardSession session = new DashboardSession(Settings.getEmail(getContext()), Settings.getPassword(getContext()));
+			session.login();
+			
 			if (uri.equals(DEPLOYMENTS_URI)) {
+				DeploymentsResource deployments = new DeploymentsResource(session, HARDCODED_ACCOUNT_ID);
+				
 				if (where != null && where.equals("deployment_id = ?")
 						&& whereArgs != null && whereArgs.length >= 1) {
 					int deploymentId = new Integer(whereArgs[0]).intValue();
-					return _deployments.show(deploymentId);
+					return deployments.show(deploymentId);
 				} else {
-					return _deployments.index();
+					return deployments.index();
 				}
 			} else if (uri.equals(SERVERS_URI)) {
+				ServersResource servers = new ServersResource(session, HARDCODED_ACCOUNT_ID);
+
 				if (where != null && where.equals("deployment_id = ?")
 						&& whereArgs != null && whereArgs.length >= 1) {
 					int deploymentId = new Integer(whereArgs[0]).intValue();
-					return _servers.indexForDeployment(deploymentId);
+					return servers.indexForDeployment(deploymentId);
 				} else {
-					return _servers.index();
+					return servers.index();
 				}
 			} else {
 				throw new DashboardError("Unknown content URI " + uri);
 			}
-		} catch (Exception e) {
+		}
+		catch(RuntimeException e) {
+			throw e;
+		}
+		catch (Exception e) {
 			Error err = new DashboardError(e);
 			err.setStackTrace(e.getStackTrace());
 			throw err;

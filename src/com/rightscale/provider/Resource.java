@@ -11,8 +11,6 @@ public class Resource extends net.xeger.rest.AbstractResource {
 	
 	private int _accountId           = 0;
 	private URI _baseURI             = null;
-	private Session _session = null;
-	
 	public Resource(Session session, int accountId)
 	{
 		super(session);
