@@ -24,40 +24,70 @@ abstract public class AbstractResource {
     
     
 	protected JSONObject getJsonObject(String resourceName)
-		throws JSONException, IOException, RestAuthException
+		throws JSONException, IOException, RestException
 	{
 		URI uri = getCollectionURI(resourceName);
 
 		DefaultHttpClient client    = _session.createClient();
 		
 		HttpGet        get          = new HttpGet(uri.toString());
-		HttpResponse   response     = client.execute(get);
-		String         responseText = readResponse(response.getEntity());			
-
-		if(response.getStatusLine().getStatusCode() == 200) {
+		HttpResponse   response;
+		
+		try {
+			response = client.execute(get);
+		}
+		catch(Exception e) {
+			throw new RestNetworkException(e);
+		}
+		
+		String responseText = readResponse(response.getEntity());			
+		int statusCode      = response.getStatusLine().getStatusCode();
+		
+		if(statusCode >= 200 && statusCode < 300) {
 			return new JSONObject(responseText);							
 		}
+		else if(statusCode >= 400 && statusCode < 500) {
+			throw new RestAuthException("Authentication failed", statusCode);
+		}
+		else if(statusCode >= 500 && statusCode < 600) {
+			throw new RestServerException("Internal server error", statusCode);
+		}
 		else {
-			throw new RestAuthException("Not logged in successfully.");
+			throw new RestException("Unrecognized HTTP status code", statusCode);			
 		}
 	}	
     
 	protected JSONArray getJsonArray(String resourceName)
-		throws JSONException, IOException, RestAuthException
+		throws JSONException, IOException, RestException
 	{
 		URI uri = getCollectionURI(resourceName);
 
 		DefaultHttpClient client    = _session.createClient();
 		
 		HttpGet        get          = new HttpGet(uri.toString());
-		HttpResponse   response     = client.execute(get);
-		String         responseText = readResponse(response.getEntity());			
+		HttpResponse   response;
 
-		if(response.getStatusLine().getStatusCode() == 200) {
+		try {
+			response = client.execute(get);
+		}
+		catch(Exception e) {
+			throw new RestNetworkException(e);
+		}
+
+		String responseText = readResponse(response.getEntity());			
+		int statusCode      = response.getStatusLine().getStatusCode();
+		
+		if(statusCode >= 200 && statusCode < 300) {
 			return new JSONArray(responseText);							
 		}
+		else if(statusCode >= 400 && statusCode < 500) {
+			throw new RestAuthException("Authentication failed", statusCode);
+		}
+		else if(statusCode >= 500 && statusCode < 600) {
+			throw new RestServerException("Internal server error", statusCode);
+		}
 		else {
-			throw new RestAuthException("Not logged in successfully.");
+			throw new RestException("Unrecognized HTTP status code", statusCode);			
 		}
 	}	
     

@@ -30,10 +30,10 @@ public class DashboardSession implements Session {
 	}
 
 	public void login()
-		throws RestAuthException
+		throws RestException
 	{
 		if(_username == null || _password == null || _username.length() == 0 || _password.length() == 0) {
-			throw new RestAuthException("Username or password not supplied");
+			throw new RestAuthException("Username or password not supplied", 401);
 		}
 		
 		//TODO: can't do API request without knowing account; can't know account list until we login.

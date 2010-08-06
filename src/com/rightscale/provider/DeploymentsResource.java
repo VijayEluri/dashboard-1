@@ -13,7 +13,7 @@ class DeploymentsResource extends Resource {
 	}
 	
 	public Cursor index()
-		throws JSONException, IOException, RestAuthException
+		throws JSONException, IOException, RestException
 	{		
 		MatrixCursor result = new MatrixCursor(Dashboard.DEPLOYMENT_COLUMNS);
 		JSONArray response = getJsonArray("deployments");		
@@ -35,7 +35,7 @@ class DeploymentsResource extends Resource {
 	}
 	
 	public Cursor show(int id)
-		throws JSONException, IOException, RestAuthException
+		throws JSONException, IOException, RestException
 	{
 		MatrixCursor result = new MatrixCursor(Dashboard.DEPLOYMENT_COLUMNS);		
 		JSONObject deployment = getJsonObject("deployments/" + id);				

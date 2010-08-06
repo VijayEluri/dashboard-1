@@ -3,8 +3,6 @@ package com.rightscale;
 import com.rightscale.provider.Dashboard;
 import com.rightscale.provider.DashboardError;
 
-import net.xeger.rest.RestAuthException;
-import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -58,7 +56,6 @@ public abstract class DashboardListActivity extends ListActivity {
 	protected void consumeError(Throwable t) {
 		if(t instanceof DashboardError) {
 			Throwable cause = t.getCause();
-			Uri uri = Uri.fromParts("content", cause.getClass().getName(), null);
 			finish();
 			startActivity(new Intent(Settings.ACTION_NOTIFY_ERROR, null, this, Settings.class));
 		}

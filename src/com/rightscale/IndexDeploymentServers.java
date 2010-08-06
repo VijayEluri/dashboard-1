@@ -35,8 +35,10 @@ public class IndexDeploymentServers extends DashboardListActivity {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-    	Uri deploymentUri = Uri.withAppendedPath(Dashboard.SERVERS_URI, new Long(id).toString());
-    	Intent i = new Intent(Intent.ACTION_VIEW, deploymentUri);
+    	//Uri serverUri = Uri.withAppendedPath(Dashboard.SERVERS_URI, new Long(id).toString());
+    	//TODO WHY THE ?!@$(& CAN'T I USE A PROPER CONTENT URI HERE?!?!?!
+    	Uri serverUri = Uri.withAppendedPath(Uri.parse("content://stupid_hack/servers"), new Long(id).toString());
+    	Intent i = new Intent(Intent.ACTION_VIEW, serverUri);
     	startActivity(i);
     }
 
@@ -99,6 +101,12 @@ public class IndexDeploymentServers extends DashboardListActivity {
         	
         	if(state.equals("operational")) {
         		resourceId = R.drawable.state_operational;
+        	}
+        	else if(state.equals("booting")) {
+        		resourceId = R.drawable.state_booting;
+        	}
+        	else if(state.equals("decommissioning")) {
+        		resourceId = R.drawable.state_decommissioning;
         	}
         	else {
         		resourceId = R.drawable.state_inactive;        		
