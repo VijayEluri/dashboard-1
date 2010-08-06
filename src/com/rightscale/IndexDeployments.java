@@ -10,14 +10,14 @@ import android.view.*;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 	
-public class ManageDeployments extends DashboardListActivity {
+public class IndexDeployments extends DashboardListActivity {
 	private static String[] FROM = {Dashboard.DEPLOYMENT_COLUMN_NICKNAME};
 	private static int[]    TO   = {R.id.deployment_name};
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.manage_deployments);
+        setContentView(R.layout.index_deployments);
     }
 
     @Override

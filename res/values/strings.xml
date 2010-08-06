@@ -10,10 +10,12 @@
 	<string name="settings">Settings</string>
 	<string name="settings_shortcut">s</string>
 		
-	<string name="no_deployments">No deployments.</string>
+	<string name="no_deployments">Loading...</string>
 
-	<string name="manage_deployment_servers">Show Deployment</string>
-	<string name="no_deployment_servers">No servers.</string>
+	<string name="index_deployment_servers">Show Deployment</string>
+	<string name="no_deployment_servers">Loading...</string>
+
+	<string name="show_server">Show Server</string>
 	
 	<string name="authentication_error">Authentication Error</string>
 	<string name="authentication_error_description">Unknown email/password; change them in Settings and try again.</string>

@@ -26,6 +26,13 @@ class ServersResource extends Resource {
 		return buildCursor(servers);
 	}
 	
+	public Cursor show(int id)
+	throws JSONException, IOException, RestAuthException
+	{
+		//TODO finish impl
+		throw new Error("Not implemented yet!");		
+	}
+
 	private Cursor buildCursor(JSONArray array)
 		throws JSONException
 	{

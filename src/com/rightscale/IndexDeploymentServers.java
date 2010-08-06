@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.*;
 
 /**
@@ -21,15 +22,22 @@ import android.widget.*;
  *   startActivity(
  *   </code>
  */
-public class ManageDeploymentServers extends DashboardListActivity {
+public class IndexDeploymentServers extends DashboardListActivity {
 	private static String[] FROM = {Dashboard.SERVER_COLUMN_NICKNAME, Dashboard.SERVER_COLUMN_STATE};
 	private static int[]    TO   = {R.id.server_name, R.id.server_state};
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.manage_servers);
+        setContentView(R.layout.index_deployment_servers);
         loadTitle();
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+    	Uri deploymentUri = Uri.withAppendedPath(Dashboard.SERVERS_URI, new Long(id).toString());
+    	Intent i = new Intent(Intent.ACTION_VIEW, deploymentUri);
+    	startActivity(i);
     }
 
     protected Cursor loadContent() {

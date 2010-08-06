@@ -11,7 +11,7 @@
 			android:label="@string/settings"
 			android:name="Settings" />		
 		
-        <activity android:label="@string/app_name" android:name="ManageDeployments">
+        <activity android:label="@string/app_name" android:name="IndexDeployments">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -23,11 +23,19 @@
             </intent-filter>        	
         </activity>
 
-        <activity android:label="@string/manage_deployment_servers" android:name="ManageDeploymentServers">
+        <activity android:label="@string/index_deployment_servers" android:name="IndexDeploymentServers">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
  				<category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="content" android:host="com.rightscale.provider.dashboard" android:pathPattern="/deployments/.*" />
+            </intent-filter>        	
+		</activity>
+
+        <activity android:label="@string/show_server" android:name="ShowServer">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+ 				<category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" android:host="com.rightscale.provider.dashboard" android:pathPattern="/servers/.*" />
             </intent-filter>        	
 		</activity>
     </application>

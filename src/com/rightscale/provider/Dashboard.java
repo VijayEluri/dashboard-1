@@ -115,7 +115,12 @@ public class Dashboard extends ContentProvider {
 						&& whereArgs != null && whereArgs.length >= 1) {
 					int deploymentId = new Integer(whereArgs[0]).intValue();
 					return servers.indexForDeployment(deploymentId);
-				} else {
+				}
+				else if(where != null && where.equals("server_id = ?")) {
+					int serverId = new Integer(whereArgs[0]).intValue();
+					return servers.show(serverId);
+				}
+				else {
 					return servers.index();
 				}
 			} else {
