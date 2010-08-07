@@ -1,7 +1,10 @@
 package com.rightscale;
 
+import net.xeger.rest.RestException;
+
 import com.rightscale.provider.DashboardError;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,9 +21,13 @@ public class Settings extends PreferenceActivity {
 		addPreferencesFromResource(R.xml.settings);
 		
 		if(getIntent().getAction() == ACTION_NOTIFY_ERROR) {
-			ErrorDialog dialog = new ErrorDialog(this);
-			dialog.show();
+			this.showDialog(R.layout.error_dialog);
 		}
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		return new ErrorDialog(getBaseContext());
 	}
 	
 	public static String getEmail(Context context) {
@@ -32,20 +39,20 @@ public class Settings extends PreferenceActivity {
 	}
 	
 	public static void handleError(Throwable t, Context context) {
-		if(t instanceof DashboardError) {
+		if(t instanceof DashboardError || t instanceof RestException) {
 			Throwable cause = t.getCause();
 			Log.e("DashboardError", cause.toString());
 			Intent intent = new Intent(Settings.ACTION_NOTIFY_ERROR, null, context, Settings.class);
 			intent.putExtra("error", t);
 			intent.putExtra("cause", cause);
 			
-			startActivity(intent);
+			context.startActivity(intent);
 		}
 		else if(t instanceof RuntimeException) {
 			throw (RuntimeException)t;
 		}
 		else {
 			throw new Error(t);
-		}							
+		}
 	}
 }

@@ -3,10 +3,13 @@ package com.rightscale.provider;
 import java.security.InvalidParameterException;
 import java.util.List;
 
+import org.apache.http.client.HttpClient;
+
 import com.rightscale.Settings;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
@@ -38,6 +41,7 @@ public class Dashboard extends ContentProvider {
     
 	public static final Uri CONTENT_URI = 
 		Uri.parse("content://com.rightscale.provider.dashboard");
+	
 	public static final Uri DEPLOYMENTS_URI     = DeploymentsResource.CONTENT_URI;
 	public static final Uri SERVERS_URI         = ServersResource.CONTENT_URI;
 	public static final Uri SERVER_SETTINGS_URI = ServerSettingsResource.CONTENT_URI;
@@ -169,5 +173,11 @@ public class Dashboard extends ContentProvider {
 	public int delete(Uri arg0, String arg1, String[] arg2) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	static public HttpClient createHttpClient(Context context) {
+		//TODO cache the session if it becomes stateful? use a pool?
+		DashboardSession session = new DashboardSession(Settings.getEmail(context), Settings.getPassword(context));
+		return session.createClient();
 	}
 }

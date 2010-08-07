@@ -18,6 +18,7 @@
 	<string name="show_server">Show Server</string>
 
 	<string name="show_server_info">Server Info</string>
+	<string name="show_server_info_name">Name</string>
 	<string name="show_server_info_state">State</string>
 	<string name="show_server_info_address">IP Address</string>
 	<string name="show_server_info_cloud">Cloud</string>

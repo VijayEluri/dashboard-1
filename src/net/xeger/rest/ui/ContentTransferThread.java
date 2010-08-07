@@ -3,7 +3,7 @@ package net.xeger.rest.ui;
 import android.database.Cursor;
 import android.os.Handler;
 
-class LoadJob implements Runnable {
+class ContentTransferThread implements Runnable {
 	protected ContentConsumer _consumer;
 	protected ContentProducer _producer;
 	protected Handler         _handler;
@@ -13,7 +13,7 @@ class LoadJob implements Runnable {
 	protected Cursor          _content;
 	protected Throwable       _error;
 	
-	public LoadJob(ContentConsumer consumer, ContentProducer producer, Handler handler, Object tag) {
+	public ContentTransferThread(ContentConsumer consumer, ContentProducer producer, Handler handler, Object tag) {
 		_consumer = consumer;
 		_producer = producer;
 		_handler = handler;
@@ -39,7 +39,7 @@ class LoadJob implements Runnable {
 			_consumer.consumeContentError(_error, _tag);
 		}
 		else {
-			//We're in the worker thread; produce the content and callback
+			//We're in the worker thread; produce the content and post the callback
 			try {
 				_content = _producer.produceContent(_tag);
 				_handler.post(this);

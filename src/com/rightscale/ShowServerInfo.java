@@ -33,11 +33,17 @@ public class ShowServerInfo extends Activity implements ContentConsumer, Content
     }
 
     public void consumeContent(Cursor cursor, Object tag) {
+    	TextView view;
+    	
     	if(SERVER == tag) {
     		cursor.moveToFirst();
+    		int colNickname   = cursor.getColumnIndex("nickname");
     		int colState = cursor.getColumnIndex("state");
 
-    		TextView view = (TextView)findViewById(R.id.show_server_info_state);
+    		view = (TextView)findViewById(R.id.show_server_info_name);
+    		view.setText(cursor.getString(colNickname));
+
+    		view = (TextView)findViewById(R.id.show_server_info_state);
     		view.setText(cursor.getString(colState));    		
     	}
     	else if(SERVER_SETTINGS == tag) {
@@ -46,12 +52,22 @@ public class ShowServerInfo extends Activity implements ContentConsumer, Content
     		int colCloudId    = cursor.getColumnIndex("cloud_id");
     		int colDatacenter = cursor.getColumnIndex("datacenter");
     		int colPricing    = cursor.getColumnIndex("pricing");
-    		TextView view;
     		
     		view = (TextView)findViewById(R.id.show_server_info_address);
     		view.setText(cursor.getString(colAddress));
+
+    		view = (TextView)findViewById(R.id.show_server_info_cloud);
+    		int cloudId = cursor.getInt(colCloudId);
+    		if(cloudId > 0) {
+    			view.setText(cursor.getString(colCloudId));
+    		}
+    		else {
+    			view.setText("(unknown)");
+    		}
+    		
     		view = (TextView)findViewById(R.id.show_server_info_datacenter);
     		view.setText(cursor.getString(colDatacenter));
+    		
     		view = (TextView)findViewById(R.id.show_server_info_pricing);
     		view.setText(cursor.getString(colPricing));    		
     	}

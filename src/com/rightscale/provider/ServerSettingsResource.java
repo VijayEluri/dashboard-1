@@ -47,9 +47,22 @@ public class ServerSettingsResource extends Resource {
 		//we can reuse the Server ID. Kind of shitty!
 		int id                    = server_id;
 		String href               = Uri.withAppendedPath(ServersResource.CONTENT_URI, new Integer(server_id).toString() + "/settings").toString();
-		int cloud_id              = new Integer(object.getString("cloud_id")).intValue(); 
-		String ip_address         = object.getString("ip-address");
-		String private_ip_address = object.getString("private-ip-address");
+		int cloud_id;
+		if(object.has("cloud_id")) {
+			cloud_id = new Integer(object.getString("cloud_id")).intValue(); 
+		}
+		else {
+			cloud_id = 0;
+		}		
+		String ip_address = null;
+		if(object.has("ip-address")) {
+			ip_address = object.getString("ip-address");
+		}
+		String private_ip_address = null;
+		if(object.has("private-ip-address")) {
+			private_ip_address = object.getString("private-ip-address");
+		}
+		
 		boolean locked            = object.getBoolean("locked");
 		String pricing            = object.getString("pricing");
 		String datacenter         = object.getString("ec2-availability-zone");

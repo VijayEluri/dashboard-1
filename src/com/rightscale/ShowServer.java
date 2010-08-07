@@ -25,7 +25,7 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TabHost.TabContentFactory;
 
-public class ShowServer extends TabActivity implements ContentConsumer, ContentProducer {
+public class ShowServer extends TabActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,35 +44,7 @@ public class ShowServer extends TabActivity implements ContentConsumer, ContentP
         
         intent = new Intent(this, ShowServerMonitoring.class);
         intent.setData(getIntent().getData());
-        tabSpec = tabHost.newTabSpec("monitoring").setIndicator(null, res.getDrawable(android.R.drawable.ic_menu_slideshow)).setContent(intent); 
+        tabSpec = tabHost.newTabSpec("monitoring").setIndicator(null, res.getDrawable(android.R.drawable.ic_menu_gallery)).setContent(intent); 
         tabHost.addTab(tabSpec);
-        
-        ContentTransfer.load(this, this, new Handler());
-    }
-    
-	public void consumeContent(Cursor cursor, Object tag) {
-		cursor.moveToFirst();
-		int colNickname = cursor.getColumnIndex("nickname");
-		setTitle(cursor.getString(colNickname));
-	}
-
-	
-	public Cursor produceContent(Object tag) {
-    	ContentResolver cr = getContentResolver();
-
-		String[] whereArgs = { getServerId() };
-    	return cr.query(Dashboard.SERVERS_URI, Dashboard.SERVER_COLUMNS, "server_id = ?", whereArgs, null);
-	}
-
-	public void consumeContentError(Throwable t, Object tag) {
-		Settings.handleError(t, this);
-		finish();
-	}	
-
-    private String getServerId() {
-        Intent intent      = getIntent();
-    	Uri contentUri      = intent.getData();
-		List<String> path   = contentUri.getPathSegments();
-		return path.get(path.size() - 1);             	
     }
 }
