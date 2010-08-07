@@ -10,23 +10,28 @@
 				  android:text="@string/show_server_info_state" android:textSize="10pt" android:textStyle="bold"></TextView>
 		<TextView android:id="@+id/show_server_info_state" android:text="Funkadelic"
 				  android:layout_width="fill_parent" android:layout_height="wrap_content"
-				  android:textSize="8pt" android:paddingLeft="8pt"></TextView>			
+				  android:textSize="8pt"
+				  android:paddingLeft="8pt"></TextView>			
 	</LinearLayout>
+	
 	<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
 				  android:orientation="vertical" android:gravity="center_vertical">
 		<TextView android:layout_width="fill_parent" android:layout_height="wrap_content"
 				  android:text="@string/show_server_info_address" android:textSize="10pt" android:textStyle="bold"></TextView>
 		<TextView android:id="@+id/show_server_info_address" android:text="127.0.0.1"
 				  android:layout_width="fill_parent" android:layout_height="wrap_content"
-				  android:textSize="8pt" android:paddingLeft="8pt"></TextView>			
+				  android:textSize="8pt"
+				  android:paddingLeft="8pt"></TextView>			
 	</LinearLayout>
+	
 	<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
 				  android:orientation="vertical" android:gravity="center_vertical">
 		<TextView android:layout_width="fill_parent" android:layout_height="wrap_content"
 				  android:text="@string/show_server_info_cloud" android:textSize="10pt" android:textStyle="bold"></TextView>
 		<TextView android:id="@+id/show_server_info_cloud" android:text="Some Cloud"
 				  android:layout_width="fill_parent" android:layout_height="wrap_content"
-				  android:textSize="8pt" android:paddingLeft="8pt"></TextView>			
+				  android:textSize="8pt"
+				  android:paddingLeft="8pt"></TextView>			
 	</LinearLayout>
 
 	<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
@@ -35,7 +40,8 @@
 				  android:text="@string/show_server_info_datacenter" android:textSize="10pt" android:textStyle="bold"></TextView>
 		<TextView android:id="@+id/show_server_info_datacenter" android:text="Some Datacenter"
 				  android:layout_width="fill_parent" android:layout_height="wrap_content"
-				  android:textSize="8pt" android:paddingLeft="8pt"></TextView>			
+				  android:textSize="8pt"
+				  android:paddingLeft="8pt"></TextView>			
 	</LinearLayout>
 
 	<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
@@ -44,7 +50,8 @@
 				  android:text="@string/show_server_info_pricing" android:textSize="10pt" android:textStyle="bold"></TextView>
 		<TextView android:id="@+id/show_server_info_pricing" android:text="on-demand"
 				  android:layout_width="fill_parent" android:layout_height="wrap_content"
-				  android:textSize="8pt" android:paddingLeft="8pt"></TextView>			
+				  android:textSize="8pt"
+				  android:paddingLeft="8pt"></TextView>			
 	</LinearLayout>
 </LinearLayout>
  

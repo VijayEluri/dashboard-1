@@ -1,12 +1,13 @@
 package com.rightscale;
 
+import net.xeger.rest.ui.*;
+
 import com.rightscale.provider.Dashboard;
 import com.rightscale.provider.DashboardError;
 
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -14,11 +15,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-public abstract class DashboardListActivity extends ListActivity {
+public abstract class DashboardListActivity extends ListActivity implements ContentProducer, ContentConsumer {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
-        new LoadContentThread(this, new Handler()).start();
+        ContentTransfer.load(this, this, new Handler());
     }
 
     @Override
@@ -51,74 +52,11 @@ public abstract class DashboardListActivity extends ListActivity {
     	}
     }
         
-	abstract protected Cursor loadContent();
-	abstract protected void consumeContent(Cursor c);
+	abstract public Cursor produceContent(Object tag);
+	abstract public void consumeContent(Cursor c, Object tag);
 
-	protected void consumeError(Throwable t) {
-		if(t instanceof DashboardError) {
-			Throwable cause = t.getCause();
-			Log.e("DashboardError", cause.toString());
-			Intent intent = new Intent(Settings.ACTION_NOTIFY_ERROR, null, this, Settings.class);
-			intent.putExtra("error", t);
-			intent.putExtra("cause", cause);
-			
-			finish();
-			startActivity(intent);
-		}
-		else if(t instanceof RuntimeException) {
-			throw (RuntimeException)t;
-		}
-		else {
-			throw new Error(t);
-		}					
-	}
-	
-	private class LoadContentThread extends Thread {
-		DashboardListActivity _activity;
-		Handler               _handler;
-		
-		public LoadContentThread(DashboardListActivity a, Handler h) {
-			_activity = a;
-			_handler  = h;
-		}
-		
-		public void run() {
-			try {
-				_handler.post( new ContentConsumer(_activity, loadContent()) );
-			}
-			catch(Throwable t) {
-				_handler.post( new ErrorConsumer(_activity, t) );
-			}
-		}
-	}
-	
-	private class ErrorConsumer implements Runnable {
-		DashboardListActivity _activity;
-		Throwable             _throwable;
-		
-		public ErrorConsumer(DashboardListActivity a, Throwable t) {
-			_activity = a;
-			_throwable = t;
-		}
-		
-		public void run() {
-			_activity.consumeError(_throwable);
-		}
-	}
-	
-	private class ContentConsumer implements Runnable {
-		DashboardListActivity _activity;
-		Cursor      _content = null;
-		
-		public ContentConsumer(DashboardListActivity a, Cursor content) {
-			_activity = a;
-			_content  = content;
-		}
-		
-		public void run() {
-			if(_content != null) {
-				_activity.consumeContent(_content);
-			}
-		}
-	}
+	public void consumeContentError(Throwable t, Object tag) {
+		Settings.handleError(t, this);
+		finish();
+	}	
 }

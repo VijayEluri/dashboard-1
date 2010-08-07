@@ -1,6 +1,9 @@
 package com.rightscale;
 
 import java.util.List;
+
+import net.xeger.rest.ui.ContentTransfer;
+
 import com.rightscale.provider.Dashboard;
 import com.rightscale.provider.DashboardError;
 
@@ -11,6 +14,7 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.*;
 
@@ -19,6 +23,9 @@ import android.widget.*;
  * whose data points to the content-URI of the deployment the user is interested in.
  */
 public class ShowDeployment extends DashboardListActivity {
+	private static final Object SERVERS          = "servers";
+	private static final Object DEPLOYMENT_TITLE = "deployment title";
+	
 	private static String[] FROM = {"Nickname", "State"};
 	private static int[]    TO   = {R.id.server_name, R.id.server_state};
 
@@ -26,7 +33,8 @@ public class ShowDeployment extends DashboardListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.show_deployment);
-        loadTitle();
+        ContentTransfer.load(this, this, new Handler(), DEPLOYMENT_TITLE);
+        ContentTransfer.load(this, this, new Handler(), SERVERS);
     }
 
     @Override
@@ -36,17 +44,33 @@ public class ShowDeployment extends DashboardListActivity {
     	startActivity(i);
     }
 
-    protected Cursor loadContent() {
+    public Cursor produceContent(Object tag) {
     	ContentResolver cr = getContentResolver();
-
 		String[] whereArgs = { getDeploymentId() };
-    	return cr.query(Dashboard.SERVERS_URI, Dashboard.SERVER_COLUMNS, "deployment_id = ?", whereArgs, null);
+    	
+    	if(tag == SERVERS) {
+	    	return cr.query(Dashboard.SERVERS_URI, Dashboard.SERVER_COLUMNS, "deployment_id = ?", whereArgs, null);
+    	}
+    	else if(tag == DEPLOYMENT_TITLE) {
+	    	return cr.query(Dashboard.DEPLOYMENTS_URI, Dashboard.DEPLOYMENT_COLUMNS, "deployment_id = ?", whereArgs, null);
+    	}
+    	else {
+    		return null;
+    	}
     }
     
-    protected void consumeContent(Cursor cursor) {
-    	startManagingCursor(cursor);
-    	ServersArrayAdapter adapter = new ServersArrayAdapter(this, R.layout.server_item, cursor, FROM, TO);
-    	setListAdapter(adapter);    	
+    public void consumeContent(Cursor cursor, Object tag) {
+    	if(tag == SERVERS) {
+	    	startManagingCursor(cursor);
+	    	ServerItemAdapter adapter = new ServerItemAdapter(this, R.layout.server_item, cursor, FROM, TO);
+	    	setListAdapter(adapter);
+    	}
+    	else if(tag == DEPLOYMENT_TITLE) {
+	    	int col = cursor.getColumnIndex("nickname");
+	    	cursor.moveToNext();
+	    	String nickname = cursor.getString(col);
+	    	this.setTitle(nickname);
+    	}
     }
 
     private String getDeploymentId() {
@@ -56,28 +80,10 @@ public class ShowDeployment extends DashboardListActivity {
 		return path.get(path.size() - 1);             	
     }
     
-    private void loadTitle() {
-    	try {
-	    	ContentResolver cr = getContentResolver();
-	
-			String[] whereArgs = { getDeploymentId() };
-	    	Cursor cursor = cr.query(Dashboard.DEPLOYMENTS_URI, Dashboard.DEPLOYMENT_COLUMNS, "deployment_id = ?", whereArgs, null);
-	    	int col = cursor.getColumnIndex("nickname");
-	    	if(cursor.moveToNext()) {
-		    	String nickname = cursor.getString(col);
-		    	this.setTitle(nickname);
-	    	}
-    	}
-    	catch(DashboardError e) {
-    		//Need to handle errors manually since we're outside of loadContent
-    		consumeError(e);
-    	}
-    }
-    
-    class ServersArrayAdapter extends SimpleCursorAdapter {
+    class ServerItemAdapter extends SimpleCursorAdapter {
         private Context _context;
         
-        public ServersArrayAdapter (Context context, int layout, Cursor cursor, String[] from, int[] to) {
+        public ServerItemAdapter (Context context, int layout, Cursor cursor, String[] from, int[] to) {
                 super(context, layout, cursor, from, to);                
                 _context = context;
         }
@@ -101,6 +107,9 @@ public class ShowDeployment extends DashboardListActivity {
         	}
         	else if(state.equals("decommissioning")) {
         		resourceId = R.drawable.state_decommissioning;
+        	}
+        	else if(state.equals("stranded")) {
+        		resourceId = R.drawable.state_stranded;
         	}
         	else {
         		resourceId = R.drawable.state_inactive;        		

@@ -27,12 +27,12 @@ public class IndexDeployments extends DashboardListActivity {
     	startActivity(i);
     }
     
-    protected Cursor loadContent() {
+    public Cursor produceContent(Object tag) {
 		ContentResolver cr = getContentResolver();
 		return cr.query(Dashboard.DEPLOYMENTS_URI, Dashboard.DEPLOYMENT_COLUMNS, null, null, null);
     }
     
-    protected void consumeContent(Cursor cursor) {
+    public void consumeContent(Cursor cursor, Object tag) {
 		startManagingCursor(cursor);
     	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.deployment_item, cursor, FROM, TO);
     	setListAdapter(adapter);
