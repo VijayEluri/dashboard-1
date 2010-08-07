@@ -12,6 +12,11 @@ public class Settings extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.settings);
+		
+		if(getIntent().getAction() == ACTION_NOTIFY_ERROR) {
+			ErrorDialog dialog = new ErrorDialog(this);
+			dialog.show();
+		}
 	}
 	
 	public static String getEmail(Context context) {

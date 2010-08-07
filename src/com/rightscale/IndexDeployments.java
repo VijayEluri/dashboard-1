@@ -11,7 +11,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 	
 public class IndexDeployments extends DashboardListActivity {
-	private static String[] FROM = {Dashboard.DEPLOYMENT_COLUMN_NICKNAME};
+	private static String[] FROM = {"Nickname"};
 	private static int[]    TO   = {R.id.deployment_name};
 	
     @Override

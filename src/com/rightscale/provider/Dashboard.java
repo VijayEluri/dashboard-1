@@ -36,52 +36,49 @@ import android.net.Uri;
 public class Dashboard extends ContentProvider {
     private static int    HARDCODED_ACCOUNT_ID = 2951;
     
-	public static final Uri CONTENT_URI = Uri
-			.parse("content://com.rightscale.provider.dashboard");
+	public static final Uri CONTENT_URI = 
+		Uri.parse("content://com.rightscale.provider.dashboard");
+	public static final Uri DEPLOYMENTS_URI     = DeploymentsResource.CONTENT_URI;
+	public static final Uri SERVERS_URI         = ServersResource.CONTENT_URI;
+	public static final Uri SERVER_SETTINGS_URI = ServerSettingsResource.CONTENT_URI;
+	
+	public static final String ID   = "_id";
+	public static final String HREF = "href";
 
-	public static final String COLUMN_ID = "_ID";
-	public static final String COLUMN_HREF = "href";
-
-	public static final Uri DEPLOYMENTS_URI = Uri.withAppendedPath(CONTENT_URI,
-			"deployments");
-	public static final String DEPLOYMENT_MIME = "vnd.rightscale.deployment";
-	public static final String DEPLOYMENT_COLUMN_NICKNAME = "Nickname";
-	public static final String[] DEPLOYMENT_COLUMNS = { COLUMN_ID, COLUMN_HREF,
-			DEPLOYMENT_COLUMN_NICKNAME };
-
-	public static final Uri SERVERS_URI = Uri.withAppendedPath(CONTENT_URI,
-			"servers");
-	public static final String SERVER_MIME = "vnd.rightscale.server";
-	public static final String SERVER_COLUMN_NICKNAME = "Nickname";
-	public static final String SERVER_COLUMN_STATE = "State";
-	public static final String[] SERVER_COLUMNS = { COLUMN_ID, COLUMN_HREF,
-			SERVER_COLUMN_NICKNAME, SERVER_COLUMN_STATE };
-
+	public static final String[] DEPLOYMENT_COLUMNS = DeploymentsResource.COLUMNS;
+	public static final String[] SERVER_COLUMNS     = ServersResource.COLUMNS;
+	public static final String[] SERVER_SETTING_COLUMNS = ServerSettingsResource.COLUMNS;
+	
 	@Override
 	public String getType(Uri uri) {
 		List<String> path = uri.getPathSegments();
 
+		
 		String model = path.get(0);
-
 		String mimePrefix, mimeType;
 
 		if (path.size() % 2 == 1) {
-			// Odd-sized paths (/deployments, /deployments/1/servers, ...) are
-			// an index page
-			// representing a collection of resources
+			// Odd-sized paths (/deployments, /deployments/1/servers, ...) 
+			// represent a collection of resources.
 			mimePrefix = "vnd.android.cursor.dir/";
 		} else {
-			// Even-sized paths are the page for an individual item
+			// Even-sized paths represent an individual item.
 			mimePrefix = "vnd.android.cursor.item/";
 		}
 
-		if (model.equals("deployments"))
-			mimeType = DEPLOYMENT_MIME;
-		if (model.equals("servers"))
-			mimeType = SERVER_MIME;
-		else
+		if (model.equals("deployments")) {
+			mimeType = DeploymentsResource.MIME_TYPE;
+		}
+		else if (model.equals("servers")) {
+			mimeType = ServersResource.MIME_TYPE;
+		}
+		else if (model.equals("server_settings")) {
+			mimeType = ServerSettingsResource.MIME_TYPE;
+		}
+		else {
 			throw new InvalidParameterException("Unknown URI: " + model);
-
+		}
+		
 		return mimePrefix + mimeType;
 	}
 
@@ -98,32 +95,51 @@ public class Dashboard extends ContentProvider {
 			DashboardSession session = new DashboardSession(Settings.getEmail(getContext()), Settings.getPassword(getContext()));
 			session.login();
 			
-			if (uri.equals(DEPLOYMENTS_URI)) {
+			if (uri.equals(DeploymentsResource.CONTENT_URI)) {
 				DeploymentsResource deployments = new DeploymentsResource(session, HARDCODED_ACCOUNT_ID);
 				
 				if (where != null && where.equals("deployment_id = ?")
 						&& whereArgs != null && whereArgs.length >= 1) {
+					//SELECT ... FROM deployments WHERE deployment_id = ?
 					int deploymentId = new Integer(whereArgs[0]).intValue();
 					return deployments.show(deploymentId);
 				} else {
+					//SELECT ... FROM deployments
 					return deployments.index();
 				}
-			} else if (uri.equals(SERVERS_URI)) {
+			} else if (uri.equals(ServersResource.CONTENT_URI)) {
 				ServersResource servers = new ServersResource(session, HARDCODED_ACCOUNT_ID);
 
 				if (where != null && where.equals("deployment_id = ?")
 						&& whereArgs != null && whereArgs.length >= 1) {
+					//SELECT ... FROM servers WHERE deployment_id = ?
 					int deploymentId = new Integer(whereArgs[0]).intValue();
 					return servers.indexForDeployment(deploymentId);
 				}
 				else if(where != null && where.equals("server_id = ?")) {
+					//SELECT ... FROM servers WHERE server_id = ?
 					int serverId = new Integer(whereArgs[0]).intValue();
 					return servers.show(serverId);
 				}
 				else {
+					//SELECT ... FROM servers
 					return servers.index();
 				}
-			} else {
+			}
+			else if(uri.equals(ServerSettingsResource.CONTENT_URI)) {
+				ServerSettingsResource serverSettings = new ServerSettingsResource(session, HARDCODED_ACCOUNT_ID);
+
+				if(where != null && where.equals("server_id = ?")) {
+					//SELECT ... FROM server_settings WHERE server_id = ?
+					int serverId = new Integer(whereArgs[0]).intValue();
+					return serverSettings.showForServer(serverId);
+				}
+				else {
+					throw new DashboardError("Cannot query server_settings without specifying server_id in where-clause");
+				}
+				
+			}
+			else {
 				throw new DashboardError("Unknown content URI " + uri);
 			}
 		}

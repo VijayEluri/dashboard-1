@@ -19,15 +19,15 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
  				<category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="content" android:host="com.rightscale.provider.dashboard" android:path="/deployments" />
+                <data android:mimeType="vnd.android.cursor.dir/vnd.rightscale.deployment" />
             </intent-filter>        	
         </activity>
 
-        <activity android:label="@string/index_deployment_servers" android:name="IndexDeploymentServers">
+        <activity android:label="@string/show_deployment" android:name="ShowDeployment">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
  				<category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="content" android:host="com.rightscale.provider.dashboard" android:pathPattern="/deployments/.*" />
+                <data android:mimeType="vnd.android.cursor.item/vnd.rightscale.deployment" />
             </intent-filter>        	
 		</activity>
 
@@ -35,13 +35,11 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
  				<category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="content" android:host="com.rightscale.provider.dashboard" android:pathPattern="/servers/.*" />
+                <data  android:mimeType="vnd.android.cursor.item/vnd.rightscale.server" />
             </intent-filter>        	
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
- 				<category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="content" android:host="stupid_hack" android:pathPattern="/servers/.*" />
-            </intent-filter>        	
+		</activity>
+
+        <activity android:label="@string/show_server_info" android:name="ShowServerInfo">
 		</activity>
     </application>
     <uses-sdk android:minSdkVersion="4" />

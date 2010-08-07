@@ -16,28 +16,22 @@ import android.widget.*;
 
 /**
  * Activity for viewing the servers in a Deployment. This activity expects to be started with an Intent
- * whose data points to the content-URI of the deployment the user is interested in. Example:
- *   <code>
- *   Intent i = new Intent(Intent.ACTION_VIEW, new Uri("content://com.rightscale.provider.dashboard/deployments/12345"));
- *   startActivity(
- *   </code>
+ * whose data points to the content-URI of the deployment the user is interested in.
  */
-public class IndexDeploymentServers extends DashboardListActivity {
-	private static String[] FROM = {Dashboard.SERVER_COLUMN_NICKNAME, Dashboard.SERVER_COLUMN_STATE};
+public class ShowDeployment extends DashboardListActivity {
+	private static String[] FROM = {"Nickname", "State"};
 	private static int[]    TO   = {R.id.server_name, R.id.server_state};
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.index_deployment_servers);
+        setContentView(R.layout.show_deployment);
         loadTitle();
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-    	//Uri serverUri = Uri.withAppendedPath(Dashboard.SERVERS_URI, new Long(id).toString());
-    	//TODO WHY THE ?!@$(& CAN'T I USE A PROPER CONTENT URI HERE?!?!?!
-    	Uri serverUri = Uri.withAppendedPath(Uri.parse("content://stupid_hack/servers"), new Long(id).toString());
+    	Uri serverUri = Uri.withAppendedPath(Dashboard.SERVERS_URI, new Long(id).toString());
     	Intent i = new Intent(Intent.ACTION_VIEW, serverUri);
     	startActivity(i);
     }

@@ -12,11 +12,14 @@
 		
 	<string name="no_deployments">Loading...</string>
 
-	<string name="index_deployment_servers">Show Deployment</string>
+	<string name="show_deployment">Show Deployment</string>
 	<string name="no_deployment_servers">Loading...</string>
 
 	<string name="show_server">Show Server</string>
-	
-	<string name="authentication_error">Authentication Error</string>
-	<string name="authentication_error_description">Unknown email/password; change them in Settings and try again.</string>
+	<string name="show_server_info">Server Info</string>
+	<string name="show_server_info_state">State</string>
+	<string name="show_server_info_address">IP Address</string>
+	<string name="show_server_info_cloud">Cloud</string>
+	<string name="show_server_info_datacenter">Datacenter</string>
+	<string name="show_server_info_pricing">Pricing</string>
 </resources>

@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -56,8 +57,13 @@ public abstract class DashboardListActivity extends ListActivity {
 	protected void consumeError(Throwable t) {
 		if(t instanceof DashboardError) {
 			Throwable cause = t.getCause();
+			Log.e("DashboardError", cause.toString());
+			Intent intent = new Intent(Settings.ACTION_NOTIFY_ERROR, null, this, Settings.class);
+			intent.putExtra("error", t);
+			intent.putExtra("cause", cause);
+			
 			finish();
-			startActivity(new Intent(Settings.ACTION_NOTIFY_ERROR, null, this, Settings.class));
+			startActivity(intent);
 		}
 		else if(t instanceof RuntimeException) {
 			throw (RuntimeException)t;
