@@ -99,13 +99,13 @@ public class ShowDeployment extends DashboardListActivity {
 		private Drawable getDrawableForState(String state) {
         	int resourceId = 0;
         	
-        	if(state.equals("operational")) {
+        	if(state.equals("operational") || state.equals("running")) {
         		resourceId = R.drawable.state_operational;
         	}
         	else if(state.equals("booting")) {
         		resourceId = R.drawable.state_booting;
         	}
-        	else if(state.equals("decommissioning")) {
+        	else if(state.equals("decommissioning") || state.equals("shutting-down ")) {
         		resourceId = R.drawable.state_decommissioning;
         	}
         	else if(state.equals("stranded")) {

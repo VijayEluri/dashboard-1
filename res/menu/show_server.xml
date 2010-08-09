@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:title="@string/ssh_server" android:id="@+id/menu_ssh_server" android:visible="false"></item>
+<item android:title="@string/reboot_server" android:id="@+id/menu_reboot_server" android:visible="false"></item>
+<item android:title="@string/launch_server" android:id="@+id/menu_launch_server" android:visible="false"></item>
+<item android:title="@string/terminate_server" android:id="@+id/menu_terminate_server" android:visible="false"></item>
+
+
+</menu>

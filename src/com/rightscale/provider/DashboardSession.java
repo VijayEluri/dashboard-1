@@ -1,14 +1,19 @@
 package com.rightscale.provider;
 
 import java.io.IOException;
+import java.net.URI;
+
 import org.apache.http.*;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.auth.*;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
+
 import net.xeger.rest.*;
 
 public class DashboardSession implements Session {
@@ -22,13 +27,25 @@ public class DashboardSession implements Session {
 	public DefaultHttpClient createClient()
 	{
 		DefaultHttpClient client = new DefaultHttpClient();
-		AuthScope authScope = new AuthScope(Resource.API_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM);
+		AuthScope authScope = new AuthScope(DashboardResource.API_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM);
 		Credentials creds = new UsernamePasswordCredentials(_username, _password);
 		client.getCredentialsProvider().setCredentials(authScope, creds);
 		client.addRequestInterceptor(createPreemptiveAuth(), 0);
 		return client;
 	}
 
+    public HttpGet createGet(URI uri) {
+    	HttpGet get = new HttpGet(uri.toString());
+    	get.addHeader("X-API-Version", "1.0");
+    	return get;
+    }
+    
+     public HttpPost createPost(URI uri) {
+    	HttpPost post = new HttpPost(uri);
+    	post.addHeader("X-API-Version", "1.0");
+    	return post;
+    }
+	
 	public void login()
 		throws RestException
 	{

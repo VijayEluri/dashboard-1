@@ -2,16 +2,17 @@ package com.rightscale.provider;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import net.xeger.rest.*;
 
-public class Resource extends net.xeger.rest.AbstractResource {
+import net.xeger.rest.ProtocolError;
+import net.xeger.rest.Session;
+
+public class DashboardResource extends net.xeger.rest.AbstractResource {
 	public static String API_HOST   = "moo1.rightscale.com";
 	public static String API_PREFIX = "https://" + API_HOST + "/api";
-	public static String URI_SUFFIX = ".js?api_version=1.0";
 	
 	private int _accountId           = 0;
 	private URI _baseURI             = null;
-	public Resource(Session session, int accountId)
+	public DashboardResource(Session session, int accountId)
 	{
 		super(session);
 		_accountId = accountId;
@@ -29,21 +30,12 @@ public class Resource extends net.xeger.rest.AbstractResource {
 		return _baseURI;
 	}	
 
-    protected URI getResourceURI(String resource, int id) {
+    protected URI getResourceURI(String relativePath) {
 		try {
-			return new URI(getBaseURI().toString() + "/" + resource + "/" + new Integer(id).toString() + URI_SUFFIX);
-		}
-		catch(URISyntaxException e) {
-			throw new Error(e);
-		}
-    }
-    
-    protected URI getCollectionURI(String collection) {
-		try {
-			return new URI(getBaseURI().toString() + "/" + collection + URI_SUFFIX);
+			return new URI(getBaseURI().toString() + "/" + relativePath);
 		}
 		catch(URISyntaxException e) {
 			throw new ProtocolError(e);
 		}    	    	
-    }	
+    }    
 }

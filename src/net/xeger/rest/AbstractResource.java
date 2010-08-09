@@ -6,15 +6,15 @@ import java.net.URI;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 abstract public class AbstractResource {
-    abstract protected URI getBaseURI();
-    abstract protected URI getResourceURI(String resource, int id);
-    abstract protected URI getCollectionURI(String collection);
+    abstract protected URI      getBaseURI();
+    abstract protected URI      getResourceURI(String relativePath);
     
     private Session _session = null;
     
@@ -23,28 +23,87 @@ abstract public class AbstractResource {
     }
     
     
-	protected JSONObject getJsonObject(String resourceName)
-		throws JSONException, IOException, RestException
+	protected JSONObject getJsonObject(String relativePath)
+		throws RestException
 	{
-		URI uri = getCollectionURI(resourceName);
+		try {
+			return new JSONObject(get(relativePath));
+		}
+		catch(JSONException e) {
+			throw new ProtocolError(e);
+		}
+	}	
+    
+	protected JSONArray getJsonArray(String relativePath)
+		throws RestException
+	{
+			try {
+				return new JSONArray(get(relativePath));
+			}
+			catch(JSONException e) {
+				throw new ProtocolError(e);
+			}
+	}	
 
-		DefaultHttpClient client    = _session.createClient();
-		
-		HttpGet        get          = new HttpGet(uri.toString());
-		HttpResponse   response;
+	public String get(String relativePath)
+		throws RestException
+	{
+		URI uri = getResourceURI(relativePath);
+
+		DefaultHttpClient client = _session.createClient();		
+		HttpGet        get       = _session.createGet(uri);
+		HttpResponse   response;		
+		String         responseText;
+		int            statusCode;
 		
 		try {
 			response = client.execute(get);
+			responseText = readResponse(response.getEntity());
+			statusCode   = response.getStatusLine().getStatusCode();
+			response.getEntity().consumeContent(); //tell the response we're finished with its data
+			
+			if(statusCode >= 400 && statusCode < 500) {
+				throw new RestAuthException("Authentication failed", statusCode);
+			}
+			else if(statusCode >= 500 && statusCode < 600) {
+				throw new RestServerException("Internal server error", statusCode);
+			}
+		}
+		catch(IOException e) {
+			throw new RestNetworkException(e);
+		}
+		
+		if(statusCode >= 200 && statusCode < 300) {
+			return responseText;
+		}
+		else {
+			throw new RestException("Unrecognized HTTP status code", statusCode);			
+		}		
+	}
+	
+	public String post(String relativePath)
+		throws RestException
+	{
+		URI uri = getResourceURI(relativePath);
+
+		DefaultHttpClient client = _session.createClient();		
+		HttpPost       post      = _session.createPost(uri);
+		HttpResponse   response;
+		String         responseText;
+		int 		   statusCode;
+		
+		try {
+			response        = client.execute(post);
+			responseText    = readResponse(response.getEntity());
+			statusCode      = response.getStatusLine().getStatusCode();
+			response.getEntity().consumeContent(); //tell the response we're finished with its data
 		}
 		catch(Exception e) {
 			throw new RestNetworkException(e);
 		}
 		
-		String responseText = readResponse(response.getEntity());			
-		int statusCode      = response.getStatusLine().getStatusCode();
-		
 		if(statusCode >= 200 && statusCode < 300) {
-			return new JSONObject(responseText);							
+			return responseText;							
 		}
 		else if(statusCode >= 400 && statusCode < 500) {
 			throw new RestAuthException("Authentication failed", statusCode);
@@ -54,43 +113,9 @@ abstract public class AbstractResource {
 		}
 		else {
 			throw new RestException("Unrecognized HTTP status code", statusCode);			
-		}
-	}	
-    
-	protected JSONArray getJsonArray(String resourceName)
-		throws JSONException, IOException, RestException
-	{
-		URI uri = getCollectionURI(resourceName);
-
-		DefaultHttpClient client    = _session.createClient();
-		
-		HttpGet        get          = new HttpGet(uri.toString());
-		HttpResponse   response;
-
-		try {
-			response = client.execute(get);
-		}
-		catch(Exception e) {
-			throw new RestNetworkException(e);
-		}
-
-		String responseText = readResponse(response.getEntity());			
-		int statusCode      = response.getStatusLine().getStatusCode();
-		
-		if(statusCode >= 200 && statusCode < 300) {
-			return new JSONArray(responseText);							
-		}
-		else if(statusCode >= 400 && statusCode < 500) {
-			throw new RestAuthException("Authentication failed", statusCode);
-		}
-		else if(statusCode >= 500 && statusCode < 600) {
-			throw new RestServerException("Internal server error", statusCode);
-		}
-		else {
-			throw new RestException("Unrecognized HTTP status code", statusCode);			
-		}
-	}	
-    
+		}		
+	}
+	
     static public String readResponse(HttpEntity entity) throws IOException
 	{
 	    String response = "";

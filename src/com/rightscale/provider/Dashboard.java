@@ -3,6 +3,8 @@ package com.rightscale.provider;
 import java.security.InvalidParameterException;
 import java.util.List;
 
+import net.xeger.rest.RestException;
+
 import org.apache.http.client.HttpClient;
 
 import com.rightscale.Settings;
@@ -32,6 +34,7 @@ import android.net.Uri;
  * Supported resources so far:
  *   - Deployment (optionally, WHERE deployment_id = x)
  *   - Server (optionally, WHERE deployment_id = x)
+ *   - Server settings (WHERE server_id = x)
  * 
  * @author tony
  * 
@@ -49,41 +52,62 @@ public class Dashboard extends ContentProvider {
 	public static final String ID   = "_id";
 	public static final String HREF = "href";
 
-	public static final String[] DEPLOYMENT_COLUMNS = DeploymentsResource.COLUMNS;
-	public static final String[] SERVER_COLUMNS     = ServersResource.COLUMNS;
+	public static final String[] DEPLOYMENT_COLUMNS     = DeploymentsResource.COLUMNS;
+	public static final String[] SERVER_COLUMNS         = ServersResource.COLUMNS;
 	public static final String[] SERVER_SETTING_COLUMNS = ServerSettingsResource.COLUMNS;
+
+	public static final String ACTION_LAUNCH    = "launch";
+	public static final String ACTION_TERMINATE = "terminate";
+	public static final String ACTION_REBOOT    = "reboot";
+
+	/*
+	 * TODO figure out how to fit this better into Android's app framework,
+	 * e.g. use a BroadcastReceiver that can handle these actions as Intents.
+	 */
+	static public void performAction(Context context, Uri uri, String action)
+		throws DashboardError
+	{
+		String mimeType = _getType(uri);
+
+		if(!mimeType.startsWith("vnd.android.cursor.item/")) {
+			throw new DashboardError("Cannot perform actions on collection resource " + uri.toString());
+		}
+		
+		List<String> pathSegments = uri.getPathSegments();
+		int id = new Integer(pathSegments.get(pathSegments.size() - 1)).intValue();
+		
+		try {
+			DashboardSession session = createSession(context);
+
+			if(mimeType.endsWith(ServersResource.MIME_TYPE)) {
+				ServersResource servers = new ServersResource(session, HARDCODED_ACCOUNT_ID);
+				
+				if(ACTION_LAUNCH.equals(action)) {
+					servers.launch(id);
+					
+				}
+				else if(ACTION_TERMINATE.equals(action)) {
+					servers.terminate(id);
+					
+				}
+				else if(ACTION_REBOOT.equals(action)) {
+					servers.reboot(id);
+				}
+			}
+			else {
+				throw new DashboardError("Cannot perform actions on unknown URI " + uri.toString());
+			}
+		}
+		catch(RestException e) {
+			Error err = new DashboardError(e);
+			err.setStackTrace(e.getStackTrace());
+			throw err;
+		}	
+	}
 	
 	@Override
 	public String getType(Uri uri) {
-		List<String> path = uri.getPathSegments();
-
-		
-		String model = path.get(0);
-		String mimePrefix, mimeType;
-
-		if (path.size() % 2 == 1) {
-			// Odd-sized paths (/deployments, /deployments/1/servers, ...) 
-			// represent a collection of resources.
-			mimePrefix = "vnd.android.cursor.dir/";
-		} else {
-			// Even-sized paths represent an individual item.
-			mimePrefix = "vnd.android.cursor.item/";
-		}
-
-		if (model.equals("deployments")) {
-			mimeType = DeploymentsResource.MIME_TYPE;
-		}
-		else if (model.equals("servers")) {
-			mimeType = ServersResource.MIME_TYPE;
-		}
-		else if (model.equals("server_settings")) {
-			mimeType = ServerSettingsResource.MIME_TYPE;
-		}
-		else {
-			throw new InvalidParameterException("Unknown URI: " + model);
-		}
-		
-		return mimePrefix + mimeType;
+		return _getType(uri);
 	}
 
 	@Override
@@ -95,9 +119,7 @@ public class Dashboard extends ContentProvider {
 	public Cursor query(Uri uri, String[] columns, String where,
 			String[] whereArgs, String sortBy) {
 		try {
-			//TODO cache the session if it becomes stateful? use a pool?
-			DashboardSession session = new DashboardSession(Settings.getEmail(getContext()), Settings.getPassword(getContext()));
-			session.login();
+			DashboardSession session = createSession(getContext());
 			
 			if (uri.equals(DeploymentsResource.CONTENT_URI)) {
 				DeploymentsResource deployments = new DeploymentsResource(session, HARDCODED_ACCOUNT_ID);
@@ -179,5 +201,46 @@ public class Dashboard extends ContentProvider {
 		//TODO cache the session if it becomes stateful? use a pool?
 		DashboardSession session = new DashboardSession(Settings.getEmail(context), Settings.getPassword(context));
 		return session.createClient();
+	}
+	
+	static public DashboardSession createSession(Context context)
+		throws RestException
+	{
+		//TODO cache the session if it becomes stateful? use a pool?
+		DashboardSession session = new DashboardSession(Settings.getEmail(context), Settings.getPassword(context));
+		session.login();
+		return session;
+	}
+	
+	static protected String _getType(Uri uri) {
+		List<String> path = uri.getPathSegments();
+
+		
+		String model = path.get(0);
+		String mimePrefix, mimeType;
+
+		if (path.size() % 2 == 1) {
+			// Odd-sized paths (/deployments, /deployments/1/servers, ...) 
+			// represent a collection of resources.
+			mimePrefix = "vnd.android.cursor.dir/";
+		} else {
+			// Even-sized paths represent an individual item.
+			mimePrefix = "vnd.android.cursor.item/";
+		}
+
+		if (model.equals("deployments")) {
+			mimeType = DeploymentsResource.MIME_TYPE;
+		}
+		else if (model.equals("servers")) {
+			mimeType = ServersResource.MIME_TYPE;
+		}
+		else if (model.equals("server_settings")) {
+			mimeType = ServerSettingsResource.MIME_TYPE;
+		}
+		else {
+			throw new InvalidParameterException("Unknown URI: " + model);
+		}
+		
+		return mimePrefix + mimeType;		
 	}
 }

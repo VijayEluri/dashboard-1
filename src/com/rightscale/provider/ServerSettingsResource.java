@@ -1,16 +1,17 @@
 package com.rightscale.provider;
 
-import java.io.IOException;
+import net.xeger.rest.ProtocolError;
+import net.xeger.rest.RestException;
+import net.xeger.rest.Session;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.database.*;
+import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
 
-import net.xeger.rest.*;
-
-public class ServerSettingsResource extends Resource {
+public class ServerSettingsResource extends DashboardResource {
 	public static final Uri CONTENT_URI =
 		Uri.withAppendedPath(Dashboard.CONTENT_URI, "server_settings");
 	public static final String MIME_TYPE = "vnd.rightscale.server_setting";
@@ -32,10 +33,15 @@ public class ServerSettingsResource extends Resource {
 	}
 
 	public Cursor showForServer(int server_id)
-	throws JSONException, IOException, RestException
+	throws RestException
 	{
-		JSONObject settings = getJsonObject("servers/" + server_id + "/settings");
-		return buildCursor(server_id, settings);
+		try {
+			JSONObject settings = getJsonObject("servers/" + server_id + "/settings.js");
+			return buildCursor(server_id, settings);
+		}
+		catch(JSONException e) {
+			throw new ProtocolError(e);
+		}
 	}
 
 
@@ -65,7 +71,14 @@ public class ServerSettingsResource extends Resource {
 		
 		boolean locked            = object.getBoolean("locked");
 		String pricing            = object.getString("pricing");
-		String datacenter         = object.getString("ec2-availability-zone");
+		
+		String datacenter;
+		if(object.has("ec2-availability-zone")) {
+			datacenter = object.getString("ec2-availability-zone");
+		}
+		else {
+			datacenter = "unknown";
+		}
 		
         row.add(id);
 		row.add(href);

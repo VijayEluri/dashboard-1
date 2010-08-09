@@ -26,4 +26,9 @@
 	<string name="show_server_info_pricing">Pricing</string>
 
 	<string name="show_server_monitoring">Server Monitoring</string>
+	
+	<string name="ssh_server">SSH</string>
+	<string name="launch_server">Launch</string>
+	<string name="terminate_server">Terminate</string>
+	<string name="reboot_server">Reboot</string>
 </resources>
