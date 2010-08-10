@@ -41,7 +41,8 @@ public class ShowServerMonitoring extends Activity {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.show_server_monitoring);
 
-		String img = "https://moo1.rightscale.com/sketchy1-110/hosts/i-07d7146d/plugins/users/views/users.png?size=thumb&period=day&tok=pWcKCpDAct4uxz1ODkmQBEg&tz=America%2FLos_Angeles";
+		//lifted from https://moo1.rightscale.com/api/acct/2951/servers/648120/monitoring.xml
+		String img = "http://moo1.rightscale.com/sketchy1-110/hosts/i-07d7146d/plugins/cpu-0/views/cpu_overview.png?size=thumb&period=day&tok=pWcKCpDAct4uxz1ODkmQBEg&tz=America%2FLos_Angeles";
 		new Thread(new LoadImage(img, new Handler())).start();
 	}
 	
@@ -89,6 +90,10 @@ public class ShowServerMonitoring extends Activity {
 			HttpGet        get          = new HttpGet(uri.toString());
 			HttpResponse   response;		
 
+			get.addHeader("Accept", "application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
+			get.addHeader("Host", "moo1.rightscale.com");
+			//get.addHeader("User-Agent", "Tonyzilla");
+			
 			response = client.execute(get);
 			
 			int status = response.getStatusLine().getStatusCode();
