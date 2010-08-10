@@ -77,7 +77,7 @@ public class ServerSettingsResource extends DashboardResource {
 			datacenter = object.getString("ec2-availability-zone");
 		}
 		else {
-			datacenter = "unknown";
+			datacenter = "";
 		}
 		
         row.add(id);

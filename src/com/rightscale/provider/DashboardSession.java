@@ -36,11 +36,14 @@ public class DashboardSession implements Session {
 
     public HttpGet createGet(URI uri) {
     	HttpGet get = new HttpGet(uri.toString());
+		get.addHeader("Host", uri.getAuthority());
+		get.addHeader("Accept", "application/json,text/json,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
+		get.addHeader("User-Agent", "com.rightscale.provider");
     	get.addHeader("X-API-Version", "1.0");
     	return get;
     }
     
-     public HttpPost createPost(URI uri) {
+    public HttpPost createPost(URI uri) {
     	HttpPost post = new HttpPost(uri);
     	post.addHeader("X-API-Version", "1.0");
     	return post;

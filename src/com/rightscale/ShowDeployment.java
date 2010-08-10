@@ -5,8 +5,6 @@ import java.util.List;
 import net.xeger.rest.ui.ContentTransfer;
 
 import com.rightscale.provider.Dashboard;
-import com.rightscale.provider.DashboardError;
-
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;

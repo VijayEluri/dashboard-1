@@ -48,13 +48,15 @@ public class Dashboard extends ContentProvider {
 	public static final Uri DEPLOYMENTS_URI     = DeploymentsResource.CONTENT_URI;
 	public static final Uri SERVERS_URI         = ServersResource.CONTENT_URI;
 	public static final Uri SERVER_SETTINGS_URI = ServerSettingsResource.CONTENT_URI;
+	public static final Uri SERVER_MONITORS_URI = ServerMonitorsResource.CONTENT_URI;
 	
 	public static final String ID   = "_id";
 	public static final String HREF = "href";
 
-	public static final String[] DEPLOYMENT_COLUMNS     = DeploymentsResource.COLUMNS;
-	public static final String[] SERVER_COLUMNS         = ServersResource.COLUMNS;
-	public static final String[] SERVER_SETTING_COLUMNS = ServerSettingsResource.COLUMNS;
+	public static final String[] DEPLOYMENT_COLUMNS      = DeploymentsResource.COLUMNS;
+	public static final String[] SERVER_COLUMNS          = ServersResource.COLUMNS;
+	public static final String[] SERVER_SETTING_COLUMNS  = ServerSettingsResource.COLUMNS;
+	public static final String[] SERVER_MONITORS_COLUMNS = ServerMonitorsResource.COLUMNS;
 
 	public static final String ACTION_LAUNCH    = "launch";
 	public static final String ACTION_TERMINATE = "terminate";
@@ -162,8 +164,19 @@ public class Dashboard extends ContentProvider {
 				}
 				else {
 					throw new DashboardError("Cannot query server_settings without specifying server_id in where-clause");
+				}				
+			}
+			else if(uri.equals(ServerMonitorsResource.CONTENT_URI)) {
+				ServerMonitorsResource serverMonitors = new ServerMonitorsResource(session, HARDCODED_ACCOUNT_ID);
+
+				if(where != null && where.equals("server_id = ?")) {
+					//SELECT ... FROM server_monitors WHERE server_id = ?
+					int serverId = new Integer(whereArgs[0]).intValue();
+					return serverMonitors.showForServer(serverId);
 				}
-				
+				else {
+					throw new DashboardError("Cannot query server_monitors without specifying server_id in where-clause");
+				}								
 			}
 			else {
 				throw new DashboardError("Unknown content URI " + uri);
@@ -197,9 +210,10 @@ public class Dashboard extends ContentProvider {
 		return 0;
 	}
 	
-	static public HttpClient createHttpClient(Context context) {
+	static public HttpClient createClient(Context context) {
 		//TODO cache the session if it becomes stateful? use a pool?
 		DashboardSession session = new DashboardSession(Settings.getEmail(context), Settings.getPassword(context));
+		//notice that we don't login the session (on purpose)
 		return session.createClient();
 	}
 	

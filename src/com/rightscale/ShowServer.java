@@ -21,12 +21,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.GridView;
-import android.widget.ListAdapter;
 import android.widget.TabHost;
-import android.widget.TextView;
-import android.widget.TabHost.TabContentFactory;
 
 public class ShowServer extends TabActivity implements ContentConsumer, ContentProducer {
 	private String _lastKnownServerState = null;
