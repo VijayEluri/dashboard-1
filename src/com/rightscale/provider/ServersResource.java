@@ -3,7 +3,6 @@ package com.rightscale.provider;
 import android.database.*;
 import android.net.Uri;
 
-import java.io.*;
 import org.json.*;
 
 import net.xeger.rest.*;

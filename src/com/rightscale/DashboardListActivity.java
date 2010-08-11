@@ -48,7 +48,7 @@ public abstract class DashboardListActivity extends ListActivity implements Cont
     		return false;
     	}
     }
-        
+
 	abstract public Cursor produceContent(Object tag);
 	abstract public void consumeContent(Cursor c, Object tag);
 

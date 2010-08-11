@@ -18,6 +18,7 @@ public class IndexDeployments extends DashboardListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.index_deployments);
+        setTitle(R.string.rightscale_deployments);
     }
 
     @Override
