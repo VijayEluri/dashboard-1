@@ -5,7 +5,15 @@
   android:layout_height="fill_parent"
   android:orientation="horizontal">
 
-  <TextView android:id="@+id/server_name" android:layout_alignParentLeft="true" android:layout_width="fill_parent" android:layout_height="wrap_content" />  
-  <ImageView android:id="@+id/server_state" android:layout_alignParentRight="true" android:layout_width="24sp" android:layout_height="24sp" />
+  <TextView android:id="@+id/server_name"
+ 		android:layout_alignParentLeft="true"
+	  	android:layout_width="fill_parent" android:layout_height="fill_parent"
+    	android:paddingTop="2dip" android:paddingBottom="3dip"
+	  	android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+  <ImageView android:id="@+id/server_state"
+		android:layout_alignParentRight="true"
+		android:layout_width="32sp" android:layout_height="32sp"
+		android:padding="4sp" />
 
 </RelativeLayout>

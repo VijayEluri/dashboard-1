@@ -12,7 +12,7 @@ import android.widget.SimpleCursorAdapter;
 	
 public class IndexDeployments extends DashboardListActivity {
 	private static String[] FROM = {"Nickname"};
-	private static int[]    TO   = {R.id.deployment_name};
+	private static int[]    TO   = {android.R.id.text1};
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,7 @@ public class IndexDeployments extends DashboardListActivity {
     
     public void consumeContent(Cursor cursor, Object tag) {
 		startManagingCursor(cursor);
-    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.deployment_item, cursor, FROM, TO);
+    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, cursor, FROM, TO);
     	setListAdapter(adapter);
     }    
 }

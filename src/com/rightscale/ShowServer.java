@@ -117,7 +117,7 @@ public class ShowServer extends TabActivity implements ContentConsumer, ContentP
     
 	public void consumeContent(Cursor c, Object tag) {
 		c.moveToFirst();
-		int colState = c.getColumnIndex("state");
+		int colState = c.getColumnIndexOrThrow("state");
 		_lastKnownServerState = c.getString(colState);    				
 	}
 

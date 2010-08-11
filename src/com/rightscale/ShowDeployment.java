@@ -64,7 +64,7 @@ public class ShowDeployment extends DashboardListActivity {
 	    	setListAdapter(adapter);
     	}
     	else if(tag == DEPLOYMENT_TITLE) {
-	    	int col = cursor.getColumnIndex("nickname");
+	    	int col = cursor.getColumnIndexOrThrow("nickname");
 	    	cursor.moveToNext();
 	    	String nickname = cursor.getString(col);
 	    	this.setTitle(nickname);

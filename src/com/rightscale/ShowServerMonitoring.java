@@ -33,24 +33,34 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 public class ShowServerMonitoring extends Activity implements ContentConsumer, ContentProducer {
-	static public final String[] SIZES   = {"thumb"};
-	static public final String[] PERIODS = {"day"};
+	public static final String THUMB = "thumb";
+	public static final String SMALL = "small";
+	public static final String LARGE = "large";
+
+	public static final String DAY   = "day";
+	public static final String NOW   = "now";
+
+	static public final String[] SIZES   = {THUMB, SMALL, LARGE};
+	static public final String[] PERIODS = {DAY, NOW};
+	
+	static public final String DEFAULT_SIZE   = SMALL;
+	static public final String DEFAULT_PERIOD = NOW;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.show_server_monitoring);
 
-		//lifted from https://moo1.rightscale.com/api/acct/2951/servers/648120/monitoring.xml
-		//String img = "http://moo1.rightscale.com/sketchy1-110/hosts/i-07d7146d/plugins/cpu-0/views/cpu_overview.png?size=thumb&period=day&tok=pWcKCpDAct4uxz1ODkmQBEg&tz=America%2FLos_Angeles";
-		//showGraph(img, "thumb", "day");
 		ContentTransfer.load(this, this, new Handler());
 	}
 	
@@ -93,6 +103,8 @@ public class ShowServerMonitoring extends Activity implements ContentConsumer, C
 		
 		return queryParams;
 	}
+
+	private Cursor _cursor;
 	
     private String getServerId() {
         Intent intent      = getIntent();
@@ -101,6 +113,37 @@ public class ShowServerMonitoring extends Activity implements ContentConsumer, C
 		return path.get(path.size() - 1);             	
     }
     
+	public void consumeContent(Cursor cursor, Object tag) {
+		_cursor = cursor;
+		startManagingCursor(cursor);
+    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, cursor, FROM, TO);
+    	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    	Spinner spinner = (Spinner)findViewById(R.id.show_server_monitoring_spinner);
+    	spinner.setAdapter(adapter);
+    	spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				int colHref = _cursor.getColumnIndexOrThrow("href");
+				_cursor.moveToPosition(position);
+				String href = _cursor.getString(colHref);				
+				showGraph(href, DEFAULT_SIZE, DEFAULT_PERIOD);
+			}
+
+			public void onNothingSelected(AdapterView<?> arg0) {
+				//TODO: clear the monitoring graph (fade out, oooh!)
+			}
+    	});
+	}
+
+	public void consumeContentError(Throwable t, Object tag) {
+		Settings.handleError(t, this);
+		finish();
+	}
+
+	public Cursor produceContent(Object tag) {
+    	ContentResolver cr = getContentResolver();
+		String[] whereArgs = { getServerId() };    	
+    	return cr.query(Dashboard.SERVER_MONITORS_URI, Dashboard.SERVER_MONITORS_COLUMNS, "server_id = ?", whereArgs, null);
+	}
     protected void consumeImage(Bitmap bitmap) {
     	ImageView view = (ImageView)findViewById(R.id.show_server_monitoring_graph);
     	
@@ -192,23 +235,5 @@ public class ShowServerMonitoring extends Activity implements ContentConsumer, C
     }
 
     static private final String[] FROM = {"graph_name"};
-    static private final int[]    TO   = {R.id.graph_name};
-    
-	public void consumeContent(Cursor c, Object tag) {
-    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.server_monitor_item, c, FROM, TO);
-    	adapter.setDropDownViewResource(R.layout.server_monitor_item);
-    	Spinner spinner = (Spinner)findViewById(R.id.show_server_monitoring_spinner);
-    	spinner.setAdapter(adapter);
-	}
-
-	public void consumeContentError(Throwable t, Object tag) {
-		Settings.handleError(t, this);
-		finish();
-	}
-
-	public Cursor produceContent(Object tag) {
-    	ContentResolver cr = getContentResolver();
-		String[] whereArgs = { getServerId() };    	
-    	return cr.query(Dashboard.SERVER_MONITORS_URI, Dashboard.SERVER_MONITORS_COLUMNS, "server_id = ?", whereArgs, null);
-	}
+    static private final int[]    TO   = {android.R.id.text1};    
 }

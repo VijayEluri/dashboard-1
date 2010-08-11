@@ -6,5 +6,5 @@
   android:orientation="vertical"
   android:padding="1dp">
 <Spinner android:id="@+id/show_server_monitoring_spinner" android:layout_width="fill_parent" android:layout_height="wrap_content"></Spinner>
-<ImageView android:id="@+id/show_server_monitoring_graph" android:layout_width="fill_parent" android:layout_height="fill_parent" android:src="@drawable/icon"></ImageView>
+<ImageView android:id="@+id/show_server_monitoring_graph" android:layout_width="fill_parent" android:layout_height="fill_parent"></ImageView>
 </LinearLayout>

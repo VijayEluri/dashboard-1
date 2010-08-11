@@ -37,8 +37,8 @@ public class ShowServerInfo extends Activity implements ContentConsumer, Content
     	
     	if(SERVER == tag) {
     		cursor.moveToFirst();
-    		int colNickname   = cursor.getColumnIndex("nickname");
-    		int colState = cursor.getColumnIndex("state");
+    		int colNickname   = cursor.getColumnIndexOrThrow("nickname");
+    		int colState = cursor.getColumnIndexOrThrow("state");
 
     		view = (TextView)findViewById(R.id.show_server_info_name);
     		view.setText(cursor.getString(colNickname));
@@ -48,10 +48,10 @@ public class ShowServerInfo extends Activity implements ContentConsumer, Content
     	}
     	else if(SERVER_SETTINGS == tag) {
     		cursor.moveToFirst();
-    		int colAddress    = cursor.getColumnIndex("ip_address");
-    		int colCloudId    = cursor.getColumnIndex("cloud_id");
-    		int colDatacenter = cursor.getColumnIndex("datacenter");
-    		int colPricing    = cursor.getColumnIndex("pricing");
+    		int colAddress    = cursor.getColumnIndexOrThrow("ip_address");
+    		int colCloudId    = cursor.getColumnIndexOrThrow("cloud_id");
+    		int colDatacenter = cursor.getColumnIndexOrThrow("datacenter");
+    		int colPricing    = cursor.getColumnIndexOrThrow("pricing");
     		
     		view = (TextView)findViewById(R.id.show_server_info_address);
     		view.setText(cursor.getString(colAddress));
