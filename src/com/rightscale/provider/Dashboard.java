@@ -102,7 +102,6 @@ public class Dashboard extends ContentProvider {
 		}
 		catch(RestException e) {
 			Error err = new DashboardError(e);
-			err.setStackTrace(e.getStackTrace());
 			throw err;
 		}	
 	}
@@ -187,7 +186,6 @@ public class Dashboard extends ContentProvider {
 		}
 		catch (Exception e) {
 			Error err = new DashboardError(e);
-			err.setStackTrace(e.getStackTrace());
 			throw err;
 		}
 	}

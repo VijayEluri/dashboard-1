@@ -26,9 +26,15 @@
 	<string name="show_server_info_datacenter">Datacenter</string>
 	<string name="show_server_info_pricing">Pricing</string>
 
-<!--  Menu strings ("main" menu) -->
+<!--  Menu strings (Show Server menu) -->
 	<string name="ssh_server">SSH</string>
 	<string name="launch_server">Launch</string>
 	<string name="terminate_server">Terminate</string>
 	<string name="reboot_server">Reboot</string>
+
+<!--  App-wide dialog -->
+	<string name="auth_error_dialog_title">Not Authorized</string>
+	<string name="auth_error_dialog_message">Your request was denied, most likely because your username and password are incorrect. Please double-check them.</string>
+	<string name="error_dialog_title">Error</string>
+	<string name="error_dialog_message">Oops! An error has occurred. Sorry about that!</string>
 </resources>
