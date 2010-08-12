@@ -1,7 +1,7 @@
 package com.rightscale;
 
 import net.xeger.rest.RestAuthException;
-import net.xeger.rest.RestException;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;

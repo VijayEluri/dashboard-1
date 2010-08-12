@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 public class ShowServerInfo extends AbstractServerActivity {
-	private Cursor _currentServerSettings = null;
-	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
