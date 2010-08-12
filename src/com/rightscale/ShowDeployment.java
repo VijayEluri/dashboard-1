@@ -2,9 +2,8 @@ package com.rightscale;
 
 import java.util.List;
 
+import net.xeger.rest.RestException;
 import net.xeger.rest.ui.ContentTransfer;
-
-import com.rightscale.provider.Dashboard;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,15 +13,20 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.widget.*;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+
+import com.rightscale.provider.Dashboard;
 
 /**
  * Activity for viewing the servers in a Deployment. This activity expects to be started with an Intent
  * whose data points to the content-URI of the deployment the user is interested in.
  */
 public class ShowDeployment extends DashboardListActivity {
-	private static final Object SERVERS          = "servers";
-	private static final Object DEPLOYMENT_TITLE = "deployment title";
+	private static final String SERVERS          = "servers";
+	private static final String DEPLOYMENT_TITLE = "deployment title";
 	
 	private static String[] FROM = {"Nickname", "State"};
 	private static int[]    TO   = {R.id.server_name, R.id.server_state};
@@ -42,7 +46,9 @@ public class ShowDeployment extends DashboardListActivity {
     	startActivity(i);
     }
 
-    public Cursor produceContent(Object tag) {
+    public Cursor produceContent(String tag)
+    	throws RestException
+    {
     	ContentResolver cr = getContentResolver();
 		String[] whereArgs = { getDeploymentId() };
     	
@@ -57,7 +63,7 @@ public class ShowDeployment extends DashboardListActivity {
     	}
     }
     
-    public void consumeContent(Cursor cursor, Object tag) {
+    public void consumeContent(Cursor cursor, String tag) {
     	if(tag == SERVERS) {
 	    	startManagingCursor(cursor);
 	    	ServerItemAdapter adapter = new ServerItemAdapter(this, R.layout.server_item, cursor, FROM, TO);

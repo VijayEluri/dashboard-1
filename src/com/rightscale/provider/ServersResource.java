@@ -1,11 +1,16 @@
 package com.rightscale.provider;
 
-import android.database.*;
+import net.xeger.rest.ProtocolError;
+import net.xeger.rest.RestException;
+import net.xeger.rest.Session;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
-
-import org.json.*;
-
-import net.xeger.rest.*;
 
 class ServersResource extends DashboardResource {
 	public static final Uri CONTENT_URI =

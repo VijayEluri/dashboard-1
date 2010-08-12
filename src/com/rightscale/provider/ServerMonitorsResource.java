@@ -1,12 +1,13 @@
 package com.rightscale.provider;
 
+import net.xeger.rest.ProtocolError;
+import net.xeger.rest.RestException;
+import net.xeger.rest.Session;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import net.xeger.rest.ProtocolError;
-import net.xeger.rest.RestException;
-import net.xeger.rest.Session;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;

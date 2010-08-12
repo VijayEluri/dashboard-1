@@ -2,10 +2,6 @@ package com.rightscale;
 
 import net.xeger.rest.RestAuthException;
 import net.xeger.rest.RestException;
-
-import com.rightscale.provider.DashboardError;
-
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +10,8 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.rightscale.provider.DashboardError;
 
 public class Settings extends PreferenceActivity {
 	public static final String ACTION_NOTIFY_ERROR = "notify_error";

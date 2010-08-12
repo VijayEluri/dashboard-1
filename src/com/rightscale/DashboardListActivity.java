@@ -1,8 +1,9 @@
 package com.rightscale;
 
-import net.xeger.rest.ui.*;
-
-import com.rightscale.provider.Dashboard;
+import net.xeger.rest.RestException;
+import net.xeger.rest.ui.ContentConsumer;
+import net.xeger.rest.ui.ContentProducer;
+import net.xeger.rest.ui.ContentTransfer;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,6 +12,8 @@ import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+
+import com.rightscale.provider.Dashboard;
 
 public abstract class DashboardListActivity extends ListActivity implements ContentProducer, ContentConsumer {
     @Override
@@ -49,10 +52,10 @@ public abstract class DashboardListActivity extends ListActivity implements Cont
     	}
     }
 
-	abstract public Cursor produceContent(Object tag);
-	abstract public void consumeContent(Cursor c, Object tag);
+	abstract public Cursor produceContent(String tag) throws RestException;
+	abstract public void consumeContent(Cursor c, String tag);
 
-	public void consumeContentError(Throwable t, Object tag) {
+	public void consumeContentError(Throwable t, String tag) {
 		Settings.handleError(t, this);
 		finish();
 	}	

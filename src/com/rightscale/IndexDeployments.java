@@ -1,14 +1,15 @@
 package com.rightscale;
 
-import com.rightscale.provider.Dashboard;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.*;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+
+import com.rightscale.provider.Dashboard;
 	
 public class IndexDeployments extends DashboardListActivity {
 	private static String[] FROM = {"Nickname"};
@@ -28,12 +29,12 @@ public class IndexDeployments extends DashboardListActivity {
     	startActivity(i);
     }
     
-    public Cursor produceContent(Object tag) {
+    public Cursor produceContent(String tag) {
 		ContentResolver cr = getContentResolver();
 		return cr.query(Dashboard.DEPLOYMENTS_URI, Dashboard.DEPLOYMENT_COLUMNS, null, null, null);
     }
     
-    public void consumeContent(Cursor cursor, Object tag) {
+    public void consumeContent(Cursor cursor, String tag) {
 		startManagingCursor(cursor);
     	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, cursor, FROM, TO);
     	setListAdapter(adapter);

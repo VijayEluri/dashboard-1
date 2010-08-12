@@ -3,35 +3,27 @@ package com.rightscale;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.xeger.rest.RestException;
 import net.xeger.rest.RestServerException;
 import net.xeger.rest.Session;
-import net.xeger.rest.ui.ContentConsumer;
-import net.xeger.rest.ui.ContentProducer;
 import net.xeger.rest.ui.ContentTransfer;
+import net.xeger.rest.ui.ImageConsumer;
+import net.xeger.rest.ui.ImageProducer;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.rightscale.provider.Dashboard;
-
-import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -39,7 +31,11 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 
-public class ShowServerMonitoring extends Activity implements ContentConsumer, ContentProducer {
+import com.rightscale.provider.Dashboard;
+
+public class ShowServerMonitoring extends AbstractServerActivity implements ImageProducer, ImageConsumer {
+	public static final String MONITORS = "monitors";
+	
 	public static final String THUMB = "thumb";
 	public static final String SMALL = "small";
 	public static final String LARGE = "large";
@@ -52,13 +48,15 @@ public class ShowServerMonitoring extends Activity implements ContentConsumer, C
 	
 	static public final String DEFAULT_SIZE   = SMALL;
 	static public final String DEFAULT_PERIOD = NOW;
+
+	private URI _selectedGraphUri = null;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.show_server_monitoring);
 
-		ContentTransfer.load(this, this, new Handler());
+		ContentTransfer.load(this, this, new Handler(), MONITORS);
 	}
 	
 	public void showGraph(String template, String size, String period) {
@@ -77,13 +75,14 @@ public class ShowServerMonitoring extends Activity implements ContentConsumer, C
 
 		int qmark = template.indexOf('?'); 
 		if(qmark < 0) {
-			throw new IllegalArgumentException("URI does not contain ? query-string marker: " + template);
+			throw new IllegalArgumentException("URI does not contain query-string marker: " + template);
 			
 		}
 		
 		String prefix = template.substring(0, qmark);
-		uri = URI.create(prefix + '?' + qstr);		
-		new Thread(new LoadImage(uri, new Handler())).start();
+    	//TODO thread safety
+		_selectedGraphUri = URI.create(prefix + '?' + qstr);
+		ContentTransfer.loadImage(this, this, new Handler());
 	}
 	
 	private Map<String, String> parseQueryParams(URI uri) {
@@ -103,45 +102,45 @@ public class ShowServerMonitoring extends Activity implements ContentConsumer, C
 
 	private Cursor _cursor;
 	
-    private String getServerId() {
-        Intent intent      = getIntent();
-    	Uri contentUri      = intent.getData();
-		List<String> path   = contentUri.getPathSegments();
-		return path.get(path.size() - 1);             	
-    }
-    
-	public void consumeContent(Cursor cursor, Object tag) {
-		_cursor = cursor;
-		startManagingCursor(cursor);
-    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, cursor, FROM, TO);
-    	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    	Spinner spinner = (Spinner)findViewById(R.id.show_server_monitoring_spinner);
-    	spinner.setAdapter(adapter);
-    	spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				int colHref = _cursor.getColumnIndexOrThrow("href");
-				_cursor.moveToPosition(position);
-				String href = _cursor.getString(colHref);				
-				showGraph(href, DEFAULT_SIZE, DEFAULT_PERIOD);
-			}
+	public void consumeContent(Cursor cursor, String tag) {
+		if(tag == MONITORS) {
+			_cursor = cursor;
+			startManagingCursor(cursor);
+	    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, cursor, FROM, TO);
+	    	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	    	Spinner spinner = (Spinner)findViewById(R.id.show_server_monitoring_spinner);
+	    	spinner.setAdapter(adapter);
+	    	spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+				public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+					int colHref = _cursor.getColumnIndexOrThrow("href");
+					_cursor.moveToPosition(position);
+					String href = _cursor.getString(colHref);				
+					showGraph(href, DEFAULT_SIZE, DEFAULT_PERIOD);
+				}
+	
+				public void onNothingSelected(AdapterView<?> arg0) {
+					//TODO: clear the monitoring graph (fade out, oooh!)
+				}
+	    	});
+		}		
 
-			public void onNothingSelected(AdapterView<?> arg0) {
-				//TODO: clear the monitoring graph (fade out, oooh!)
-			}
-    	});
+		super.consumeContent(cursor, tag);		
 	}
 
-	public void consumeContentError(Throwable t, Object tag) {
-		Settings.handleError(t, this);
-		finish();
+	public Cursor produceContent(String tag)
+		throws RestException
+	{
+		if(tag == MONITORS) {
+	    	ContentResolver cr = getContentResolver();
+			String[] whereArgs = { getServerId() };    	
+	    	return cr.query(Dashboard.SERVER_MONITORS_URI, Dashboard.SERVER_MONITORS_COLUMNS, "server_id = ?", whereArgs, null);			
+		}
+		else {
+			return super.produceContent(tag);
+		}
 	}
-
-	public Cursor produceContent(Object tag) {
-    	ContentResolver cr = getContentResolver();
-		String[] whereArgs = { getServerId() };    	
-    	return cr.query(Dashboard.SERVER_MONITORS_URI, Dashboard.SERVER_MONITORS_COLUMNS, "server_id = ?", whereArgs, null);
-	}
-    protected void consumeImage(Bitmap bitmap) {
+	
+    public void consumeImage(Bitmap bitmap, String tag) {
     	ImageView view = (ImageView)findViewById(R.id.show_server_monitoring_graph);
     	
     	if(bitmap != null) {
@@ -152,21 +151,30 @@ public class ShowServerMonitoring extends Activity implements ContentConsumer, C
     	}
     }
 
-    private Bitmap produceImage(URI uri)
-    	throws IOException, URISyntaxException, RestException
-    {       
+    public Bitmap produceImage(String tag) throws RestException
+    {
+    	//TODO thread safety
+    	if(_selectedGraphUri == null) {
+    		return null;
+    	}
+    	
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 1;
 
-        Bitmap bitmap = null;
-        InputStream in = null;       
-        in = openHttpConnection(uri);
-        bitmap = BitmapFactory.decodeStream(in, null, options);
-        in.close();
-        return bitmap;               
+        try {
+	        Bitmap bitmap = null;
+	        InputStream in = null;       
+	        in = openHttpConnection(_selectedGraphUri);
+	        bitmap = BitmapFactory.decodeStream(in, null, options);
+	        in.close();
+	        return bitmap;
+        }
+        catch(IOException e) {
+        	throw new RestException(e);
+        }
     }
 
-    private InputStream openHttpConnection(URI uri)
+    public InputStream openHttpConnection(URI uri)
     	throws RestException
     {
 		try {
@@ -195,42 +203,10 @@ public class ShowServerMonitoring extends Activity implements ContentConsumer, C
 
 	}
     
-    class ConsumeImage implements Runnable {
-    	Bitmap _bitmap;
-    	
-    	public ConsumeImage(Bitmap bitmap) {
-    		_bitmap = bitmap;
-    	}
-    	
-    	public void run() {
-    		consumeImage(_bitmap);
-    	}
-    }
-    
-    class LoadImage implements Runnable {
-    	URI  _uri;
-    	Handler _handler;
-    	
-    	public LoadImage(URI uri, Handler handler) {
-    		_uri     = uri;
-    		_handler = handler;
-    	}
-    	
-    	public void run() {
-    		try {
-    			Bitmap bitmap = produceImage(_uri);
-        		ConsumeImage callback = new ConsumeImage(bitmap);
-        		_handler.post(callback);
-    		}
-    		catch(Exception e) {
-    			Log.e("ShowServerMonitoring", e.toString());
-    			ConsumeImage blank = new ConsumeImage(null);
-    			_handler.post(blank);
-    		}
-    		
-    	}
-    }
-
     static private final String[] FROM = {"graph_name"};
-    static private final int[]    TO   = {android.R.id.text1};    
+    static private final int[]    TO   = {android.R.id.text1};
+
+	public void consumeImageError(Throwable error, String tag) {
+		consumeContentError(error, tag);
+	}    
 }

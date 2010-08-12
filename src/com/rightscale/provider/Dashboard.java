@@ -7,13 +7,13 @@ import net.xeger.rest.RestException;
 
 import org.apache.http.client.HttpClient;
 
-import com.rightscale.Settings;
-
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+
+import com.rightscale.Settings;
 
 /**
  * The Android content provider used to retrieve REST resources from the
