@@ -73,6 +73,7 @@ public class Settings extends PreferenceActivity {
 			Intent intent = new Intent(Settings.ACTION_NOTIFY_ERROR, null, context, Settings.class);
 			intent.putExtra("error", t);
 			
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);			
 			context.startActivity(intent);
 		}
 		else if(t instanceof RuntimeException) {

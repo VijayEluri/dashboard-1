@@ -34,7 +34,7 @@ class ServerTemplateExecutablesResource extends DashboardResource {
 		throws RestException
 	{
 		try {
-			return buildCursor( serverTemplateId, getJsonArray("servers/" + serverTemplateId + "/executables.js") );
+			return buildCursor( serverTemplateId, getJsonArray("server_templates/" + serverTemplateId + "/executables.js") );
 		}
 		catch(JSONException e) {
 			throw new ProtocolError(e);

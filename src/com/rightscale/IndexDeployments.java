@@ -11,7 +11,7 @@ import android.widget.SimpleCursorAdapter;
 
 import com.rightscale.provider.Dashboard;
 	
-public class IndexDeployments extends DashboardListActivity {
+public class IndexDeployments extends AbstractDashboardActivity {
 	private static String[] FROM = {"Nickname"};
 	private static int[]    TO   = {android.R.id.text1};
 	

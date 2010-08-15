@@ -15,7 +15,7 @@ import android.view.MenuItem;
 
 import com.rightscale.provider.Dashboard;
 
-public abstract class DashboardListActivity extends ListActivity implements ContentProducer, ContentConsumer {
+public abstract class AbstractDashboardActivity extends ListActivity implements ContentProducer, ContentConsumer {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        

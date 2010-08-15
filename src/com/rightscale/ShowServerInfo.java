@@ -9,7 +9,7 @@ public class ShowServerInfo extends AbstractServerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.show_server_info);
-            }
+    }
 
     public void consumeContent(Cursor cursor, String tag) {
     	super.consumeContent(cursor, tag);

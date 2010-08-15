@@ -23,11 +23,14 @@ public class ShowServer extends TabActivity {
         tabSpec = tabHost.newTabSpec("info").setIndicator(null, res.getDrawable(android.R.drawable.ic_menu_info_details)).setContent(intent); 
         tabHost.addTab(tabSpec);
         
+        intent = new Intent(this, ShowServerScripts.class);
+        intent.setData(getIntent().getData());
+        tabSpec = tabHost.newTabSpec("scripts").setIndicator(null, res.getDrawable(android.R.drawable.ic_menu_manage)).setContent(intent); 
+        tabHost.addTab(tabSpec);
+        
         intent = new Intent(this, ShowServerMonitoring.class);
         intent.setData(getIntent().getData());
         tabSpec = tabHost.newTabSpec("monitoring").setIndicator(null, res.getDrawable(android.R.drawable.ic_menu_gallery)).setContent(intent); 
         tabHost.addTab(tabSpec);
     }
-
-
 }
