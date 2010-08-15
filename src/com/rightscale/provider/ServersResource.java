@@ -35,7 +35,7 @@ class ServersResource extends DashboardResource {
 		throws RestException
 	{
 		try {
-			return buildCursor( getJsonArray("servers") );
+			return buildCursor( getJsonArray("servers.js") );
 		}
 		catch(JSONException e) {
 			throw new ProtocolError(e);

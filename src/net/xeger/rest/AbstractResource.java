@@ -15,7 +15,7 @@ import org.json.JSONObject;
 
 abstract public class AbstractResource {
     abstract protected URI      getBaseURI();
-    abstract protected URI      getResourceURI(String relativePath);
+    abstract protected URI      getResourceURI(String relativePath, String query);
     
     private Session _session = null;
     
@@ -23,33 +23,45 @@ abstract public class AbstractResource {
     	_session = session;
     }
     
+
+    protected JSONObject getJsonObject(String relativePath)
+    	throws RestException
+    {
+    	return getJsonObject(relativePath, null);
+    }
     
-	protected JSONObject getJsonObject(String relativePath)
+	protected JSONObject getJsonObject(String relativePath, String query)
 		throws RestException
 	{
 		try {
-			return new JSONObject(get(relativePath));
+			return new JSONObject(get(relativePath, query));
 		}
 		catch(JSONException e) {
 			throw new ProtocolError(e);
 		}
 	}	
     
-	protected JSONArray getJsonArray(String relativePath)
+    protected JSONArray getJsonArray(String relativePath)
+	throws RestException
+{
+	return getJsonArray(relativePath, null);
+}
+
+	protected JSONArray getJsonArray(String relativePath, String query)
 		throws RestException
 	{
 			try {
-				return new JSONArray(get(relativePath));
+				return new JSONArray(get(relativePath, query));
 			}
 			catch(JSONException e) {
 				throw new ProtocolError(e);
 			}
 	}	
 
-	public String get(String relativePath)
+	public String get(String relativePath, String query)
 		throws RestException
 	{
-		URI uri = getResourceURI(relativePath);
+		URI uri = getResourceURI(relativePath, query);
 
 		DefaultHttpClient client = _session.createClient();		
 		HttpGet        get       = _session.createGet(uri);
@@ -85,7 +97,7 @@ abstract public class AbstractResource {
 	public String post(String relativePath)
 		throws RestException
 	{
-		URI uri = getResourceURI(relativePath);
+		URI uri = getResourceURI(relativePath, null);
 
 		DefaultHttpClient client = _session.createClient();		
 		HttpPost       post      = _session.createPost(uri);

@@ -30,9 +30,14 @@ public class DashboardResource extends net.xeger.rest.AbstractResource {
 		return _baseURI;
 	}	
 
-    protected URI getResourceURI(String relativePath) {
+    protected URI getResourceURI(String relativePath, String query) {
 		try {
-			return new URI(getBaseURI().toString() + "/" + relativePath);
+			if(query != null) {
+				return new URI(getBaseURI().toString() + "/" + relativePath + "?" + query);				
+			}
+			else {
+				return new URI(getBaseURI().toString() + "/" + relativePath);
+			}
 		}
 		catch(URISyntaxException e) {
 			throw new ProtocolError(e);

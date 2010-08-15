@@ -45,18 +45,22 @@ public class Dashboard extends ContentProvider {
 	public static final Uri CONTENT_URI = 
 		Uri.parse("content://com.rightscale.provider.dashboard");
 	
-	public static final Uri DEPLOYMENTS_URI     = DeploymentsResource.CONTENT_URI;
-	public static final Uri SERVERS_URI         = ServersResource.CONTENT_URI;
-	public static final Uri SERVER_SETTINGS_URI = ServerSettingsResource.CONTENT_URI;
-	public static final Uri SERVER_MONITORS_URI = ServerMonitorsResource.CONTENT_URI;
+	public static final Uri DEPLOYMENTS_URI                 = DeploymentsResource.CONTENT_URI;
+	public static final Uri SERVERS_URI                     = ServersResource.CONTENT_URI;
+	public static final Uri SERVER_SETTINGS_URI             = ServerSettingsResource.CONTENT_URI;
+	public static final Uri SERVER_MONITORS_URI             = ServerMonitorsResource.CONTENT_URI;
+	public static final Uri SERVER_TEMPLATES_URI            = ServerTemplatesResource.CONTENT_URI;
+	public static final Uri SERVER_TEMPLATE_EXECUTABLES_URI = ServerTemplateExecutablesResource.CONTENT_URI;
 	
 	public static final String ID   = "_id";
 	public static final String HREF = "href";
 
-	public static final String[] DEPLOYMENT_COLUMNS      = DeploymentsResource.COLUMNS;
-	public static final String[] SERVER_COLUMNS          = ServersResource.COLUMNS;
-	public static final String[] SERVER_SETTING_COLUMNS  = ServerSettingsResource.COLUMNS;
-	public static final String[] SERVER_MONITORS_COLUMNS = ServerMonitorsResource.COLUMNS;
+	public static final String[] DEPLOYMENT_COLUMNS                 = DeploymentsResource.COLUMNS;
+	public static final String[] SERVER_COLUMNS                     = ServersResource.COLUMNS;
+	public static final String[] SERVER_SETTING_COLUMNS             = ServerSettingsResource.COLUMNS;
+	public static final String[] SERVER_MONITORS_COLUMNS            = ServerMonitorsResource.COLUMNS;
+	public static final String[] SERVER_TEMPLATE_COLUMNS            = ServerTemplatesResource.COLUMNS;
+	public static final String[] SERVER_TEMPLATE_EXECUTABLE_COLUMNS = ServerTemplateExecutablesResource.COLUMNS;
 
 	public static final String ACTION_LAUNCH    = "launch";
 	public static final String ACTION_TERMINATE = "terminate";
@@ -176,6 +180,30 @@ public class Dashboard extends ContentProvider {
 				else {
 					throw new DashboardError("Cannot query server_monitors without specifying server_id in where-clause");
 				}								
+			}
+			else if(uri.equals(ServerTemplatesResource.CONTENT_URI)) {
+				ServerTemplatesResource serverTemplates = new ServerTemplatesResource(session, HARDCODED_ACCOUNT_ID);
+				
+				if(where != null && where.equals("id = ?")) {
+					//SELECT ... FROM server_templates WHERE id = ?
+					int serverTemplateId = new Integer(whereArgs[0]).intValue();
+					return serverTemplates.show(serverTemplateId);
+				}
+				else {
+					return serverTemplates.index();
+				}
+			}
+			else if(uri.equals(ServerTemplateExecutablesResource.CONTENT_URI)) {
+				ServerTemplateExecutablesResource serverTemplates = new ServerTemplateExecutablesResource(session, HARDCODED_ACCOUNT_ID);								
+				
+				if(where != null && where.equals("server_template_id = ? and apply = ?")) {
+					int serverTemplateId = new Integer(whereArgs[0]).intValue();
+					String apply = whereArgs[1];
+					return serverTemplates.indexForServerTemplate(serverTemplateId, apply);
+				}
+				else {
+					throw new DashboardError("Cannot query server_template_executables without specifying server_template_id and apply in where-clause");
+				}
 			}
 			else {
 				throw new DashboardError("Unknown content URI " + uri);
