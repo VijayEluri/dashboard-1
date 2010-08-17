@@ -4,6 +4,8 @@ import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestException;
 import net.xeger.rest.Session;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +13,9 @@ import org.json.JSONObject;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class ServersResource extends DashboardResource {
 	public static final Uri CONTENT_URI =
@@ -83,6 +88,14 @@ class ServersResource extends DashboardResource {
 		throws RestException
 	{
 		post("servers/" + id + "/reboot");		
+	}
+	
+	public void runScript(int id, int scriptId)
+		throws RestException		
+	{
+		ArrayList<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+		params.add( new BasicNameValuePair("right_script", new Integer(scriptId).toString()) );
+		post("servers/" + id + "/run_script", params);
 	}
 	
 	private void buildRow(MatrixCursor.RowBuilder row, JSONObject object)

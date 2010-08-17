@@ -2,13 +2,18 @@ package net.xeger.rest;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -97,10 +102,27 @@ abstract public class AbstractResource {
 	public String post(String relativePath)
 		throws RestException
 	{
+		return post(relativePath, null);
+	}
+	
+	public String post(String relativePath, List<? extends NameValuePair> params)
+		throws RestException
+	{
 		URI uri = getResourceURI(relativePath, null);
 
 		DefaultHttpClient client = _session.createClient();		
 		HttpPost       post      = _session.createPost(uri);
+		
+		if(params != null) {
+			UrlEncodedFormEntity entity;
+			try {
+				entity = new UrlEncodedFormEntity(params);
+			} catch (UnsupportedEncodingException e) {
+				throw new ProtocolError(e);
+			}
+			post.setEntity(entity);			
+		}
+		
 		HttpResponse   response;
 		String         responseText;
 		int 		   statusCode;

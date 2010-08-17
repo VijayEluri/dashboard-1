@@ -5,9 +5,15 @@ import com.rightscale.provider.Dashboard;
 import net.xeger.rest.RestException;
 import net.xeger.rest.ui.ContentTransfer;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
+import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
@@ -20,12 +26,28 @@ public class ShowServerScripts extends AbstractServerActivity {
 	protected Cursor _currentExecutables = null;
 	protected int    _currentServerTemplateId = 0;
 	
+	@Override
 	public void onCreate(Bundle savedState) {
 		super.onCreate(savedState);
 		setContentView(R.layout.show_server_scripts);
+
+		ListView view = (ListView)findViewById(R.id.show_server_scripts_list);
+		
+		view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				if(_currentExecutables == null) return;				
+				int colRightScriptId = _currentExecutables.getColumnIndexOrThrow("right_script_id");
+
+				_currentExecutables.moveToPosition(position);		    	
+		    	int executableId = _currentExecutables.getInt(colRightScriptId);
+		    	Dashboard.performAction(getBaseContext(), getServerUri(), Dashboard.ACTION_RUN_SCRIPT, executableId);
+				
+				parent.setSelected(false);
+			}
+		});
 	}
 	
-	public void consumeContent(Cursor cursor, String tag) {
+    public void consumeContent(Cursor cursor, String tag) {
 		super.consumeContent(cursor, tag);
 		
 		if(tag == SERVER) {			
@@ -36,9 +58,11 @@ public class ShowServerScripts extends AbstractServerActivity {
 				stopManagingCursor(_currentExecutables);
 			}
 			
+			_currentExecutables = cursor;
 			startManagingCursor(cursor);
-
-	    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, cursor, FROM, TO);
+			
+			String state = _currentServer.getString(_currentServer.getColumnIndexOrThrow("state"));
+	    	SimpleCursorAdapter adapter = new ScriptAdapter(state, this, android.R.layout.simple_list_item_1, cursor, FROM, TO);
 			ListView list = (ListView)findViewById(R.id.show_server_scripts_list);
 			list.setAdapter(adapter);
 		}
@@ -56,6 +80,29 @@ public class ShowServerScripts extends AbstractServerActivity {
 		}
 		else {
 			return super.produceContent(tag);
+		}
+	}
+	
+	class ScriptAdapter extends SimpleCursorAdapter {
+		String _serverState = null;
+		
+		public ScriptAdapter(String serverState, Context context, int layout, Cursor c,
+				String[] from, int[] to) {
+			super(context, layout, c, from, to);
+			_serverState = serverState;
+		}
+		
+		public boolean isEnabled(int position) {
+			if(!_serverState.equals("operational")) {
+				return false;
+			}
+			
+			Cursor c = this.getCursor();
+			c.moveToPosition(position);
+			int colRightScriptId = c.getColumnIndexOrThrow("right_script_id");
+			
+			//Scripts are enabled if we know their right_script_id (recipes don't work)
+			return !c.isNull(colRightScriptId);
 		}
 	}
 }
