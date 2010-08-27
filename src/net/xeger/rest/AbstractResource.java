@@ -63,7 +63,7 @@ abstract public class AbstractResource {
 			}
 	}	
 
-	public String get(String relativePath, String query)
+	public HttpEntity getEntity(String relativePath, String query)
 		throws RestException
 	{
 		URI uri = getResourceURI(relativePath, query);
@@ -71,14 +71,17 @@ abstract public class AbstractResource {
 		DefaultHttpClient client = _session.createClient();		
 		HttpGet        get       = _session.createGet(uri);
 		HttpResponse   response;		
-		String         responseText;
 		int            statusCode;
 		
 		try {
 			response = client.execute(get);
-			responseText = readResponse(response.getEntity());
 			statusCode   = response.getStatusLine().getStatusCode();
-			response.getEntity().consumeContent(); //tell the response we're finished with its data
+			
+			if(statusCode >= 200 && statusCode < 300) {
+				return response.getEntity();
+			}
+			
+			response.getEntity().consumeContent(); //We won't be using this...
 			
 			if(statusCode >= 400 && statusCode < 500) {
 				throw new RestAuthException("Authentication failed", statusCode);
@@ -86,17 +89,24 @@ abstract public class AbstractResource {
 			else if(statusCode >= 500 && statusCode < 600) {
 				throw new RestServerException("Internal server error", statusCode);
 			}
+			else {
+				throw new RestException("Unrecognized HTTP status code", statusCode);			
+			}		
 		}
 		catch(IOException e) {
 			throw new RestNetworkException(e);
-		}
-		
-		if(statusCode >= 200 && statusCode < 300) {
-			return responseText;
-		}
-		else {
-			throw new RestException("Unrecognized HTTP status code", statusCode);			
 		}		
+	}
+	
+	public String get(String relativePath, String query)
+		throws RestException
+	{
+		try {
+			return readResponse(getEntity(relativePath, query));
+		}
+		catch(IOException e) {
+			throw new RestNetworkException(e);			
+		}
 	}
 	
 	public String post(String relativePath)

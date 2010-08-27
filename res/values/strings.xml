@@ -2,6 +2,9 @@
 <resources>
 	<string name="app_name">RightScale</string>
 
+<!--  Services -->
+	<string name="feed">Feed</string>
+
 <!--  Settings -->
     <string name="email">Email</string>    
     <string name="password">Password</string>

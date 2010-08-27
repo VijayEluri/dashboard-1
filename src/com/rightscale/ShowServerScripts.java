@@ -30,7 +30,6 @@ public class ShowServerScripts extends AbstractServerActivity {
 	public void onCreate(Bundle savedState) {
 		super.onCreate(savedState);
 		setContentView(R.layout.show_server_scripts);
-
 		ListView view = (ListView)findViewById(R.id.show_server_scripts_list);
 		
 		view.setOnItemClickListener(new AdapterView.OnItemClickListener() {

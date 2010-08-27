@@ -7,7 +7,7 @@ import net.xeger.rest.ProtocolError;
 import net.xeger.rest.Session;
 
 public class DashboardResource extends net.xeger.rest.AbstractResource {
-	public static String API_HOST   = "moo1.rightscale.com";
+	public static String API_HOST   = "moo1.rightscale.com"; //TODO make this configurable
 	public static String API_PREFIX = "https://" + API_HOST + "/api";
 	
 	private int _accountId           = 0;

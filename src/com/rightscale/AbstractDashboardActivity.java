@@ -16,14 +16,27 @@ import android.view.MenuItem;
 import android.view.Window;
 
 import com.rightscale.provider.Dashboard;
+import com.rightscale.service.DashboardFeed;
 
 public abstract class AbstractDashboardActivity extends ListActivity implements ContentProducer, ContentConsumer {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ContentTransfer.load(this, this, new Handler());
+        ContentTransfer.load(this, this, new Handler());        
     }
 
+    public void onStart() {
+    	super.onStart();
+        Intent feedIntent = new Intent(this, DashboardFeed.class);
+        startService(feedIntent);    	
+    }
+
+    public void onStop() {
+    	super.onStop();
+        Intent feedIntent = new Intent(this, DashboardFeed.class);
+    	this.stopService(feedIntent);
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
     	super.onCreateOptionsMenu(menu);

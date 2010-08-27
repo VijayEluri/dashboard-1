@@ -7,6 +7,9 @@
     <application android:icon="@drawable/icon" android:label="@string/app_name" android:theme="@android:style/Theme">
     	<provider android:name="com.rightscale.provider.Dashboard" android:authorities="com.rightscale.provider.dashboard" />
 
+		<service android:label="@string/feed" android:name="com.rightscale.service.DashboardFeed" android:enabled="true">
+		</service>
+		
 		<activity android:label="@string/settings" android:name="Settings">
             <intent-filter>
                 <action android:name="notify_error" />

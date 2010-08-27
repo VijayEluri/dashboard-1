@@ -7,7 +7,10 @@ import net.xeger.rest.ui.ContentConsumer;
 import net.xeger.rest.ui.ContentProducer;
 import net.xeger.rest.ui.ContentTransfer;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -16,8 +19,10 @@ import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.rightscale.provider.Dashboard;
+import com.rightscale.service.DashboardFeed;
 
 public class AbstractServerActivity extends Activity implements ContentConsumer, ContentProducer {
 	static public final String SERVER          = "server";
@@ -31,6 +36,18 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
         super.onCreate(savedInstanceState);
         ContentTransfer.load(this, this, new Handler(), SERVER);
         ContentTransfer.load(this, this, new Handler(), SERVER_SETTINGS);
+    }
+
+    public void onStart() {
+    	super.onStart();
+        Intent feedIntent = new Intent(this, DashboardFeed.class);
+        startService(feedIntent);    	
+    }
+
+    public void onStop() {
+    	super.onStop();
+        Intent feedIntent = new Intent(this, DashboardFeed.class);
+    	this.stopService(feedIntent);
     }
 
     @Override
@@ -47,18 +64,15 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     	
     	MenuInflater inflater = getMenuInflater();
     	inflater.inflate(R.menu.show_server, menu);
-    	
-    	if(state.matches("inactive|stopped")) {
+
+		if(state.matches("inactive|stopped")) {
     		//Can launch server if it isn't currently running
     		menu.findItem(R.id.menu_launch_server).setVisible(true);
     	}
-    	else {
-    		//Can always SSH as long as server isn't inactive
-    		menu.findItem(R.id.menu_ssh_server).setVisible(true);
-    	}
     	
-    	if(state.matches("stopped|bidding|booting|operational")) {
-    		menu.findItem(R.id.menu_terminate_server).setVisible(true);    		
+    	if(state.matches("booting|stranded|operational|shutting-down|decommissioning")) {
+			//Can always SSH as long as server is running
+			menu.findItem(R.id.menu_ssh_server).setVisible(true);
     	}
     	
     	if(state.matches("booting|operational")) {
@@ -66,6 +80,10 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     		menu.findItem(R.id.menu_reboot_server).setVisible(true);
     	}
 
+    	if(state.matches("stopped|bidding|pending|booting|stranded|operational|shutting-down|decommissioning")) {
+    		menu.findItem(R.id.menu_terminate_server).setVisible(true);    		
+    	}
+    	
     	return true;
     }    
     
@@ -74,8 +92,12 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     	if(_currentServer == null) {
     		return false;
     	}
-    	
+
+    	StringBuilder toast = new StringBuilder();
+
     	Uri server = getServerUri();
+        int colNickname = _currentServer.getColumnIndexOrThrow("nickname");
+    	String nickname = _currentServer.getString(colNickname);
     	
     	switch(item.getItemId()) {
     	case R.id.menu_ssh_server:
@@ -86,25 +108,33 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     		Uri uri = Uri.parse(sb.toString());    		
 			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 			startActivity(intent);
-			return true;
+			break;
+			
     	case R.id.menu_launch_server:
     		Dashboard.performAction(getBaseContext(), server, Dashboard.ACTION_LAUNCH);
-            ContentTransfer.load(this, this, new Handler());
-    		return true;
-
+			toast.append(nickname).append(" has been launched."); //TODO i18n
+            break;
+            
     	case R.id.menu_reboot_server:
     		Dashboard.performAction(getBaseContext(), server, Dashboard.ACTION_REBOOT);
-            ContentTransfer.load(this, this, new Handler());
-    		return true;
-
+			toast.append(nickname).append(" is being rebooted."); //TODO i18n
+            break;
+            
     	case R.id.menu_terminate_server:
     		Dashboard.performAction(getBaseContext(), server, Dashboard.ACTION_TERMINATE);
-            ContentTransfer.load(this, this, new Handler());
-    		return true;
-
+			toast.append(nickname).append(" has been terminated."); //TODO i18n
+            break;
+            
     	default:
     		return false;
-    	}    	
+    	}
+    	
+        ContentTransfer.load(this, this, new Handler());
+        if(toast.length() > 0) {
+    		Toast.makeText(this, toast.toString(), Toast.LENGTH_SHORT).show();
+    	}
+
+        return true;    	
     }
 
 	public Cursor produceContent(String tag)
