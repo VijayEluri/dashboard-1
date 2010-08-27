@@ -1,24 +1,19 @@
 package com.rightscale.service;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.xeger.rest.AbstractResource;
+import net.xeger.rest.Session;
+
 import org.apache.http.HttpEntity;
-import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import android.util.Log;
-
-import net.xeger.rest.AbstractResource;
-import net.xeger.rest.RestException;
-import net.xeger.rest.Session;
 
 class FeedScraper extends AbstractResource implements Runnable {
 	static final int DEFAULT_POLL_PERIOD = 2000;

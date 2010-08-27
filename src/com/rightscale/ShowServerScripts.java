@@ -1,21 +1,19 @@
 package com.rightscale;
 
-import com.rightscale.provider.Dashboard;
-
 import net.xeger.rest.RestException;
 import net.xeger.rest.ui.ContentTransfer;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
+
+import com.rightscale.provider.Dashboard;
 
 public class ShowServerScripts extends AbstractServerActivity {
 	static public final String SCRIPTS = "scripts";
@@ -42,6 +40,8 @@ public class ShowServerScripts extends AbstractServerActivity {
 		    	Dashboard.performAction(getBaseContext(), getServerUri(), Dashboard.ACTION_RUN_SCRIPT, executableId);
 				
 				parent.setSelected(false);
+
+	    		Toast.makeText(ShowServerScripts.this, R.string.notify_script_queued, Toast.LENGTH_SHORT).show();
 			}
 		});
 	}

@@ -7,10 +7,7 @@ import net.xeger.rest.ui.ContentConsumer;
 import net.xeger.rest.ui.ContentProducer;
 import net.xeger.rest.ui.ContentTransfer;
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -131,7 +128,8 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     	
         ContentTransfer.load(this, this, new Handler());
         if(toast.length() > 0) {
-    		Toast.makeText(this, toast.toString(), Toast.LENGTH_SHORT).show();
+        	//TODO use a resource template for the toast (i18n friendliness)
+        	Toast.makeText(this, toast.toString(), Toast.LENGTH_SHORT).show();
     	}
 
         return true;    	

@@ -1,10 +1,11 @@
 package com.rightscale.provider;
 
+import java.util.ArrayList;
+
 import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestException;
 import net.xeger.rest.Session;
 
-import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,9 +14,6 @@ import org.json.JSONObject;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class ServersResource extends DashboardResource {
 	public static final Uri CONTENT_URI =

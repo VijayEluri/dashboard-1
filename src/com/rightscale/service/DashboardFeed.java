@@ -1,29 +1,17 @@
 package com.rightscale.service;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-
-import net.xeger.rest.AbstractResource;
-import net.xeger.rest.ProtocolError;
-import net.xeger.rest.RestAuthException;
 import net.xeger.rest.RestException;
-import net.xeger.rest.RestNetworkException;
-import net.xeger.rest.RestServerException;
-import net.xeger.rest.Session;
-
-import com.rightscale.Settings;
-import com.rightscale.provider.DashboardSession;
-
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+
+import com.rightscale.Settings;
+import com.rightscale.provider.DashboardSession;
 
 public class DashboardFeed extends Service {
 	public static final String FEED_HOST   = "moo1.rightscale.com"; //TODO make this configurable
