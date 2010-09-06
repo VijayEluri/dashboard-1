@@ -18,30 +18,16 @@ import com.rightscale.provider.Dashboard;
 import com.rightscale.service.DashboardFeed;
 
 public abstract class AbstractDashboardActivity extends ListActivity implements ContentProducer, ContentConsumer {
-	protected String _accountId;
-
-	public String getAccountId() {
-		return _accountId;
-	}
-	
-	public Uri getRelativeRoute(String pathSegment) {
-		Uri uri = Uri.withAppendedPath(Routes.BASE_CONTENT_URI, "accounts/" + getAccountId());
-		return Uri.withAppendedPath(uri, pathSegment);
-	}
-	
-	public Uri getRelativeRoute(String pathSegment, long resourceId) {
-		Uri uri = Uri.withAppendedPath(Routes.BASE_CONTENT_URI, "accounts/" + getAccountId());
-		return Uri.withAppendedPath(uri, pathSegment + "/" + resourceId);
-	}
+	Helper _helper = null;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	if(getIntent().getData() != null) {
-    		_accountId = Routes.getAccountId(getIntent().getData());
+    		_helper = new Helper(Routes.getAccountId(getIntent().getData()));
     	}
     	else {
-    		//HACK: if someone launches us without a data-ful intent (really we should hit up a dashboard here!)
-    		_accountId = "2951";
+    		//HACK if someone launches us without a data-ful intent (really we should hit up a dashboard here!)
+    		_helper = new Helper("2951");
     	}
         super.onCreate(savedInstanceState);
         ContentTransfer.load(this, this, new Handler());        
@@ -73,7 +59,7 @@ public abstract class AbstractDashboardActivity extends ListActivity implements 
     	
     	switch(item.getItemId()) {
     	case R.id.menu_deployments:
-        	i = new Intent(Intent.ACTION_VIEW, Routes.indexDeployments(getAccountId()));
+        	i = new Intent(Intent.ACTION_VIEW, Routes.indexDeployments(_helper.getAccountId()));
         	break;
     	case R.id.menu_settings:
     		i = new Intent(this, Settings.class);

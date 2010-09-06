@@ -2,7 +2,11 @@ package com.rightscale.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import net.xeger.rest.RestException;
 import android.app.Service;
@@ -12,6 +16,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.rightscale.Routes;
 import com.rightscale.Settings;
 import com.rightscale.provider.DashboardSession;
 
@@ -85,7 +90,30 @@ public class DashboardFeed extends Service {
         return _binder;
     }
 
-    void onDashboardEvent(Date when, Uri subject, String subjectName, String summary) {
-    	//TODO send a broadcast (maybe also a notification, if no app activity is running?)
+	//HACK we remember a fixed # of things, could have horrible consequences!
+    //TODO remember up until a certain time ago (5 min?)
+    private Set<String>  _seenSet  = new HashSet<String>();
+    private List<String> _seenList = new ArrayList<String>();
+    
+    synchronized void onDashboardEvent(Date when, Uri subject, String subjectName, String summary) {
+    	StringBuffer sb = new StringBuffer(subject.toString());
+    	sb.append(":");
+    	sb.append(new Long(when.getTime()).toString());
+    	String hash = sb.toString();
+
+		if(!_seenSet.contains(hash)) { 
+			_seenSet.add(hash);
+			_seenList.add(hash);
+			Log.i("DashboardFeed", subject.toString() + " - " + summary);
+	    	Intent intent = new Intent(Intent.ACTION_VIEW, subject);
+	    	intent.putExtra("name", subjectName);
+	    	intent.putExtra("summary", subjectName);
+	    	this.sendBroadcast(intent);
+		}
+
+		while(_seenSet.size() > 1000) {
+			_seenSet.remove(_seenList.get(0));
+			_seenList.remove(0);
+		}
     }
 }

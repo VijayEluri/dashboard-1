@@ -132,8 +132,8 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 	{
 		if(tag == MONITORS) {
 	    	ContentResolver cr = getContentResolver();
-			String[] whereArgs = { getAccountId(), getServerId() };    	
-	    	return cr.query(getRelativeRoute("server_monitors"), Dashboard.SERVER_MONITORS_COLUMNS, "account_id = ? AND server_id = ?", whereArgs, null);			
+			String[] whereArgs = { _helper.getAccountId(), getServerId() };    	
+	    	return cr.query(_helper.getRelativeRoute("server_monitors"), Dashboard.SERVER_MONITORS_COLUMNS, "account_id = ? AND server_id = ?", whereArgs, null);			
 		}
 		else {
 			return super.produceContent(tag);

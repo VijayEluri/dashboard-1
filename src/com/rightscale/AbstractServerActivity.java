@@ -25,28 +25,13 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 	static public final String SERVER          = "server";
 	static public final String SERVER_SETTINGS = "server_settings";
 
-	protected String _accountId;
-
+	protected Helper _helper                = null;  
 	protected Cursor _currentServer         = null;
 	protected Cursor _currentServerSettings = null;
 	
-	public String getAccountId() {
-		return _accountId;
-	}
-	
-	public Uri getRelativeRoute(String pathSegment) {
-		Uri uri = Uri.withAppendedPath(Routes.BASE_CONTENT_URI, "accounts/" + getAccountId());
-		return Uri.withAppendedPath(uri, pathSegment);
-	}
-	
-	public Uri getRelativeRoute(String pathSegment, long resourceId) {
-		Uri uri = Uri.withAppendedPath(Routes.BASE_CONTENT_URI, "accounts/" + getAccountId());
-		return Uri.withAppendedPath(uri, pathSegment + "/" + resourceId);
-	}
-	
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        _accountId = Routes.getAccountId(getIntent().getData());
+        _helper = new Helper(Routes.getAccountId(getIntent().getData()));
         super.onCreate(savedInstanceState);
         ContentTransfer.load(this, this, new Handler(), SERVER);
         ContentTransfer.load(this, this, new Handler(), SERVER_SETTINGS);
@@ -123,17 +108,17 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 			break;
 			
     	case R.id.menu_launch_server:
-    		Dashboard.performAction(getBaseContext(), server, getAccountId(), Dashboard.ACTION_LAUNCH);
+    		Dashboard.performAction(getBaseContext(), server, _helper.getAccountId(), Dashboard.ACTION_LAUNCH);
 			toast.append(nickname).append(" has been launched."); //TODO i18n
             break;
             
     	case R.id.menu_reboot_server:
-    		Dashboard.performAction(getBaseContext(), server, getAccountId(), Dashboard.ACTION_REBOOT);
+    		Dashboard.performAction(getBaseContext(), server, _helper.getAccountId(), Dashboard.ACTION_REBOOT);
 			toast.append(nickname).append(" is being rebooted."); //TODO i18n
             break;
             
     	case R.id.menu_terminate_server:
-    		Dashboard.performAction(getBaseContext(), server, getAccountId(), Dashboard.ACTION_TERMINATE);
+    		Dashboard.performAction(getBaseContext(), server, _helper.getAccountId(), Dashboard.ACTION_TERMINATE);
 			toast.append(nickname).append(" has been terminated."); //TODO i18n
             break;
             
@@ -156,14 +141,14 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 		if(tag == SERVER) {
 	    	ContentResolver cr = getContentResolver();
 	
-			String[] whereArgs = { new Long(getAccountId()).toString(), getServerId() };
-	    	return cr.query(getRelativeRoute("servers"), Dashboard.SERVER_COLUMNS, "account_id = ? AND id = ?", whereArgs, null);
+			String[] whereArgs = { _helper.getAccountId(), getServerId() };
+	    	return cr.query(_helper.getRelativeRoute("servers"), Dashboard.SERVER_COLUMNS, "account_id = ? AND id = ?", whereArgs, null);
 		}
 		else if(SERVER_SETTINGS == tag) {
         	ContentResolver cr = getContentResolver();
 
-    		String[] whereArgs = { new Long(getAccountId()).toString(), getServerId() };
-        	return cr.query(getRelativeRoute("server_settings"), Dashboard.SERVER_SETTING_COLUMNS, "account_id = ? AND server_id = ?", whereArgs, null);    		
+    		String[] whereArgs = { _helper.getAccountId(), getServerId() };
+        	return cr.query(_helper.getRelativeRoute("server_settings"), Dashboard.SERVER_SETTING_COLUMNS, "account_id = ? AND server_id = ?", whereArgs, null);    		
     	}
 		else {
 			return null;

@@ -24,12 +24,12 @@ import android.net.Uri;
 import android.util.Log;
 
 class FeedScraper extends AbstractResource implements Runnable {
-	static final int DEFAULT_POLL_PERIOD = 15000;
-	static final int MAX_POLL_PERIOD     = 60000;
+	static final int DEFAULT_POLL_PERIOD = 5000;
+	static final int MAX_POLL_PERIOD     = 30000;
 	static final int ERROR_POLL_PERIOD   = MAX_POLL_PERIOD;
 	
 	static final SimpleDateFormat ATOM_DATE_FORMAT = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss'Z'");	
-	static final Pattern          RESOURCE_REGEX   = Pattern.compile("Resource:.*<a href=\"/acct/([0-9]+)?path=%2F([a-z]+)%2F([0-9]+)>([^<]*)</a");
+	static final Pattern          RESOURCE_REGEX   = Pattern.compile("Resource:.*<a href=\"/acct/([0-9]+)\\?path=%2F([a-z]+)%2F([0-9]+)\">([^<]*)</a");
 	static final Pattern          EVENT_REGEX      = Pattern.compile("Event:.*<a.*>([^<]*)</a>");	
 
 	DashboardFeed _context = null;
@@ -103,9 +103,6 @@ class FeedScraper extends AbstractResource implements Runnable {
 	}
     
     void reportFeedEvent(String updated, String htmlContent) {
-    	Log.i("FeedScraper", updated);
-    	Log.i("FeedScraper", htmlContent);
-
     	Date   when;
     	Uri    subjectUri;
     	String subjectName;
@@ -130,7 +127,6 @@ class FeedScraper extends AbstractResource implements Runnable {
     		if(resource.equals("servers")) {
 	    		//TODO actually construct uri once we have proper routes
     			subjectUri = Routes.showServer(accountId, resourceId);
-	    		//subjectUri = Uri.parse(accountId + resource + resourceId + subjectName);
     		}
     		else {
         		Log.w("FeedScraper", "Unknown resource type:\n" + htmlContent);

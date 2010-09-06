@@ -41,7 +41,7 @@ public class ShowDeployment extends AbstractDashboardActivity {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-    	Intent i = new Intent(Intent.ACTION_VIEW, Routes.showServer(getAccountId(), new Long(id).toString()));
+    	Intent i = new Intent(Intent.ACTION_VIEW, Routes.showServer(_helper.getAccountId(), new Long(id).toString()));
     	startActivity(i);
     }
 
@@ -49,13 +49,13 @@ public class ShowDeployment extends AbstractDashboardActivity {
     	throws RestException
     {
     	ContentResolver cr = getContentResolver();
-		String[] whereArgs = { new Long(getAccountId()).toString(), getDeploymentId() };
+		String[] whereArgs = { _helper.getAccountId(), getDeploymentId() };
     	
     	if(tag == SERVERS) {
-	    	return cr.query(getRelativeRoute("servers"), Dashboard.SERVER_COLUMNS, "account_id = ? AND deployment_id = ?", whereArgs, null);
+	    	return cr.query(_helper.getRelativeRoute("servers"), Dashboard.SERVER_COLUMNS, "account_id = ? AND deployment_id = ?", whereArgs, null);
     	}
     	else if(tag == DEPLOYMENT_TITLE) {
-	    	return cr.query(getRelativeRoute("deployments"), Dashboard.DEPLOYMENT_COLUMNS, "account_id = ? AND id = ?", whereArgs, null);
+	    	return cr.query(_helper.getRelativeRoute("deployments"), Dashboard.DEPLOYMENT_COLUMNS, "account_id = ? AND id = ?", whereArgs, null);
     	}
     	else {
     		return null;

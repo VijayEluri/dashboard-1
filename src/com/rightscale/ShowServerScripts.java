@@ -37,7 +37,7 @@ public class ShowServerScripts extends AbstractServerActivity {
 
 				_currentExecutables.moveToPosition(position);		    	
 		    	int executableId = _currentExecutables.getInt(colRightScriptId);
-		    	Dashboard.performAction(getBaseContext(), getServerUri(), getAccountId(), Dashboard.ACTION_RUN_SCRIPT, executableId);
+		    	Dashboard.performAction(getBaseContext(), getServerUri(), _helper.getAccountId(), Dashboard.ACTION_RUN_SCRIPT, executableId);
 				
 				parent.setSelected(false);
 
@@ -74,8 +74,8 @@ public class ShowServerScripts extends AbstractServerActivity {
 	    	ContentResolver cr = getContentResolver();
 	    	
 			int colSTID = _currentServer.getColumnIndexOrThrow("server_template_id");
-			String[] whereArgs = { getAccountId(), new Integer(_currentServer.getInt(colSTID)).toString(), "operational" };
-	    	return cr.query(getRelativeRoute("server_template_executables"), Dashboard.SERVER_TEMPLATE_EXECUTABLE_COLUMNS, "account_id = ? AND server_template_id = ? AND apply = ?", whereArgs, null);		
+			String[] whereArgs = { _helper.getAccountId(), new Integer(_currentServer.getInt(colSTID)).toString(), "operational" };
+	    	return cr.query(_helper.getRelativeRoute("server_template_executables"), Dashboard.SERVER_TEMPLATE_EXECUTABLE_COLUMNS, "account_id = ? AND server_template_id = ? AND apply = ?", whereArgs, null);		
 		}
 		else {
 			return super.produceContent(tag);
