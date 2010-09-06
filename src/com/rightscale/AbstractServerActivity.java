@@ -7,6 +7,7 @@ import net.xeger.rest.ui.ContentConsumer;
 import net.xeger.rest.ui.ContentProducer;
 import net.xeger.rest.ui.ContentTransfer;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,7 +20,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.rightscale.provider.Dashboard;
-import com.rightscale.service.DashboardFeed;
 
 public class AbstractServerActivity extends Activity implements ContentConsumer, ContentProducer {
 	static public final String SERVER          = "server";
@@ -28,23 +28,38 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 	protected Helper _helper                = null;  
 	protected Cursor _currentServer         = null;
 	protected Cursor _currentServerSettings = null;
+	protected BroadcastReceiver _receiver   = null;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        _helper = new Helper(Routes.getAccountId(getIntent().getData()));
+        _helper = new Helper(this, Routes.getAccountId(getIntent().getData()));
         super.onCreate(savedInstanceState);
         ContentTransfer.load(this, this, new Handler(), SERVER);
         ContentTransfer.load(this, this, new Handler(), SERVER_SETTINGS);
     }
 
+    @Override
     public void onStart() {
     	super.onStart();
-        startService(new Intent(this, DashboardFeed.class));    	
+    	_helper.onStart();
     }
 
+    @Override
+    public void onResume() {
+    	super.onResume();
+    	_helper.onResume();
+    }
+
+    @Override
+    public void onPause() {
+    	super.onPause();
+    	_helper.onPause();
+    }
+
+    @Override
     public void onStop() {
     	super.onStop();
-    	stopService(new Intent(this, DashboardFeed.class));
+    	_helper.onStop();
     }
 
     @Override

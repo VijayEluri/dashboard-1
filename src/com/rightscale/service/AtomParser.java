@@ -7,7 +7,8 @@ class AtomParser extends org.xml.sax.helpers.DefaultHandler {
 	StringBuffer _content    = null;
 	StringBuffer _updated    = null;
 	int          _numEntries = 0;
-
+	int          _numInteresting = 0;
+	
 	boolean      _inEntry    = false,
 	             _inContent  = false,
                  _inUpdated  = false;	
@@ -18,6 +19,10 @@ class AtomParser extends org.xml.sax.helpers.DefaultHandler {
 	
 	public int getNumEntries() {
 		return _numEntries;
+	}
+	
+	public int getNumInteresting() {
+		return _numInteresting;
 	}
 	
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
@@ -56,7 +61,9 @@ class AtomParser extends org.xml.sax.helpers.DefaultHandler {
 			_inEntry = false;
 			String updated = _updated.toString();
 			String htmlContent = _content.toString();
-			_scraper.reportFeedEvent(updated, htmlContent);
+			if(_scraper.reportFeedEvent(updated, htmlContent)) {
+				_numInteresting += 1;
+			}
 			_numEntries += 1;
 		}
 		else if(_inContent && localName.equals("content")) {

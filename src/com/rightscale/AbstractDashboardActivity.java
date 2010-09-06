@@ -7,42 +7,52 @@ import net.xeger.rest.ui.ContentTransfer;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.rightscale.provider.Dashboard;
-import com.rightscale.service.DashboardFeed;
-
 public abstract class AbstractDashboardActivity extends ListActivity implements ContentProducer, ContentConsumer {
-	Helper _helper = null;
+	private static String HARDCODED_ACCOUNT_ID = "2951"; // 2951 = DEMO
+
+	protected Helper            _helper   = null;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     	if(getIntent().getData() != null) {
-    		_helper = new Helper(Routes.getAccountId(getIntent().getData()));
+    		_helper = new Helper(this, Routes.getAccountId(getIntent().getData()));
     	}
     	else {
     		//HACK if someone launches us without a data-ful intent (really we should hit up a dashboard here!)
-    		_helper = new Helper("2951");
+    		_helper = new Helper(this, HARDCODED_ACCOUNT_ID);
     	}
-        super.onCreate(savedInstanceState);
         ContentTransfer.load(this, this, new Handler());        
     }
 
     @Override
     public void onStart() {
     	super.onStart();
-        startService(new Intent(this, DashboardFeed.class));    	
+    	_helper.onStart();
+    }
+
+    @Override
+    public void onResume() {
+    	super.onResume();
+    	_helper.onResume();
+    }
+
+    @Override
+    public void onPause() {
+    	super.onPause();
+    	_helper.onPause();
     }
 
     @Override
     public void onStop() {
     	super.onStop();
-    	stopService(new Intent(this, DashboardFeed.class));
+    	_helper.onStop();
     }
 
     @Override

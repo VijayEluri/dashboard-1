@@ -2,11 +2,7 @@ package com.rightscale.provider;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import net.xeger.rest.RestException;
 
 import org.apache.http.client.HttpClient;
@@ -44,8 +40,6 @@ import com.rightscale.Settings;
  * 
  */
 public class Dashboard extends ContentProvider {
-	private static String HARDCODED_ACCOUNT_ID = "2951"; // 2951 = DEMO
-
 	public static final Uri BASE_CONTENT_URI = Uri
 			.parse("content://com.rightscale.provider.dashboard");
 

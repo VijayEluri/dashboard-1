@@ -10,7 +10,6 @@ import org.json.JSONObject;
 
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.net.Uri;
 
 class ServerTemplatesResource extends DashboardResource {
 	public static final String MIME_TYPE = "vnd.rightscale.server_template";

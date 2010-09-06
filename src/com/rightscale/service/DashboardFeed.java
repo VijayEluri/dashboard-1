@@ -16,11 +16,12 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.rightscale.Routes;
 import com.rightscale.Settings;
 import com.rightscale.provider.DashboardSession;
 
 public class DashboardFeed extends Service {
+	public static final String CATEGORY_EVENT = "com.rightscale.service.DashboardFeed.category.event";
+	
 	public static final String FEED_HOST   = "moo1.rightscale.com"; //TODO make this configurable
 	public static final String FEED_PREFIX = "https://" + FEED_HOST + "/user_notifications/feed.atom?feed_token=";	
 	public static final String HARDCODED_TOKEN = "38ecd5ab72d787d323e837ee2064a3334d1f5139"; //TODO make this configurable
@@ -57,6 +58,7 @@ public class DashboardFeed extends Service {
 			DashboardSession session = new DashboardSession(Settings.getEmail(this), Settings.getPassword(this));
 			session.login();
 
+			//TODO undo hack
 			//URI uri = new URI(FEED_PREFIX + HARDCODED_TOKEN);
 			URI uri = new URI(HARDCODED_DEBUG_URL);
 
@@ -95,25 +97,30 @@ public class DashboardFeed extends Service {
     private Set<String>  _seenSet  = new HashSet<String>();
     private List<String> _seenList = new ArrayList<String>();
     
-    synchronized void onDashboardEvent(Date when, Uri subject, String subjectName, String summary) {
+    synchronized boolean onDashboardEvent(Date when, Uri subject, String subjectName, String summary) {
     	StringBuffer sb = new StringBuffer(subject.toString());
     	sb.append(":");
     	sb.append(new Long(when.getTime()).toString());
     	String hash = sb.toString();
 
+    	boolean likedIt = false;
+
 		if(!_seenSet.contains(hash)) { 
 			_seenSet.add(hash);
 			_seenList.add(hash);
-			Log.i("DashboardFeed", subject.toString() + " - " + summary);
 	    	Intent intent = new Intent(Intent.ACTION_VIEW, subject);
+	    	intent.addCategory(CATEGORY_EVENT);
 	    	intent.putExtra("name", subjectName);
 	    	intent.putExtra("summary", subjectName);
-	    	this.sendBroadcast(intent);
+	    	sendBroadcast(intent);
+	    	likedIt = true;
 		}
 
-		while(_seenSet.size() > 1000) {
+		while(_seenSet.size() > 100) {
 			_seenSet.remove(_seenList.get(0));
 			_seenList.remove(0);
 		}
+		
+		return likedIt;
     }
 }

@@ -61,7 +61,7 @@ class FeedScraper extends AbstractResource implements Runnable {
     	
     	while(false == _shouldStop) {
     		boolean error   = false;
-    		int     entries = 0;
+    		int interesting = 0;
     		
 	    	try {
 	    		HttpEntity response = getEntity(null, null);
@@ -74,7 +74,7 @@ class FeedScraper extends AbstractResource implements Runnable {
 	            xr.setContentHandler(parser);
 	    		xr.parse(new InputSource(response.getContent()));
 	    		response.consumeContent();
-	    		entries = parser.getNumEntries();
+	    		interesting = parser.getNumInteresting();
 	    	}
 	    	catch(Exception e) {
 	    		Log.e("FeedScraper", e.getClass().getName());
@@ -85,7 +85,7 @@ class FeedScraper extends AbstractResource implements Runnable {
 	    	if(error) {
 	    		pollPeriod = ERROR_POLL_PERIOD;
 	    	}
-	    	else if(entries == 0) {
+	    	else if(interesting == 0) {
 	    		pollPeriod = (int) (pollPeriod * 1.5);
 	    		pollPeriod = Math.max(pollPeriod, MAX_POLL_PERIOD);
 	    	}
@@ -102,7 +102,7 @@ class FeedScraper extends AbstractResource implements Runnable {
     	}
 	}
     
-    void reportFeedEvent(String updated, String htmlContent) {
+    boolean reportFeedEvent(String updated, String htmlContent) {
     	Date   when;
     	Uri    subjectUri;
     	String subjectName;
@@ -114,7 +114,7 @@ class FeedScraper extends AbstractResource implements Runnable {
     	catch (ParseException e) {
 			e.printStackTrace();
     		Log.e("FeedScraper", htmlContent);
-			return;
+			return false;
 		}
 
     	Matcher m = RESOURCE_REGEX.matcher(htmlContent);
@@ -125,17 +125,16 @@ class FeedScraper extends AbstractResource implements Runnable {
     		subjectName         = m.group(4);
 
     		if(resource.equals("servers")) {
-	    		//TODO actually construct uri once we have proper routes
     			subjectUri = Routes.showServer(accountId, resourceId);
     		}
     		else {
         		Log.w("FeedScraper", "Unknown resource type:\n" + htmlContent);
-    			return;    			
+    			return false;    			
     		}
     	}
     	else {
-    		Log.w("FeedScraper", "No RESOURCE_REGEX:\n" + htmlContent);
-			return;
+    		//Log.w("FeedScraper", "No RESOURCE_REGEX:\n" + htmlContent);
+			return false;
     	}
 
     	m = EVENT_REGEX.matcher(htmlContent);
@@ -143,10 +142,10 @@ class FeedScraper extends AbstractResource implements Runnable {
     		summary = m.group(1);
     	}
     	else {
-    		Log.w("FeedScraper", "No EVENT_REGEX:\n" + htmlContent);
-			return;    		
+    		//Log.w("FeedScraper", "No EVENT_REGEX:\n" + htmlContent);
+			return false;    		
     	}
-    	
-    	_context.onDashboardEvent(when, subjectUri, subjectName, summary);    	
+
+    	return _context.onDashboardEvent(when, subjectUri, subjectName, summary);
     }
 }
