@@ -324,8 +324,7 @@ public class Dashboard extends ContentProvider {
 	
 	static public HttpClient createClient(Context context) {
 		// TODO cache the session if it becomes stateful? use a pool?
-		DashboardSession session = new DashboardSession(Settings
-				.getEmail(context), Settings.getPassword(context));
+		DashboardSession session = new DashboardSession(Settings.getEmail(context), Settings.getPassword(context), Settings.getSystem(context));
 		// notice that we don't login the session (on purpose)
 		return session.createClient();
 	}
@@ -333,8 +332,7 @@ public class Dashboard extends ContentProvider {
 	static public DashboardSession createSession(Context context)
 			throws RestException {
 		// TODO cache the session if it becomes stateful? use a pool?
-		DashboardSession session = new DashboardSession(Settings
-				.getEmail(context), Settings.getPassword(context));
+		DashboardSession session = new DashboardSession(Settings.getEmail(context), Settings.getPassword(context), Settings.getSystem(context));
 		session.login();
 		return session;
 	}

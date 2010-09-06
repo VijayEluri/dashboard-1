@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -24,7 +25,14 @@ public class Settings extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.settings);
-		if(getIntent().getAction().equals(ACTION_NOTIFY_ERROR)) {
+		
+		if(!getEmail(this).endsWith("@rightscale.com")) {
+			//Bit of obfuscation: hide the system unless the user's email ends with @rightscale.com
+			Preference system = this.findPreference("system");
+			getPreferenceScreen().removePreference(system);
+		}
+		
+		if( (getIntent() != null) && (getIntent().getAction() != null) && getIntent().getAction().equals(ACTION_NOTIFY_ERROR) ) {
 			_error = (DashboardError)getIntent().getExtras().get("error");
 			this.showDialog(DIALOG_ERROR_ID);
 		}
@@ -66,11 +74,17 @@ public class Settings extends PreferenceActivity {
 	public static String getPassword(Context context) {
 		return PreferenceManager.getDefaultSharedPreferences(context).getString("password", null);		
 	}
+
+	public static String getSystem(Context context) {
+		return PreferenceManager.getDefaultSharedPreferences(context).getString("system", "my.rightscale.com");				
+	}
 	
 	public static void handleError(Throwable t, Context context) {
 		if(t instanceof DashboardError) {
 			Throwable cause = t.getCause() != null ? t.getCause() : t;
 			Log.e("DashboardError", cause.toString());
+			cause.printStackTrace();
+			
 			Intent intent = new Intent(Settings.ACTION_NOTIFY_ERROR, null, context, Settings.class);
 			intent.putExtra("error", t);
 			

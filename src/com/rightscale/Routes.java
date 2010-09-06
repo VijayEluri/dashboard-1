@@ -4,11 +4,15 @@ import com.rightscale.provider.Dashboard;
 
 import android.net.Uri;
 
+/**
+ * Helper class for generating URIs that launch various Activities.
+ * 
+ * The application's activities use the same URI authority and path scheme as the content provider;
+ * this allows application routes to be associated with a MIME type (which is resolved by the
+ * content provider) and activities' intent filters therefore key on MIME type instead of path
+ * components.
+ */
 public class Routes {
-	/**
-	 * The application routes share a base URI with the content provider. This allows Activities to be triggered
-	 * on the MIME content-type of the URI attached to an Intent.
-	 */
 	public static final Uri BASE_CONTENT_URI = Dashboard.BASE_CONTENT_URI;
 
 	static public String getAccountId(Uri uri) {

@@ -30,7 +30,7 @@ public class IndexDeployments extends AbstractDashboardActivity {
     public Cursor produceContent(String tag) {
 		ContentResolver cr = getContentResolver();
 		String[] whereArgs = { new Long(_helper.getAccountId()).toString() };
-		return cr.query(_helper.getRelativeRoute("deployments"), Dashboard.DEPLOYMENT_COLUMNS, "account_id = ?", whereArgs, null);
+		return cr.query(_helper.getContentRoute("deployments"), Dashboard.DEPLOYMENT_COLUMNS, "account_id = ?", whereArgs, null);
     }
     
     public void consumeContent(Cursor cursor, String tag) {

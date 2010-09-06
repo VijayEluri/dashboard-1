@@ -18,7 +18,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 abstract public class AbstractResource {
-    abstract protected URI      getBaseURI();
     abstract protected URI      getResourceURI(String relativePath, String query);
     
     private Session _session = null;
@@ -27,6 +26,9 @@ abstract public class AbstractResource {
     	_session = session;
     }
     
+    protected URI getBaseURI() {
+    	return _session.getBaseURI();
+    }
 
     protected JSONObject getJsonObject(String relativePath)
     	throws RestException
@@ -67,12 +69,14 @@ abstract public class AbstractResource {
 	{
 		URI uri = getResourceURI(relativePath, query);
 
+		_session.login();
+		
 		DefaultHttpClient client = _session.createClient();		
 		HttpGet        get       = _session.createGet(uri);
 		HttpResponse   response;		
 		int            statusCode;
 		
-		try {
+		try {			
 			response = client.execute(get);
 			statusCode   = response.getStatusLine().getStatusCode();
 			
@@ -81,8 +85,9 @@ abstract public class AbstractResource {
 			}
 			
 			response.getEntity().consumeContent(); //We won't be using this...
-			
+
 			if(statusCode >= 400 && statusCode < 500) {
+				_session.logout();
 				throw new RestAuthException("Authentication failed", statusCode);
 			}
 			else if(statusCode >= 500 && statusCode < 600) {

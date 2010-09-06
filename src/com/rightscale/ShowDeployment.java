@@ -52,10 +52,10 @@ public class ShowDeployment extends AbstractDashboardActivity {
 		String[] whereArgs = { _helper.getAccountId(), getDeploymentId() };
     	
     	if(tag == SERVERS) {
-	    	return cr.query(_helper.getRelativeRoute("servers"), Dashboard.SERVER_COLUMNS, "account_id = ? AND deployment_id = ?", whereArgs, null);
+	    	return cr.query(_helper.getContentRoute("servers"), Dashboard.SERVER_COLUMNS, "account_id = ? AND deployment_id = ?", whereArgs, null);
     	}
     	else if(tag == DEPLOYMENT_TITLE) {
-	    	return cr.query(_helper.getRelativeRoute("deployments"), Dashboard.DEPLOYMENT_COLUMNS, "account_id = ? AND id = ?", whereArgs, null);
+	    	return cr.query(_helper.getContentRoute("deployments"), Dashboard.DEPLOYMENT_COLUMNS, "account_id = ? AND id = ?", whereArgs, null);
     	}
     	else {
     		return null;

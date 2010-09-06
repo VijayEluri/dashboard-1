@@ -25,15 +25,11 @@ public class Helper {
 		return _accountId;
 	}
 	
-	public Uri getRelativeRoute(String pathSegment) {
+	public Uri getContentRoute(String pathSegment) {
 		return Uri.withAppendedPath(_accountUri, pathSegment);
 	}
 	
-	public Uri getRelativeRoute(String pathSegment, long resourceId) {
-		return Uri.withAppendedPath(_accountUri, pathSegment + "/" + resourceId);
-	}
-	
-	public Uri getRelativeRoute(String pathSegment, String resourceId) {
+	public Uri getContentRoute(String pathSegment, String resourceId) {
 		return Uri.withAppendedPath(_accountUri, pathSegment + "/" + resourceId);
 	}
 	

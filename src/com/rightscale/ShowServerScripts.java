@@ -75,7 +75,7 @@ public class ShowServerScripts extends AbstractServerActivity {
 	    	
 			int colSTID = _currentServer.getColumnIndexOrThrow("server_template_id");
 			String[] whereArgs = { _helper.getAccountId(), new Integer(_currentServer.getInt(colSTID)).toString(), "operational" };
-	    	return cr.query(_helper.getRelativeRoute("server_template_executables"), Dashboard.SERVER_TEMPLATE_EXECUTABLE_COLUMNS, "account_id = ? AND server_template_id = ? AND apply = ?", whereArgs, null);		
+	    	return cr.query(_helper.getContentRoute("server_template_executables"), Dashboard.SERVER_TEMPLATE_EXECUTABLE_COLUMNS, "account_id = ? AND server_template_id = ? AND apply = ?", whereArgs, null);		
 		}
 		else {
 			return super.produceContent(tag);

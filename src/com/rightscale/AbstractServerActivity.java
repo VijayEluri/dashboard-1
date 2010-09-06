@@ -157,13 +157,13 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 	    	ContentResolver cr = getContentResolver();
 	
 			String[] whereArgs = { _helper.getAccountId(), getServerId() };
-	    	return cr.query(_helper.getRelativeRoute("servers"), Dashboard.SERVER_COLUMNS, "account_id = ? AND id = ?", whereArgs, null);
+	    	return cr.query(_helper.getContentRoute("servers"), Dashboard.SERVER_COLUMNS, "account_id = ? AND id = ?", whereArgs, null);
 		}
 		else if(SERVER_SETTINGS == tag) {
         	ContentResolver cr = getContentResolver();
 
     		String[] whereArgs = { _helper.getAccountId(), getServerId() };
-        	return cr.query(_helper.getRelativeRoute("server_settings"), Dashboard.SERVER_SETTING_COLUMNS, "account_id = ? AND server_id = ?", whereArgs, null);    		
+        	return cr.query(_helper.getContentRoute("server_settings"), Dashboard.SERVER_SETTING_COLUMNS, "account_id = ? AND server_id = ?", whereArgs, null);    		
     	}
 		else {
 			return null;

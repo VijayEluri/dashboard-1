@@ -22,10 +22,6 @@ import com.rightscale.provider.DashboardSession;
 public class DashboardFeed extends Service {
 	public static final String CATEGORY_EVENT = "com.rightscale.service.DashboardFeed.category.event";
 	
-	public static final String FEED_HOST   = "moo1.rightscale.com"; //TODO make this configurable
-	public static final String FEED_PREFIX = "https://" + FEED_HOST + "/user_notifications/feed.atom?feed_token=";	
-	public static final String HARDCODED_TOKEN = "38ecd5ab72d787d323e837ee2064a3334d1f5139"; //TODO make this configurable
-
 	public static final String HARDCODED_DEBUG_URL="https://my.rightscale.com/user_notifications/feed.atom?feed_token=fe2c2fbdbbe634c8ecae7237222b50f4011935a2";
 	
     /**
@@ -55,11 +51,10 @@ public class DashboardFeed extends Service {
         }
         
         try {
-			DashboardSession session = new DashboardSession(Settings.getEmail(this), Settings.getPassword(this));
+			DashboardSession session = new DashboardSession(Settings.getEmail(this), Settings.getPassword(this), Settings.getSystem(this));
 			session.login();
 
 			//TODO undo hack
-			//URI uri = new URI(FEED_PREFIX + HARDCODED_TOKEN);
 			URI uri = new URI(HARDCODED_DEBUG_URL);
 
 			_scraper       = new FeedScraper(this, session, uri);

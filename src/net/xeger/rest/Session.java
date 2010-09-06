@@ -10,6 +10,7 @@ public interface Session {
 	public void login() throws RestException;
 	public void logout();
 	
+	public URI getBaseURI();
 	public DefaultHttpClient createClient();
 	public HttpGet createGet(URI uri);
 	public HttpPost createPost(URI uri);
