@@ -41,8 +41,7 @@ public class ShowDeployment extends AbstractDashboardActivity {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-    	Uri serverUri = Uri.withAppendedPath(Dashboard.SERVERS_URI, new Long(id).toString());
-    	Intent i = new Intent(Intent.ACTION_VIEW, serverUri);
+    	Intent i = new Intent(Intent.ACTION_VIEW, Routes.showServer(id));
     	startActivity(i);
     }
 

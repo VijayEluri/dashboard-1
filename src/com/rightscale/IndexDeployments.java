@@ -3,7 +3,6 @@ package com.rightscale;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -24,8 +23,7 @@ public class IndexDeployments extends AbstractDashboardActivity {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-    	Uri deploymentUri = Uri.withAppendedPath(Dashboard.DEPLOYMENTS_URI, new Long(id).toString());
-    	Intent i = new Intent(Intent.ACTION_VIEW, deploymentUri);
+    	Intent i = new Intent(Intent.ACTION_VIEW, Routes.showDeployment(id));
     	startActivity(i);
     }
     

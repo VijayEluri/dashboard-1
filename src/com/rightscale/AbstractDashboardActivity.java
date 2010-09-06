@@ -13,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.rightscale.provider.Dashboard;
 import com.rightscale.service.DashboardFeed;
 
 public abstract class AbstractDashboardActivity extends ListActivity implements ContentProducer, ContentConsumer {
@@ -49,7 +48,7 @@ public abstract class AbstractDashboardActivity extends ListActivity implements 
     	
     	switch(item.getItemId()) {
     	case R.id.menu_deployments:
-        	i = new Intent(Intent.ACTION_VIEW, Dashboard.DEPLOYMENTS_URI);
+        	i = new Intent(Intent.ACTION_VIEW, Routes.indexDeployments());
         	break;
     	case R.id.menu_settings:
     		i = new Intent(this, Settings.class);

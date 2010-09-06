@@ -2,10 +2,12 @@ package com.rightscale.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 
 import net.xeger.rest.RestException;
 import android.app.Service;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -17,6 +19,8 @@ public class DashboardFeed extends Service {
 	public static final String FEED_HOST   = "moo1.rightscale.com"; //TODO make this configurable
 	public static final String FEED_PREFIX = "https://" + FEED_HOST + "/user_notifications/feed.atom?feed_token=";	
 	public static final String HARDCODED_TOKEN = "38ecd5ab72d787d323e837ee2064a3334d1f5139"; //TODO make this configurable
+
+	public static final String HARDCODED_DEBUG_URL="https://my.rightscale.com/user_notifications/feed.atom?feed_token=fe2c2fbdbbe634c8ecae7237222b50f4011935a2";
 	
     /**
      * Class for clients to access.  Because we know this service always
@@ -48,18 +52,18 @@ public class DashboardFeed extends Service {
 			DashboardSession session = new DashboardSession(Settings.getEmail(this), Settings.getPassword(this));
 			session.login();
 
-			URI uri = new URI(FEED_PREFIX + HARDCODED_TOKEN);
+			//URI uri = new URI(FEED_PREFIX + HARDCODED_TOKEN);
+			URI uri = new URI(HARDCODED_DEBUG_URL);
 
-			_scraper       = new FeedScraper(session, uri);
+			_scraper       = new FeedScraper(this, session, uri);
 			_thread = new Thread(_scraper);
 			_thread.start();			
 		}
 		catch(URISyntaxException e) {
-    		Log.e("FeedScraper", e.getMessage());
 			e.printStackTrace();
 		}
 		catch(RestException e) {
-			Log.e("DashboardFeed", e.getMessage());
+			e.printStackTrace();
 			//TODO: send an error broadcast/notification (launch Settings activity - failed auth?)
 		}
     }
@@ -81,28 +85,7 @@ public class DashboardFeed extends Service {
         return _binder;
     }
 
-    /**
-     * Show a notification while this service is running.
-     */
-//    private void showNotification() {
-//        // In this sample, we'll use the same text for the ticker and the expanded notification
-//        CharSequence text = getText(R.string.local_service_started);
-//
-//        // Set the icon, scrolling text and timestamp
-//        Notification notification = new Notification(R.drawable.stat_sample, text,
-//                System.currentTimeMillis());
-//
-//        // The PendingIntent to launch our activity if the user selects this notification
-//        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-//                new Intent(this, LocalServiceActivities.Controller.class), 0);
-//
-//        // Set the info for the views that show in the notification panel.
-//        notification.setLatestEventInfo(this, getText(R.string.local_service_label),
-//                       text, contentIntent);
-//
-//        // Send the notification.
-//        // We use a layout id because it is a unique number.  We use it later to cancel.
-//        mNM.notify(R.string.local_service_started, notification);
-//    }
-
+    void onDashboardEvent(Date when, Uri subject, String subjectName, String summary) {
+    	//TODO send a broadcast (maybe also a notification, if no app activity is running?)
+    }
 }

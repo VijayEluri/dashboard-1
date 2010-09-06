@@ -2,6 +2,11 @@ package com.rightscale.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -13,6 +18,9 @@ import org.apache.http.HttpEntity;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+import com.rightscale.Routes;
+
+import android.net.Uri;
 import android.util.Log;
 
 class FeedScraper extends AbstractResource implements Runnable {
@@ -20,14 +28,20 @@ class FeedScraper extends AbstractResource implements Runnable {
 	static final int MAX_POLL_PERIOD     = 20000;
 	static final int ERROR_POLL_PERIOD   = MAX_POLL_PERIOD;
 	
-	URI     _uri;
-	boolean _shouldStop = false;
+	static final SimpleDateFormat ATOM_DATE_FORMAT = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss'Z'");	
+	static final Pattern          RESOURCE_REGEX   = Pattern.compile("Resource:.*<a href=\"/acct/([0-9]+)?path=%2F([a-z]+)%2F([0-9]+)>([^<]*)</a");
+	static final Pattern          EVENT_REGEX      = Pattern.compile("Event:.*<a.*>([^<]*)</a>");	
+
+	DashboardFeed _context = null;
+	URI           _uri = null;
+	boolean       _shouldStop = false;
 	
-	public FeedScraper(Session session, URI uri)
+	public FeedScraper(DashboardFeed context, Session session, URI uri)
 		throws URISyntaxException
 	{
 		super(session);
-		_uri = uri;  
+		_context = context;
+		_uri     = uri;  
 	}
 	
 	protected URI getBaseURI() {
@@ -61,10 +75,9 @@ class FeedScraper extends AbstractResource implements Runnable {
 	    		xr.parse(new InputSource(response.getContent()));
 	    		response.consumeContent();
 	    		entries = parser.getNumEntries();
-	    		Log.d("FeedScraper", "Scraped " + entries + " feed entries.");
 	    	}
 	    	catch(Exception e) {
-	    		Log.e("FeedScraper", e.getMessage());
+	    		Log.e("FeedScraper", e.getClass().getName());
 				e.printStackTrace();
 				error = true;
 	    	}
@@ -89,7 +102,55 @@ class FeedScraper extends AbstractResource implements Runnable {
     	}
 	}
     
-    void reportFeedEvent(String subject, String summary) {
-    	//TODO send a broadcast (or a system notification?)
+    void reportFeedEvent(String updated, String htmlContent) {
+    	Log.i("FeedScraper", updated);
+    	Log.i("FeedScraper", htmlContent);
+
+    	Date   when;
+    	Uri    subjectUri;
+    	String subjectName;
+    	String summary;
+    	
+    	try {
+    		when = ATOM_DATE_FORMAT.parse(updated);
+    	}
+    	catch (ParseException e) {
+			e.printStackTrace();
+    		Log.e("FeedScraper", htmlContent);
+			return;
+		}
+
+    	Matcher m = RESOURCE_REGEX.matcher(htmlContent);
+    	if(m.find()) {
+    		String accountId    = m.group(1);
+    		String resource     = m.group(2);
+    		String resourceId   = m.group(3);
+    		subjectName         = m.group(4);
+
+    		if(resource.equals("servers")) {
+	    		//TODO actually construct uri once we have proper routes
+    			subjectUri = Routes.showServer(Long.parseLong(resourceId));
+	    		//subjectUri = Uri.parse(accountId + resource + resourceId + subjectName);
+    		}
+    		else {
+        		Log.e("FeedScraper", "Unknown resource type:\n" + htmlContent);
+    			return;    			
+    		}
+    	}
+    	else {
+    		Log.e("FeedScraper", "No RESOURCE_REGEX:\n" + htmlContent);
+			return;
+    	}
+
+    	m = EVENT_REGEX.matcher(htmlContent);
+    	if(m.find()) {
+    		summary = m.group(1);
+    	}
+    	else {
+    		Log.e("FeedScraper", "No EVENT_REGEX:\n" + htmlContent);
+			return;    		
+    	}
+    	
+    	_context.onDashboardEvent(when, subjectUri, subjectName, summary);    	
     }
 }
