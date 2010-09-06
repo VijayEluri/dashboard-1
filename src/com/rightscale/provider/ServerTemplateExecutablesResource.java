@@ -13,8 +13,6 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 
 class ServerTemplateExecutablesResource extends DashboardResource {
-	public static final Uri CONTENT_URI =
-		Uri.withAppendedPath(Dashboard.CONTENT_URI, "server_template_executables");
 	public static final String MIME_TYPE = "vnd.rightscale.server_template_executable";
 	
 	public static final String ID                 = Dashboard.ID;
@@ -26,11 +24,11 @@ class ServerTemplateExecutablesResource extends DashboardResource {
 	
 	public static final String[] COLUMNS = { ID, SERVER_TEMPLATE_ID, APPLY, POSITION, NAME, RIGHT_SCRIPT_ID };
 
-	public ServerTemplateExecutablesResource(Session session, int accountId) {
+	public ServerTemplateExecutablesResource(Session session, String accountId) {
 		super(session, accountId);
 	}
 	
-	public Cursor indexForServerTemplate(int serverTemplateId, String apply)
+	public Cursor indexForServerTemplate(String serverTemplateId, String apply)
 		throws RestException
 	{
 		try {
@@ -87,15 +85,16 @@ class ServerTemplateExecutablesResource extends DashboardResource {
 		}
 	}
 	
-	private Cursor buildCursor(int serverTemplateId, JSONArray array)
+	private Cursor buildCursor(String serverTemplateId, JSONArray array)
 		throws JSONException, ProtocolError
 	{
-		MatrixCursor result = new MatrixCursor(COLUMNS);
-				
+		int nServerTemplateId = Integer.parseInt(serverTemplateId);
+
+		MatrixCursor result = new MatrixCursor(COLUMNS);	
 		for(int i = 0; i < array.length(); i++) {
 			JSONObject object = array.getJSONObject(i);		
 			MatrixCursor.RowBuilder row = result.newRow();
-			buildRow(serverTemplateId, row, object);
+			buildRow(nServerTemplateId, row, object);
 		}
 		
 		return result;			

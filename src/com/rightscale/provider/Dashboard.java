@@ -1,7 +1,11 @@
 package com.rightscale.provider;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.xeger.rest.RestException;
 
@@ -40,17 +44,10 @@ import com.rightscale.Settings;
  * 
  */
 public class Dashboard extends ContentProvider {
-	private static int HARDCODED_ACCOUNT_ID = 2951; // 2951 = DEMO
+	private static String HARDCODED_ACCOUNT_ID = "2951"; // 2951 = DEMO
 
-	public static final Uri CONTENT_URI = Uri
+	public static final Uri BASE_CONTENT_URI = Uri
 			.parse("content://com.rightscale.provider.dashboard");
-
-	public static final Uri DEPLOYMENTS_URI = DeploymentsResource.CONTENT_URI;
-	public static final Uri SERVERS_URI = ServersResource.CONTENT_URI;
-	public static final Uri SERVER_SETTINGS_URI = ServerSettingsResource.CONTENT_URI;
-	public static final Uri SERVER_MONITORS_URI = ServerMonitorsResource.CONTENT_URI;
-	public static final Uri SERVER_TEMPLATES_URI = ServerTemplatesResource.CONTENT_URI;
-	public static final Uri SERVER_TEMPLATE_EXECUTABLES_URI = ServerTemplateExecutablesResource.CONTENT_URI;
 
 	public static final String ID = "_id";
 	public static final String HREF = "href";
@@ -67,20 +64,49 @@ public class Dashboard extends ContentProvider {
 	public static final String ACTION_REBOOT = "reboot";
 	public static final String ACTION_RUN_SCRIPT = "runScript";
 
+	static protected List<String> WHERE_ACCOUNT = new ArrayList<String>();
+	static {
+		WHERE_ACCOUNT.add("account_id");
+	}
+	
+	static protected List<String> WHERE_ACCOUNT_AND_ID = new ArrayList<String>();
+	static {
+		WHERE_ACCOUNT_AND_ID.add("account_id");
+		WHERE_ACCOUNT_AND_ID.add("id");
+	}
+	
+	static protected List<String> WHERE_ACCOUNT_AND_DEPLOYMENT = new ArrayList<String>();
+	static {
+		WHERE_ACCOUNT_AND_DEPLOYMENT.add("account_id");
+		WHERE_ACCOUNT_AND_DEPLOYMENT.add("deployment_id");
+	}
+	
+	static protected List<String> WHERE_ACCOUNT_AND_SERVER = new ArrayList<String>();
+	static {
+		WHERE_ACCOUNT_AND_SERVER.add("account_id");
+		WHERE_ACCOUNT_AND_SERVER.add("server_id");
+	}
+	
+	static protected List<String> WHERE_ACCOUNT_AND_SERVER_TEMPLATE_AND_APPLY = new ArrayList<String>();
+	static {
+		WHERE_ACCOUNT_AND_SERVER_TEMPLATE_AND_APPLY.add("account_id");
+		WHERE_ACCOUNT_AND_SERVER_TEMPLATE_AND_APPLY.add("server_template_id");
+		WHERE_ACCOUNT_AND_SERVER_TEMPLATE_AND_APPLY.add("apply");
+	}
+	
 	/*
 	 * TODO figure out how to fit this better into Android's app framework, e.g.
 	 * use a BroadcastReceiver that can handle these actions as Intents.
 	 */
-	static public void performAction(Context context, Uri uri, String action) {
-		performAction(context, uri, action, null);
+	static public void performAction(Context context, Uri uri, String accountId, String action) {
+		performAction(context, uri, accountId, action, null);
 	}
 
 	/*
 	 * TODO figure out how to fit this better into Android's app framework, e.g.
 	 * use a BroadcastReceiver that can handle these actions as Intents.
 	 */
-	static public void performAction(Context context, Uri uri, String action,
-			Object param) throws DashboardError {
+	static public void performAction(Context context, Uri uri, String accountId, String action, Object param) throws DashboardError {
 		String mimeType = _getType(uri);
 
 		if (!mimeType.startsWith("vnd.android.cursor.item/")) {
@@ -90,15 +116,13 @@ public class Dashboard extends ContentProvider {
 		}
 
 		List<String> pathSegments = uri.getPathSegments();
-		int id = new Integer(pathSegments.get(pathSegments.size() - 1))
-				.intValue();
+		String id = pathSegments.get(pathSegments.size() - 1);
 
 		try {
 			DashboardSession session = createSession(context);
 
 			if (mimeType.endsWith(ServersResource.MIME_TYPE)) {
-				ServersResource servers = new ServersResource(session,
-						HARDCODED_ACCOUNT_ID);
+				ServersResource servers = new ServersResource(session, accountId);
 
 				if (ACTION_LAUNCH.equals(action)) {
 					servers.launch(id);
@@ -109,7 +133,7 @@ public class Dashboard extends ContentProvider {
 				} else if (ACTION_REBOOT.equals(action)) {
 					servers.reboot(id);
 				} else if (ACTION_RUN_SCRIPT.equals(action)) {
-					servers.runScript(id, ((Integer) param).intValue());
+					servers.runScript(id, (String)param);
 				}
 			} else {
 				throw new DashboardError(
@@ -133,93 +157,88 @@ public class Dashboard extends ContentProvider {
 	}
 
 	@Override
-	public Cursor query(Uri uri, String[] columns, String where,
-			String[] whereArgs, String sortBy) {
+	public Cursor query(Uri uri, String[] columns, String where, String[] whereArgs, String sortBy) {
 		try {
+			List<String> segments = uri.getPathSegments();
 			DashboardSession session = createSession(getContext());
-
-			if (uri.equals(DeploymentsResource.CONTENT_URI)) {
-				DeploymentsResource deployments = new DeploymentsResource(
-						session, HARDCODED_ACCOUNT_ID);
-
-				if (where != null && where.equals("deployment_id = ?")
-						&& whereArgs != null && whereArgs.length >= 1) {
-					// SELECT ... FROM deployments WHERE deployment_id = ?
-					int deploymentId = new Integer(whereArgs[0]).intValue();
-					return deployments.show(deploymentId);
-				} else {
+			String[] args = null;
+			
+			if(segments.size() < 3 || !segments.get(0).equals("accounts")) {
+				throw new DashboardError("Unknown content URI: " + uri);				
+			}
+			
+			if (segments.get(2).equals("deployments")) {
+				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_ID)) != null) {
+					// SELECT ... FROM deployments WHERE id = ?
+					DeploymentsResource deployments = new DeploymentsResource(session, args[0]);
+					return deployments.show(args[1]);
+				}
+				else if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT)) != null) {
 					// SELECT ... FROM deployments
+					DeploymentsResource deployments = new DeploymentsResource(session, args[0]);
 					return deployments.index();
 				}
-			} else if (uri.equals(ServersResource.CONTENT_URI)) {
-				ServersResource servers = new ServersResource(session,
-						HARDCODED_ACCOUNT_ID);
-
-				if (where != null && where.equals("deployment_id = ?")
-						&& whereArgs != null && whereArgs.length >= 1) {
+				else {
+					throw new DashboardError("Unknown where-clause: " + where);									
+				}
+			} else if (segments.get(2).equals("servers")) {
+				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_DEPLOYMENT)) != null) {
 					// SELECT ... FROM servers WHERE deployment_id = ?
-					int deploymentId = new Integer(whereArgs[0]).intValue();
-					return servers.indexForDeployment(deploymentId);
-				} else if (where != null && where.equals("server_id = ?")) {
-					// SELECT ... FROM servers WHERE server_id = ?
-					int serverId = new Integer(whereArgs[0]).intValue();
-					return servers.show(serverId);
-				} else {
+					ServersResource servers = new ServersResource(session, args[0]);
+					return servers.indexForDeployment(args[1]);
+				}
+				else if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_ID)) != null) {
+					// SELECT ... FROM servers WHERE id = ?
+					ServersResource servers = new ServersResource(session, args[0]);
+					return servers.show(args[1]);
+				}
+				else if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT)) != null) {
 					// SELECT ... FROM servers
+					ServersResource servers = new ServersResource(session, args[0]);
 					return servers.index();
 				}
-			} else if (uri.equals(ServerSettingsResource.CONTENT_URI)) {
-				ServerSettingsResource serverSettings = new ServerSettingsResource(
-						session, HARDCODED_ACCOUNT_ID);
-
-				if (where != null && where.equals("server_id = ?")) {
+				else {
+					throw new DashboardError("Unknown where-clause: " + where);									
+				}
+			} else if (segments.get(2).equals("server_settings")) {
+				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_SERVER)) != null) {
 					// SELECT ... FROM server_settings WHERE server_id = ?
-					int serverId = new Integer(whereArgs[0]).intValue();
-					return serverSettings.showForServer(serverId);
-				} else {
-					throw new DashboardError(
-							"Cannot query server_settings without specifying server_id in where-clause");
+					ServerSettingsResource serverSettings = new ServerSettingsResource(session, args[0]);
+					return serverSettings.showForServer(args[1]);
 				}
-			} else if (uri.equals(ServerMonitorsResource.CONTENT_URI)) {
-				ServerMonitorsResource serverMonitors = new ServerMonitorsResource(
-						session, HARDCODED_ACCOUNT_ID);
-
-				if (where != null && where.equals("server_id = ?")) {
+				else {
+					throw new DashboardError("Unknown where-clause: " + where);									
+				}
+			} else if (segments.get(2).equals("server_monitors")) {
+				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_SERVER)) != null) {
 					// SELECT ... FROM server_monitors WHERE server_id = ?
-					int serverId = new Integer(whereArgs[0]).intValue();
-					return serverMonitors.showForServer(serverId);
-				} else {
-					throw new DashboardError(
-							"Cannot query server_monitors without specifying server_id in where-clause");
+					ServerMonitorsResource serverMonitors = new ServerMonitorsResource(session, args[0]);
+					return serverMonitors.showForServer(args[1]);
 				}
-			} else if (uri.equals(ServerTemplatesResource.CONTENT_URI)) {
-				ServerTemplatesResource serverTemplates = new ServerTemplatesResource(
-						session, HARDCODED_ACCOUNT_ID);
-
-				if (where != null && where.equals("id = ?")) {
+				else {
+					throw new DashboardError("Unknown where-clause: " + where);									
+				}
+			} else if (segments.get(2).equals("server_templates")) {
+				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_ID)) != null) {
 					// SELECT ... FROM server_templates WHERE id = ?
-					int serverTemplateId = new Integer(whereArgs[0]).intValue();
-					return serverTemplates.show(serverTemplateId);
-				} else {
+					ServerTemplatesResource serverTemplates = new ServerTemplatesResource(session, args[0]);
+					return serverTemplates.show(args[1]);
+				}
+				else if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT)) != null) {
+					ServerTemplatesResource serverTemplates = new ServerTemplatesResource(session, args[0]);
 					return serverTemplates.index();
 				}
-			} else if (uri
-					.equals(ServerTemplateExecutablesResource.CONTENT_URI)) {
-				ServerTemplateExecutablesResource serverTemplates = new ServerTemplateExecutablesResource(
-						session, HARDCODED_ACCOUNT_ID);
-
-				if (where != null
-						&& where.equals("server_template_id = ? and apply = ?")) {
-					int serverTemplateId = new Integer(whereArgs[0]).intValue();
-					String apply = whereArgs[1];
-					return serverTemplates.indexForServerTemplate(
-							serverTemplateId, apply);
-				} else {
-					throw new DashboardError(
-							"Cannot query server_template_executables without specifying server_template_id and apply in where-clause");
+				else {
+					throw new DashboardError("Unknown where-clause: " + where);									
 				}
-			} else {
-				throw new DashboardError("Unknown content URI " + uri);
+			} else if (segments.get(2).equals("server_template_executables")) {
+				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_SERVER_TEMPLATE_AND_APPLY)) != null) {
+					ServerTemplateExecutablesResource serverTemplates = new ServerTemplateExecutablesResource(session, args[0]);
+					return serverTemplates.indexForServerTemplate(args[1], args[2]);
+				}
+				else {
+					throw new DashboardError("Unknown where-clause: " + where);									
+				}
 			}
 		} catch (RuntimeException e) {
 			throw e;
@@ -227,6 +246,8 @@ public class Dashboard extends ContentProvider {
 			Error err = new DashboardError(e);
 			throw err;
 		}
+		
+		throw new DashboardError("Unknown content URI " + uri);
 	}
 
 	@Override
@@ -247,6 +268,66 @@ public class Dashboard extends ContentProvider {
 		return 0;
 	}
 
+	protected String[] parseWhereArgs(String where, String[] whereArgs, List<String> requiredParams) {
+		if(where == null) {
+			return null;
+		}
+		
+		String[] tokens = where.split("\\s+");		
+
+		String[] args          = new String[requiredParams.size()];
+		String columnName      = null;
+		int    n               = 0;		
+		
+		int state = 0;
+		for(String token : tokens) {
+			switch(state) {
+			case 0:
+				if(requiredParams.contains(token)) {
+					columnName = token;
+					state = 1;
+				}
+				else {
+					//if the query string contains something other than we expect, the parse fails 
+					return null;
+				}
+				break;
+			case 1:
+				if(token.equals("=")) {
+					state = 2;
+				}
+				else {
+					throw new DashboardError("Parse error: expected '=' but got " + token);					
+				}
+				break;
+			case 2:
+				if(token.equals("?")) {
+					args[requiredParams.indexOf(columnName)] = whereArgs[n++];
+					state = 3;
+				}
+				else {
+					throw new DashboardError("Parse error: expected '?' but got " + token);										
+				}
+				break;
+			case 3:
+				if(token.equalsIgnoreCase("and")) {
+					state = 0;
+				}
+				else {
+					throw new DashboardError("Parse error: expected 'AND' but got " + token);										
+				}
+				break;
+			}
+		}
+		
+		if(n == requiredParams.size()) {
+			return args;
+		}
+		else {
+			return null;
+		}
+	}
+	
 	static public HttpClient createClient(Context context) {
 		// TODO cache the session if it becomes stateful? use a pool?
 		DashboardSession session = new DashboardSession(Settings
@@ -267,15 +348,18 @@ public class Dashboard extends ContentProvider {
 	static protected String _getType(Uri uri) {
 		List<String> path = uri.getPathSegments();
 
-		String model = path.get(0);
+		String model;
 		String mimePrefix, mimeType;
 
 		if (path.size() % 2 == 1) {
 			// Odd-sized paths (/deployments, /deployments/1/servers, ...)
 			// represent a collection of resources.
+			model =  path.get(path.size() - 1);
 			mimePrefix = "vnd.android.cursor.dir/";
 		} else {
-			// Even-sized paths represent an individual item.
+			// Even-sized paths (/deployments/1, /server_templates/1/executables/5)
+			// represent an individual item.
+			model =  path.get(path.size() - 2);
 			mimePrefix = "vnd.android.cursor.item/";
 		}
 

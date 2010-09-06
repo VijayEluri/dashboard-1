@@ -7,33 +7,58 @@ import net.xeger.rest.ui.ContentTransfer;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.rightscale.provider.Dashboard;
 import com.rightscale.service.DashboardFeed;
 
 public abstract class AbstractDashboardActivity extends ListActivity implements ContentProducer, ContentConsumer {
+	protected String _accountId;
+
+	public String getAccountId() {
+		return _accountId;
+	}
+	
+	public Uri getRelativeRoute(String pathSegment) {
+		Uri uri = Uri.withAppendedPath(Routes.BASE_CONTENT_URI, "accounts/" + getAccountId());
+		return Uri.withAppendedPath(uri, pathSegment);
+	}
+	
+	public Uri getRelativeRoute(String pathSegment, long resourceId) {
+		Uri uri = Uri.withAppendedPath(Routes.BASE_CONTENT_URI, "accounts/" + getAccountId());
+		return Uri.withAppendedPath(uri, pathSegment + "/" + resourceId);
+	}
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	if(getIntent().getData() != null) {
+    		_accountId = Routes.getAccountId(getIntent().getData());
+    	}
+    	else {
+    		//HACK: if someone launches us without a data-ful intent (really we should hit up a dashboard here!)
+    		_accountId = "2951";
+    	}
         super.onCreate(savedInstanceState);
         ContentTransfer.load(this, this, new Handler());        
     }
 
+    @Override
     public void onStart() {
     	super.onStart();
-        Intent feedIntent = new Intent(this, DashboardFeed.class);
-        startService(feedIntent);    	
+        startService(new Intent(this, DashboardFeed.class));    	
     }
 
+    @Override
     public void onStop() {
     	super.onStop();
-        Intent feedIntent = new Intent(this, DashboardFeed.class);
-    	this.stopService(feedIntent);
+    	stopService(new Intent(this, DashboardFeed.class));
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
     	super.onCreateOptionsMenu(menu);
@@ -48,7 +73,7 @@ public abstract class AbstractDashboardActivity extends ListActivity implements 
     	
     	switch(item.getItemId()) {
     	case R.id.menu_deployments:
-        	i = new Intent(Intent.ACTION_VIEW, Routes.indexDeployments());
+        	i = new Intent(Intent.ACTION_VIEW, Routes.indexDeployments(getAccountId()));
         	break;
     	case R.id.menu_settings:
     		i = new Intent(this, Settings.class);

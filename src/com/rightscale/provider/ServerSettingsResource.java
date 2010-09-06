@@ -12,8 +12,6 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 
 public class ServerSettingsResource extends DashboardResource {
-	public static final Uri CONTENT_URI =
-		Uri.withAppendedPath(Dashboard.CONTENT_URI, "server_settings");
 	public static final String MIME_TYPE = "vnd.rightscale.server_setting";
 	
 	public static final String ID                 = Dashboard.ID;
@@ -28,31 +26,39 @@ public class ServerSettingsResource extends DashboardResource {
 
 	public static final String[] COLUMNS = { ID, HREF, SERVER_ID, CLOUD_ID, IP_ADDRESS, PRIVATE_IP_ADDRESS, LOCKED, PRICING, DATACENTER };
 	
-	public ServerSettingsResource(Session session, int accountId) {
+	public ServerSettingsResource(Session session, String accountId) {
 		super(session, accountId);
 	}
 
-	public Cursor showForServer(int server_id)
+	public Cursor showForServer(String serverId)
 	throws RestException
 	{
 		try {
-			JSONObject settings = getJsonObject("servers/" + server_id + "/settings.js");
-			return buildCursor(server_id, settings);
+			JSONObject settings = getJsonObject("servers/" + serverId + "/settings.js");
+			return buildCursor(serverId, settings);
 		}
 		catch(JSONException e) {
 			throw new ProtocolError(e);
 		}
 	}
 
+	private Cursor buildCursor(String serverId, JSONObject object)
+	throws JSONException
+	{
+		int nServerId = Integer.parseInt(serverId);
+		MatrixCursor result = new MatrixCursor(COLUMNS);
+		MatrixCursor.RowBuilder row = result.newRow();
+		buildRow(nServerId, row, object);
+		return result;
+	}
 
 	private void buildRow(int server_id, MatrixCursor.RowBuilder row, JSONObject object)
 		throws JSONException
 	{
 
-		//HACK: Settings have no ID exposed through the API, but since they map 1:1 to servers,
-		//we can reuse the Server ID. Kind of shitty!
-		int id                    = server_id;
-		String href               = Uri.withAppendedPath(ServersResource.CONTENT_URI, new Integer(server_id).toString() + "/settings").toString();
+		//HACK: Settings have no ID exposed through the API, but since they map 1:1 to servers, we can reuse the Server ID.
+		int id = server_id;
+		String href = getResourceURI("servers/" + server_id + "/settings.js", null).toString();
 		int cloud_id;
 		if(object.has("cloud_id")) {
 			cloud_id = new Integer(object.getString("cloud_id")).intValue(); 
@@ -89,14 +95,5 @@ public class ServerSettingsResource extends DashboardResource {
 		row.add(locked);
 		row.add(pricing);
 		row.add(datacenter);
-	}
-	
-	private Cursor buildCursor(int server_id, JSONObject object)
-	throws JSONException
-	{
-		MatrixCursor result = new MatrixCursor(COLUMNS);
-		MatrixCursor.RowBuilder row = result.newRow();
-		buildRow(server_id, row, object);
-		return result;
-	}
+	}	
 }

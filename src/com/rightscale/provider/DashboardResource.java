@@ -10,9 +10,10 @@ public class DashboardResource extends net.xeger.rest.AbstractResource {
 	public static String API_HOST   = "moo1.rightscale.com"; //TODO make this configurable
 	public static String API_PREFIX = "https://" + API_HOST + "/api";
 	
-	private int _accountId           = 0;
-	private URI _baseURI             = null;
-	public DashboardResource(Session session, int accountId)
+	private String _accountId = null;
+	private URI _baseURI      = null;
+	
+	public DashboardResource(Session session, String accountId)
 	{
 		super(session);
 		_accountId = accountId;
@@ -21,7 +22,7 @@ public class DashboardResource extends net.xeger.rest.AbstractResource {
 	protected URI getBaseURI() {
 		try {
 			if(_baseURI == null) {
-				_baseURI = new URI(API_PREFIX + "/acct/" + new Integer(_accountId).toString());
+				_baseURI = new URI(API_PREFIX + "/acct/" + _accountId);
 			}
 		} catch(URISyntaxException e) {
 			throw new ProtocolError(e);

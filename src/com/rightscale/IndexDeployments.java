@@ -23,13 +23,14 @@ public class IndexDeployments extends AbstractDashboardActivity {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-    	Intent i = new Intent(Intent.ACTION_VIEW, Routes.showDeployment(id));
+    	Intent i = new Intent(Intent.ACTION_VIEW, Routes.showDeployment(getAccountId(), new Long(id).toString()));
     	startActivity(i);
     }
     
     public Cursor produceContent(String tag) {
 		ContentResolver cr = getContentResolver();
-		return cr.query(Dashboard.DEPLOYMENTS_URI, Dashboard.DEPLOYMENT_COLUMNS, null, null, null);
+		String[] whereArgs = { new Long(getAccountId()).toString() };
+		return cr.query(getRelativeRoute("deployments"), Dashboard.DEPLOYMENT_COLUMNS, "account_id = ?", whereArgs, null);
     }
     
     public void consumeContent(Cursor cursor, String tag) {

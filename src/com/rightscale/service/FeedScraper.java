@@ -24,8 +24,8 @@ import android.net.Uri;
 import android.util.Log;
 
 class FeedScraper extends AbstractResource implements Runnable {
-	static final int DEFAULT_POLL_PERIOD = 2000;
-	static final int MAX_POLL_PERIOD     = 20000;
+	static final int DEFAULT_POLL_PERIOD = 15000;
+	static final int MAX_POLL_PERIOD     = 60000;
 	static final int ERROR_POLL_PERIOD   = MAX_POLL_PERIOD;
 	
 	static final SimpleDateFormat ATOM_DATE_FORMAT = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss'Z'");	
@@ -129,16 +129,16 @@ class FeedScraper extends AbstractResource implements Runnable {
 
     		if(resource.equals("servers")) {
 	    		//TODO actually construct uri once we have proper routes
-    			subjectUri = Routes.showServer(Long.parseLong(resourceId));
+    			subjectUri = Routes.showServer(accountId, resourceId);
 	    		//subjectUri = Uri.parse(accountId + resource + resourceId + subjectName);
     		}
     		else {
-        		Log.e("FeedScraper", "Unknown resource type:\n" + htmlContent);
+        		Log.w("FeedScraper", "Unknown resource type:\n" + htmlContent);
     			return;    			
     		}
     	}
     	else {
-    		Log.e("FeedScraper", "No RESOURCE_REGEX:\n" + htmlContent);
+    		Log.w("FeedScraper", "No RESOURCE_REGEX:\n" + htmlContent);
 			return;
     	}
 
@@ -147,7 +147,7 @@ class FeedScraper extends AbstractResource implements Runnable {
     		summary = m.group(1);
     	}
     	else {
-    		Log.e("FeedScraper", "No EVENT_REGEX:\n" + htmlContent);
+    		Log.w("FeedScraper", "No EVENT_REGEX:\n" + htmlContent);
 			return;    		
     	}
     	

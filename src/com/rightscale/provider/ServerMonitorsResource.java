@@ -13,8 +13,6 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 
 public class ServerMonitorsResource extends DashboardResource {
-	public static final Uri CONTENT_URI =
-		Uri.withAppendedPath(Dashboard.CONTENT_URI, "server_monitors");
 	public static final String MIME_TYPE   = "vnd.rightscale.server_monitor";
 	
 	public static final String ID          = Dashboard.ID;
@@ -24,11 +22,11 @@ public class ServerMonitorsResource extends DashboardResource {
 
 	public static final String[] COLUMNS = { ID, HREF, SERVER_ID, GRAPH_NAME };
 	
-	public ServerMonitorsResource(Session session, int accountId) {
+	public ServerMonitorsResource(Session session, String accountId) {
 		super(session, accountId);
 	}
 
-	public Cursor showForServer(int serverId)
+	public Cursor showForServer(String serverId)
 	throws RestException
 {
 	try {
@@ -42,21 +40,23 @@ public class ServerMonitorsResource extends DashboardResource {
 }
 
 	
-	private Cursor buildCursor(int serverId, JSONArray array)
+	private Cursor buildCursor(String serverId, JSONArray array)
 		throws JSONException
 	{
 		MatrixCursor result = new MatrixCursor(COLUMNS);
 
+		int nServerId = Integer.parseInt(serverId);
+		
 		for(int i = 0; i < array.length(); i++) {
 			JSONObject object = array.getJSONObject(i);
 			MatrixCursor.RowBuilder row = result.newRow();
-			buildRow(serverId, row, object);
+			buildRow(nServerId, row, object);
 		}
 		
 		return result;
 	}
 
-	private void buildRow(int server_id, MatrixCursor.RowBuilder row, JSONObject object)
+	private void buildRow(int serverId, MatrixCursor.RowBuilder row, JSONObject object)
 		throws JSONException
 	{
 		object = object.getJSONObject("monitor");
@@ -67,7 +67,7 @@ public class ServerMonitorsResource extends DashboardResource {
 
 		row.add(id++);
 		row.add(href);
-		row.add(server_id);
+		row.add(serverId);
 		row.add(graphName);
 	}
 }

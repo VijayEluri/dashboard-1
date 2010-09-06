@@ -13,8 +13,6 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 
 class DeploymentsResource extends DashboardResource {
-	public static final Uri CONTENT_URI = 
-		Uri.withAppendedPath(Dashboard.CONTENT_URI, "deployments");	
 	public static final String MIME_TYPE = "vnd.rightscale.deployment";
 	
 	public static final String ID       = Dashboard.ID;
@@ -23,7 +21,7 @@ class DeploymentsResource extends DashboardResource {
 	
 	public static final String[] COLUMNS = { ID, HREF, NICKNAME };
 
-	public DeploymentsResource(Session session, int accountId) {
+	public DeploymentsResource(Session session, String accountId) {
 		super(session, accountId);
 	}
 	
@@ -54,7 +52,7 @@ class DeploymentsResource extends DashboardResource {
 		return result;			
 	}
 	
-	public Cursor show(int id)
+	public Cursor show(String id)
 		throws RestException
 	{
 		try {

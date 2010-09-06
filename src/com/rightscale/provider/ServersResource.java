@@ -16,8 +16,6 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 
 class ServersResource extends DashboardResource {
-	public static final Uri CONTENT_URI =
-		Uri.withAppendedPath(Dashboard.CONTENT_URI, "servers");
 	public static final String MIME_TYPE = "vnd.rightscale.server";
 	
 	public static final String ID                 = Dashboard.ID;
@@ -30,7 +28,7 @@ class ServersResource extends DashboardResource {
 	
 	public static final String[] COLUMNS = { ID, HREF, DEPLOYMENT_ID, SERVER_TEMPLATE_ID, NICKNAME, STATE };
 
-	public ServersResource(Session session, int accountId) {
+	public ServersResource(Session session, String accountId) {
 		super(session, accountId);
 	}
 	
@@ -45,7 +43,7 @@ class ServersResource extends DashboardResource {
 		}
 	}
 	
-	public Cursor indexForDeployment(int deploymentId)
+	public Cursor indexForDeployment(String deploymentId)
 		throws RestException
 	{
 		try {
@@ -58,7 +56,7 @@ class ServersResource extends DashboardResource {
 		}
 	}
 	
-	public Cursor show(int id)
+	public Cursor show(String id)
 	throws RestException
 	{
 		try {
@@ -70,25 +68,25 @@ class ServersResource extends DashboardResource {
 		}
 	}
 
-	public void launch(int id)
+	public void launch(String id)
 		throws RestException
 	{
 		post("servers/" + id + "/start");
 	}
 	
-	public void terminate(int id)
+	public void terminate(String id)
 		throws RestException
 	{
 		post("servers/" + id + "/stop");		
 	}
 	
-	public void reboot(int id)
+	public void reboot(String id)
 		throws RestException
 	{
 		post("servers/" + id + "/reboot");		
 	}
 	
-	public void runScript(int id, int scriptId)
+	public void runScript(String id, String scriptId)
 		throws RestException		
 	{
 		ArrayList<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();

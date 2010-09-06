@@ -13,8 +13,6 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 
 class ServerTemplatesResource extends DashboardResource {
-	public static final Uri CONTENT_URI =
-		Uri.withAppendedPath(Dashboard.CONTENT_URI, "server_templates");
 	public static final String MIME_TYPE = "vnd.rightscale.server_template";
 	
 	public static final String ID              = Dashboard.ID;
@@ -26,7 +24,7 @@ class ServerTemplatesResource extends DashboardResource {
 	
 	public static final String[] COLUMNS = { ID, HREF, NICKNAME, DESCRIPTION, VERSION, IS_HEAD_VERSION };
 
-	public ServerTemplatesResource(Session session, int accountId) {
+	public ServerTemplatesResource(Session session, String accountId) {
 		super(session, accountId);
 	}
 	
@@ -41,7 +39,7 @@ class ServerTemplatesResource extends DashboardResource {
 		}
 	}
 	
-	public Cursor show(int id)
+	public Cursor show(String id)
 		throws RestException
 	{
 		try {
