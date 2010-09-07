@@ -24,7 +24,7 @@ import com.rightscale.provider.Dashboard;
  * Activity for viewing the servers in a Deployment. This activity expects to be started with an Intent
  * whose data points to the content-URI of the deployment the user is interested in.
  */
-public class ShowDeployment extends AbstractDashboardActivity {
+public class ShowDeployment extends AbstractAccountActivity {
 	private static final String SERVERS          = "servers";
 	private static final String DEPLOYMENT_TITLE = "deployment title";
 	

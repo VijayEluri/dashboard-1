@@ -13,7 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-public abstract class AbstractDashboardActivity extends ListActivity implements ContentProducer, ContentConsumer {
+public abstract class AbstractAccountActivity extends ListActivity implements ContentProducer, ContentConsumer {
 	private static String HARDCODED_ACCOUNT_ID = "2951"; // 2951 = DEMO
 
 	protected Helper            _helper   = null;
@@ -68,6 +68,9 @@ public abstract class AbstractDashboardActivity extends ListActivity implements 
     	Intent i = null;
     	
     	switch(item.getItemId()) {
+    	case R.id.menu_accounts:
+        	i = new Intent(Intent.ACTION_VIEW, Routes.indexAccounts());
+        	break;
     	case R.id.menu_deployments:
         	i = new Intent(Intent.ACTION_VIEW, Routes.indexDeployments(_helper.getAccountId()));
         	break;

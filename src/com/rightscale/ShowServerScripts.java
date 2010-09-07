@@ -36,12 +36,12 @@ public class ShowServerScripts extends AbstractServerActivity {
 				int colRightScriptId = _currentExecutables.getColumnIndexOrThrow("right_script_id");
 
 				_currentExecutables.moveToPosition(position);		    	
-		    	int executableId = _currentExecutables.getInt(colRightScriptId);
-		    	Dashboard.performAction(getBaseContext(), getServerUri(), _helper.getAccountId(), Dashboard.ACTION_RUN_SCRIPT, executableId);
+		    	String executableId = new Integer(_currentExecutables.getInt(colRightScriptId)).toString();
+	    		
+	    		Dashboard.performAction(getBaseContext(), getServerUri(), _helper.getAccountId(), Dashboard.ACTION_RUN_SCRIPT, executableId);		    			
+		    	Toast.makeText(ShowServerScripts.this, R.string.notify_execution_requested, Toast.LENGTH_LONG).show();		    	
 				
 				parent.setSelected(false);
-
-	    		Toast.makeText(ShowServerScripts.this, R.string.notify_script_queued, Toast.LENGTH_SHORT).show();
 			}
 		});
 	}

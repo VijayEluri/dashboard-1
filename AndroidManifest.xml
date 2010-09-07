@@ -17,11 +17,19 @@
             </intent-filter>        	
 		</activity>		
 		
-        <activity android:label="@string/app_name" android:name="IndexDeployments">
+		<activity android:label="@string/app_name" android:name="IndexAccounts">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+ 				<category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/vnd.rightscale.account" />
+            </intent-filter>        	
+		</activity>		
+		
+        <activity android:label="@string/rightscale_deployments" android:name="IndexDeployments">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
  				<category android:name="android.intent.category.DEFAULT" />

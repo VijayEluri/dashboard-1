@@ -34,6 +34,9 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import com.rightscale.provider.Dashboard;
 
 public class ShowServerMonitoring extends AbstractServerActivity implements ImageProducer, ImageConsumer {
+    static private final String[] FROM = {"graph_name"};
+    static private final int[]    TO   = {android.R.id.text1};
+
 	public static final String MONITORS = "monitors";
 	
 	public static final String THUMB = "thumb";
@@ -203,9 +206,6 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 
 	}
     
-    static private final String[] FROM = {"graph_name"};
-    static private final int[]    TO   = {android.R.id.text1};
-
 	public void consumeImageError(Throwable error, String tag) {
 		consumeContentError(error, tag);
 	}    

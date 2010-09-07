@@ -25,10 +25,17 @@ public class Routes {
 		}
 	}
 	
+	static public Uri indexAccounts() {
+		return BASE_CONTENT_URI.buildUpon()
+			.appendPath("accounts")
+			.build();
+	}
+
 	static public Uri indexDeployments(String accountId) {
 		return BASE_CONTENT_URI.buildUpon()
 			.appendPath("accounts")
 			.appendPath(accountId)
+			.appendPath("deployments")
 			.build();
 	}
 

@@ -46,9 +46,10 @@ public class Dashboard extends ContentProvider {
 	public static final String ID = "_id";
 	public static final String HREF = "href";
 
-	public static final String[] DEPLOYMENT_COLUMNS = DeploymentsResource.COLUMNS;
-	public static final String[] SERVER_COLUMNS = ServersResource.COLUMNS;
-	public static final String[] SERVER_SETTING_COLUMNS = ServerSettingsResource.COLUMNS;
+	public static final String[] ACCOUNT_COLUMNS         = AccountsResource.COLUMNS;
+	public static final String[] DEPLOYMENT_COLUMNS      = DeploymentsResource.COLUMNS;
+	public static final String[] SERVER_COLUMNS          = ServersResource.COLUMNS;
+	public static final String[] SERVER_SETTING_COLUMNS  = ServerSettingsResource.COLUMNS;
 	public static final String[] SERVER_MONITORS_COLUMNS = ServerMonitorsResource.COLUMNS;
 	public static final String[] SERVER_TEMPLATE_COLUMNS = ServerTemplatesResource.COLUMNS;
 	public static final String[] SERVER_TEMPLATE_EXECUTABLE_COLUMNS = ServerTemplateExecutablesResource.COLUMNS;
@@ -100,7 +101,7 @@ public class Dashboard extends ContentProvider {
 	 * TODO figure out how to fit this better into Android's app framework, e.g.
 	 * use a BroadcastReceiver that can handle these actions as Intents.
 	 */
-	static public void performAction(Context context, Uri uri, String accountId, String action, Object param) throws DashboardError {
+	static public void performAction(Context context, Uri uri, String accountId, String action, String param) throws DashboardError {
 		String mimeType = _getType(uri);
 
 		if (!mimeType.startsWith("vnd.android.cursor.item/")) {
@@ -156,11 +157,17 @@ public class Dashboard extends ContentProvider {
 			List<String> segments = uri.getPathSegments();
 			DashboardSession session = createSession(getContext());
 			String[] args = null;
+
+			if(segments.size() == 1 && segments.get(0).equals("accounts")) {
+				//Special case: asking for index of accounts
+				AccountsResource accounts = new AccountsResource(session);
+				return accounts.index();
+			}
 			
 			if(segments.size() < 3 || !segments.get(0).equals("accounts")) {
 				throw new DashboardError("Unknown content URI: " + uri);				
 			}
-			
+
 			if (segments.get(2).equals("deployments")) {
 				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_ID)) != null) {
 					// SELECT ... FROM deployments WHERE id = ?
@@ -355,13 +362,19 @@ public class Dashboard extends ContentProvider {
 			mimePrefix = "vnd.android.cursor.item/";
 		}
 
-		if (model.equals("deployments")) {
+		if (model.equals("accounts")) {
+			mimeType = AccountsResource.MIME_TYPE;
+		}
+		else if (model.equals("deployments")) {
 			mimeType = DeploymentsResource.MIME_TYPE;
-		} else if (model.equals("servers")) {
+		}
+		else if (model.equals("servers")) {
 			mimeType = ServersResource.MIME_TYPE;
-		} else if (model.equals("server_settings")) {
+		}
+		else if (model.equals("server_settings")) {
 			mimeType = ServerSettingsResource.MIME_TYPE;
-		} else {
+		}
+		else {
 			throw new InvalidParameterException("Unknown URI: " + model);
 		}
 

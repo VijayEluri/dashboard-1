@@ -11,11 +11,16 @@
 	<string name="system">System</string>
 	
 <!--  Menu strings ("main" menu) -->
+	<string name="accounts">Accounts</string>
+	<string name="accounts_shortcut">a</string>
 	<string name="deployments">Deployments</string>
 	<string name="deployments_shortcut">d</string>
 	<string name="settings">Settings</string>
 	<string name="settings_shortcut">s</string>
 		
+<!--  IndexAccounts -->
+	<string name="connect">Connect</string>
+	
 <!--  IndexDeployments -->
 	<string name="rightscale_deployments">RightScale Deployments</string>
 	<string name="no_deployments"></string>
@@ -43,5 +48,5 @@
 	<string name="error_dialog_message">Oops! An error has occurred. Sorry about that!</string>
 
 <!--  Notifications, toasts and other popup-y things -->
-	<string name="notify_script_queued">Action queued.</string>
+	<string name="notify_execution_requested">Script execution requested.</string>
 </resources>
