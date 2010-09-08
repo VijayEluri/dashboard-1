@@ -52,6 +52,7 @@ public class Helper {
 		}
 		
 	}
+	
 	public void onCreate(){
 		showSpinner();
 	}
