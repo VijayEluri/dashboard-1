@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import net.xeger.rest.AbstractResource;
 import net.xeger.rest.ProtocolError;
+import net.xeger.rest.RestAuthException;
 import net.xeger.rest.RestException;
 import net.xeger.rest.Session;
 
@@ -46,6 +47,10 @@ class AccountsResource extends AbstractResource {
 		MatrixCursor result = new MatrixCursor(COLUMNS);
 		
 		String response = this.get("servers", null);		
+
+		if(response.contains(DashboardSession.LOGIN_PAGE_CANARY)) {
+			throw new RestAuthException("Authentication failed", 401);
+		}
 		
 		int nStart = response.indexOf("<select id=\"account\"");
 		if(nStart < 0) {
@@ -54,12 +59,6 @@ class AccountsResource extends AbstractResource {
 		int nStop  = response.indexOf("</select>", nStart);
 		
 		Matcher match = ACCOUNT_REGEX.matcher(response);
-
-		Matcher fucker = ACCOUNT_REGEX.matcher(response);
-		fucker.find();
-		if(fucker.matches()) {
-			
-		}
 
 		boolean found = false;
 		

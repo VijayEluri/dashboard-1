@@ -7,6 +7,7 @@ import net.xeger.rest.ui.ContentConsumer;
 import net.xeger.rest.ui.ContentProducer;
 import net.xeger.rest.ui.ContentTransfer;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -22,20 +23,29 @@ import android.widget.Toast;
 import com.rightscale.provider.Dashboard;
 
 public class AbstractServerActivity extends Activity implements ContentConsumer, ContentProducer {
+	abstract class ServerAction implements Runnable {
+		Uri _server;
+		
+		ServerAction(Uri server) {
+			_server = server;
+		}
+	}
+	
 	static public final String SERVER          = "server";
 	static public final String SERVER_SETTINGS = "server_settings";
 
-	protected Helper _helper                = null;  
+	protected Helper         _helper = null;  
+	protected ProgressDialog _dialog = null;
+
 	protected Cursor _currentServer         = null;
 	protected Cursor _currentServerSettings = null;
 	protected BroadcastReceiver _receiver   = null;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        _helper = new Helper(this, Routes.getAccountId(getIntent().getData()));
         super.onCreate(savedInstanceState);
-        ContentTransfer.load(this, this, new Handler(), SERVER);
-        ContentTransfer.load(this, this, new Handler(), SERVER_SETTINGS);
+        _helper = new Helper(this, Routes.getAccountId(getIntent().getData()));
+        _dialog = _helper.showProgressDialog(this); //only show progress dialog on the first load    	
     }
 
     @Override
@@ -48,6 +58,7 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     public void onResume() {
     	super.onResume();
     	_helper.onResume();
+        loadContent();
     }
 
     @Override
@@ -111,6 +122,8 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
         int colNickname = _currentServer.getColumnIndexOrThrow("nickname");
     	String nickname = _currentServer.getString(colNickname);
     	
+    	ServerAction action = null;
+    	
     	switch(item.getItemId()) {
     	case R.id.menu_ssh_server:
     		int colAddress = _currentServerSettings.getColumnIndexOrThrow("ip_address");
@@ -123,33 +136,55 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 			break;
 			
     	case R.id.menu_launch_server:
-    		Dashboard.performAction(getBaseContext(), server, _helper.getAccountId(), Dashboard.ACTION_LAUNCH);
+    		action = new ServerAction(server) {
+    			public void run() {
+    	    		Dashboard.performAction(getBaseContext(), _server, _helper.getAccountId(), Dashboard.ACTION_LAUNCH);
+    	    		//TODO reload content
+    			}
+    		};
 			toast.append(nickname).append(" has been launched."); //TODO i18n
             break;
             
     	case R.id.menu_reboot_server:
-    		Dashboard.performAction(getBaseContext(), server, _helper.getAccountId(), Dashboard.ACTION_REBOOT);
+    		action = new ServerAction(server) {
+    			public void run() {
+    	    		Dashboard.performAction(getBaseContext(), _server, _helper.getAccountId(), Dashboard.ACTION_REBOOT);    				
+    	    		//TODO reload content
+    			}
+    		};
 			toast.append(nickname).append(" is being rebooted."); //TODO i18n
             break;
             
     	case R.id.menu_terminate_server:
-    		Dashboard.performAction(getBaseContext(), server, _helper.getAccountId(), Dashboard.ACTION_TERMINATE);
+    		action = new ServerAction(server) {
+    			public void run() {
+    	    		Dashboard.performAction(getBaseContext(), _server, _helper.getAccountId(), Dashboard.ACTION_TERMINATE);
+    	    		//TODO reload content
+    			}
+    		};
 			toast.append(nickname).append(" has been terminated."); //TODO i18n
             break;
-            
-    	default:
-    		return false;
     	}
     	
-        ContentTransfer.load(this, this, new Handler());
-        if(toast.length() > 0) {
-        	//TODO use a resource template for the toast (i18n friendliness)
-        	Toast.makeText(this, toast.toString(), Toast.LENGTH_SHORT).show();
+    	if(action != null) {
+	    	new Thread(action).start();
+	        if(toast.length() > 0) {
+	        	//TODO use a resource template for the toast (i18n friendliness)
+	        	Toast.makeText(this, toast.toString(), Toast.LENGTH_SHORT).show();
+	    	}
+	        return true;
     	}
-
-        return true;    	
+    	else {
+    		return false;
+    	}
     }
 
+    public void loadContent()
+    {
+    	ContentTransfer.load(this, this, new Handler(), SERVER);
+        ContentTransfer.load(this, this, new Handler(), SERVER_SETTINGS);    	
+    }
+    
 	public Cursor produceContent(String tag)
 		throws RestException
 	{
@@ -171,6 +206,8 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 	}    
     
 	public void consumeContent(Cursor cursor, String tag) {
+		_dialog = _helper.hideProgressDialog(_dialog);
+
 		if(tag == SERVER) {
 			if(_currentServer != null) {
 				stopManagingCursor(_currentServer);
@@ -190,6 +227,8 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 	}
 
 	public void consumeContentError(Throwable t, String tag) {
+		_dialog = _helper.hideProgressDialog(_dialog);
+		
 		Settings.handleError(t, getBaseContext());
 	}
 

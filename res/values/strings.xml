@@ -43,9 +43,9 @@
 
 <!--  App-wide dialogs -->
 	<string name="auth_error_dialog_title">Not Authorized</string>
-	<string name="auth_error_dialog_message">Your request was denied, most likely because your username and password are incorrect. Please double-check them.</string>
+	<string name="auth_error_dialog_message">Your request was denied, most likely because your username or password is incorrect. Please double-check their values.</string>
 	<string name="error_dialog_title">Error</string>
-	<string name="error_dialog_message">Oops! An error has occurred. Sorry about that!</string>
+	<string name="error_dialog_message">Oops! An error has occurred. Sorry about that.</string>
 
 <!--  Notifications, toasts and other popup-y things -->
 	<string name="notify_execution_requested">Script execution requested.</string>

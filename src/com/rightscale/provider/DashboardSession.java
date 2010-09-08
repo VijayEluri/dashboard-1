@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.xeger.rest.AbstractResource;
 import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestAuthException;
 import net.xeger.rest.RestException;
@@ -19,6 +20,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 public class DashboardSession implements Session {
+	static public final String LOGIN_PAGE_CANARY = "New RightScale Session";
+	
 	private String _username, _password;
 	private URI _baseURI;
 	
@@ -45,6 +48,7 @@ public class DashboardSession implements Session {
 		throws RestException
 	{
 		if(_sessionCookie != null) {
+			//TODO also check that it has a valid user ID!!!!
 			return;
 		}
 		
@@ -53,6 +57,8 @@ public class DashboardSession implements Session {
 		}
 
 		try {
+			// Can't use accounts-API login because we don't necessarily know an account ID.
+			// HACK: use UI login instead.
 			URI loginUri = new URI(_baseURI.toString() + "/sessions");
 			HttpPost post = createPost(loginUri);
 	
@@ -63,8 +69,9 @@ public class DashboardSession implements Session {
 	
 			DefaultHttpClient client = createClient();
 			HttpResponse response = client.execute(post);
-
-			if(response.getStatusLine().getStatusCode() != 200) {
+			String body = AbstractResource.readResponse(response.getEntity());
+			
+			if(response.getStatusLine().getStatusCode() != 200 || body.contains(LOGIN_PAGE_CANARY)) {
 				throw new RestAuthException("UI login request failed", response.getStatusLine().getStatusCode());
 			}
 			

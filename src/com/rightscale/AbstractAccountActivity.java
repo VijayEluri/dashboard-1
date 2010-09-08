@@ -5,6 +5,7 @@ import net.xeger.rest.ui.ContentConsumer;
 import net.xeger.rest.ui.ContentProducer;
 import net.xeger.rest.ui.ContentTransfer;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
 	private static String HARDCODED_ACCOUNT_ID = "2951"; // 2951 = DEMO
 
 	protected Helper            _helper   = null;
+	protected ProgressDialog    _dialog   = null;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,8 +29,9 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
     	else {
     		//HACK if someone launches us without a data-ful intent (really we should hit up a dashboard here!)
     		_helper = new Helper(this, HARDCODED_ACCOUNT_ID);
-    	}
-        ContentTransfer.load(this, this, new Handler());        
+    	}    	
+
+    	_dialog = _helper.showProgressDialog(this);    	
     }
 
     @Override
@@ -41,6 +44,7 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
     public void onResume() {
     	super.onResume();
     	_helper.onResume();
+    	loadContent();
     }
 
     @Override
@@ -88,10 +92,20 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
     	}
     }
 
+    public void loadContent()
+    {
+        ContentTransfer.load(this, this, new Handler());        
+    }
+    
 	abstract public Cursor produceContent(String tag) throws RestException;
-	abstract public void consumeContent(Cursor c, String tag);
+
+	public void consumeContent(Cursor c, String tag) {
+		_dialog = _helper.hideProgressDialog(_dialog);
+	}
 
 	public void consumeContentError(Throwable t, String tag) {
+		_dialog = _helper.hideProgressDialog(_dialog);
+
 		Settings.handleError(t, this);
 		finish();
 	}	

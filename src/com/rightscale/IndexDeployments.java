@@ -34,6 +34,7 @@ public class IndexDeployments extends AbstractAccountActivity {
     }
     
     public void consumeContent(Cursor cursor, String tag) {
+    	super.consumeContent(cursor, tag);
 		startManagingCursor(cursor);
     	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, cursor, FROM, TO);
     	setListAdapter(adapter);

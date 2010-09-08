@@ -63,6 +63,8 @@ public class ShowDeployment extends AbstractAccountActivity {
     }
     
     public void consumeContent(Cursor cursor, String tag) {
+    	super.consumeContent(cursor, tag);
+
     	if(tag == SERVERS) {
 	    	startManagingCursor(cursor);
 	    	ServerItemAdapter adapter = new ServerItemAdapter(this, R.layout.server_item, cursor, FROM, TO);

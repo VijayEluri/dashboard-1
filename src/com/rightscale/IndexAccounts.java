@@ -7,12 +7,16 @@ import net.xeger.rest.ui.ContentConsumer;
 import net.xeger.rest.ui.ContentProducer;
 import net.xeger.rest.ui.ContentTransfer;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -26,19 +30,62 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
     static private final String[] FROM = {"nickname"};
     static private final int[]    TO   = {android.R.id.text1};
 
-	protected Helper _helper;
-	protected Cursor _cursor;
+	protected Helper         _helper;
+	protected ProgressDialog _dialog;
+	
+	protected Cursor         _cursor;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.index_accounts);
-
-		_helper = new Helper(this, null);
-	
-		ContentTransfer.load(this, this, new Handler(), ACCOUNTS);
+		_helper = new Helper(this, null);	
+    	_dialog = _helper.showProgressDialog(this); //only show progress dialog on the first load    			
 	}
 
+	@Override
+	public void onStart() {
+    	super.onStart();
+		_helper.onStart();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		loadContent();		
+	}
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	super.onCreateOptionsMenu(menu);
+    	MenuInflater inflater = getMenuInflater();
+    	inflater.inflate(R.menu.index_accounts, menu);
+    	return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	Intent i = null;
+    	
+    	switch(item.getItemId()) {
+    	case R.id.menu_settings:
+    		i = new Intent(this, Settings.class);
+    		break;
+    	}
+    	
+    	if(i != null) {
+    		startActivity(i);
+    		return true;
+    	}
+    	else {
+    		return false;
+    	}
+    }
+
+    public void loadContent() {
+		ContentTransfer.load(this, this, new Handler(), ACCOUNTS);
+    }
+    
 	public Cursor produceContent(String tag) throws RestException {
 		if(tag == ACCOUNTS) {
 	    	ContentResolver cr = getContentResolver();
@@ -51,6 +98,8 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
 	}
 
 	public void consumeContent(Cursor cursor, String tag) {
+		_dialog = _helper.hideProgressDialog(_dialog);
+		
 		if(tag == ACCOUNTS) {
 			_cursor = cursor;
 			startManagingCursor(cursor);
@@ -66,6 +115,7 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
 			    	Spinner spinner = (Spinner)findViewById(R.id.index_accounts_spinner);
 					_cursor.moveToPosition(spinner.getSelectedItemPosition());
 					int idxId = _cursor.getColumnIndexOrThrow(Dashboard.ID);
+					String fucker = _cursor.getString(idxId); 
 		        	Intent i = new Intent(Intent.ACTION_VIEW, Routes.indexDeployments(_cursor.getString(idxId)));
 		        	startActivity(i);					
 				}	    		
@@ -74,6 +124,7 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
 	}
 
 	public void consumeContentError(Throwable throwable, String tag) {
+		_dialog = _helper.hideProgressDialog(_dialog);
 		Settings.handleError(throwable, this);
 		finish();
 	}

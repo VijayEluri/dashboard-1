@@ -5,6 +5,7 @@ import net.xeger.rest.ui.ContentTransfer;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -13,9 +14,17 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+import com.rightscale.AbstractServerActivity.ServerAction;
 import com.rightscale.provider.Dashboard;
 
 public class ShowServerScripts extends AbstractServerActivity {
+	abstract class ServerAction implements Runnable {
+		String _exe;
+		
+		ServerAction(String exe) {
+			_exe = exe;
+		}
+	}
 	static public final String SCRIPTS = "scripts";
 
 	private static String[] FROM = {"name"};
@@ -32,16 +41,28 @@ public class ShowServerScripts extends AbstractServerActivity {
 		
 		view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				if(_currentExecutables == null) return;				
+				parent.setSelected(false);
+
+				ServerAction action = null;
+				
+				if(_currentExecutables == null) {
+					return;				
+				}
+				
 				int colRightScriptId = _currentExecutables.getColumnIndexOrThrow("right_script_id");
 
 				_currentExecutables.moveToPosition(position);		    	
 		    	String executableId = new Integer(_currentExecutables.getInt(colRightScriptId)).toString();
 	    		
-	    		Dashboard.performAction(getBaseContext(), getServerUri(), _helper.getAccountId(), Dashboard.ACTION_RUN_SCRIPT, executableId);		    			
-		    	Toast.makeText(ShowServerScripts.this, R.string.notify_execution_requested, Toast.LENGTH_LONG).show();		    	
-				
-				parent.setSelected(false);
+	    		action = new ServerAction(executableId) {
+	    			public void run() {
+	    	    		Dashboard.performAction(getBaseContext(), getServerUri(), _helper.getAccountId(), Dashboard.ACTION_RUN_SCRIPT, _exe);		    			
+	    	            //TODO reload content            				
+	    			}
+	    		};
+
+	    		new Thread(action).start();
+		    	Toast.makeText(ShowServerScripts.this, R.string.notify_execution_requested, Toast.LENGTH_LONG).show();		    					
 			}
 		});
 	}

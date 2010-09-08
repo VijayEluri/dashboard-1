@@ -155,6 +155,7 @@ abstract public class AbstractResource {
 			return responseText;							
 		}
 		else if(statusCode >= 400 && statusCode < 500) {
+			_session.logout();
 			throw new RestAuthException("Authentication failed", statusCode);
 		}
 		else if(statusCode >= 500 && statusCode < 600) {

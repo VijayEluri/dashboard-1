@@ -25,8 +25,9 @@ public class Settings extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.settings);
-		
-		if(!getEmail(this).endsWith("@rightscale.com")) {
+
+		String email = getEmail(this);
+		if( (email != null) && !email.endsWith("@rightscale.com")) {
 			//Bit of obfuscation: hide the system unless the user's email ends with @rightscale.com
 			Preference system = this.findPreference("system");
 			getPreferenceScreen().removePreference(system);

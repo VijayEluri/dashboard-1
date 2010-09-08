@@ -106,7 +106,9 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 	private Cursor _cursor;
 	
 	public void consumeContent(Cursor cursor, String tag) {
-		if(tag == MONITORS) {
+    	super.consumeContent(cursor, tag);
+
+    	if(tag == MONITORS) {
 			_cursor = cursor;
 			startManagingCursor(cursor);
 	    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, cursor, FROM, TO);
@@ -126,8 +128,6 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 				}
 	    	});
 		}		
-
-		super.consumeContent(cursor, tag);		
 	}
 
 	public Cursor produceContent(String tag)
@@ -150,6 +150,7 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
     		view.setImageBitmap(bitmap);
     	}
     	else {
+    		view.setScaleType(ImageView.ScaleType.CENTER);
     		view.setImageDrawable(getBaseContext().getResources().getDrawable(android.R.drawable.ic_menu_close_clear_cancel));
     	}
     }
@@ -204,6 +205,12 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 			throw new net.xeger.rest.RestNetworkException(e);
 		}
 
+	}
+
+	public void consumeContentError(Throwable t, String tag) {
+		//Monitoring API returns a 403 if monitoring isn't enabled. Treat this as a simple failure
+		//rather than yanking the user into Preferences (base class impl).
+		consumeImage(null, null);
 	}
     
 	public void consumeImageError(Throwable error, String tag) {

@@ -3,6 +3,7 @@ package com.rightscale;
 import com.rightscale.provider.Dashboard;
 import com.rightscale.service.DashboardFeed;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +35,17 @@ public class Helper {
 	
 	public Uri getContentRoute(String pathSegment, String resourceId) {
 		return Uri.withAppendedPath(_accountUri, pathSegment + "/" + resourceId);
+	}
+	
+	public ProgressDialog showProgressDialog(Context context) {
+		return ProgressDialog.show(context, "", "Loading. Please wait...", true);
+	}
+	
+	public ProgressDialog hideProgressDialog(ProgressDialog dialog) {
+		if(dialog != null) {
+			dialog.dismiss();
+		}
+		return null;
 	}
 	
     public void onStart() {
