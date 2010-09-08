@@ -45,7 +45,7 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         _helper = new Helper(this, Routes.getAccountId(getIntent().getData()));
-        _dialog = _helper.showProgressDialog(this); //only show progress dialog on the first load    	
+        _helper.onCreate(); //only show progress dialog on the first load    	
     }
 
     @Override
@@ -55,16 +55,16 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     }
 
     @Override
+    public void onPause() {
+    	super.onPause();
+    	_helper.onPause();
+    }
+    
+    @Override
     public void onResume() {
     	super.onResume();
     	_helper.onResume();
         loadContent();
-    }
-
-    @Override
-    public void onPause() {
-    	super.onPause();
-    	_helper.onPause();
     }
 
     @Override
@@ -206,7 +206,7 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 	}    
     
 	public void consumeContent(Cursor cursor, String tag) {
-		_dialog = _helper.hideProgressDialog(_dialog);
+		_helper.onConsumeContent();
 
 		if(tag == SERVER) {
 			if(_currentServer != null) {
@@ -227,7 +227,7 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 	}
 
 	public void consumeContentError(Throwable t, String tag) {
-		_dialog = _helper.hideProgressDialog(_dialog);
+		_helper.onConsumeContent();
 		
 		Settings.handleError(t, getBaseContext());
 	}

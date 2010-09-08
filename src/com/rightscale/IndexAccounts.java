@@ -40,7 +40,7 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.index_accounts);
 		_helper = new Helper(this, null);	
-    	_dialog = _helper.showProgressDialog(this); //only show progress dialog on the first load    			
+		_helper.onCreate(); //only show progress dialog on the first load    			
 	}
 
 	@Override
@@ -48,14 +48,27 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
     	super.onStart();
 		_helper.onStart();
 	}
-
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		_helper.onPause();
+	}
+	
 	@Override
 	public void onResume() {
 		super.onResume();
 		loadContent();		
+		_helper.onResume();
 	}
 
-    @Override
+	@Override
+	public void onStop() {
+		super.onStop();
+		_helper.onStop();
+	}
+    
+	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
     	super.onCreateOptionsMenu(menu);
     	MenuInflater inflater = getMenuInflater();
@@ -98,7 +111,7 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
 	}
 
 	public void consumeContent(Cursor cursor, String tag) {
-		_dialog = _helper.hideProgressDialog(_dialog);
+		_helper.onConsumeContent();
 		
 		if(tag == ACCOUNTS) {
 			_cursor = cursor;
@@ -124,7 +137,7 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
 	}
 
 	public void consumeContentError(Throwable throwable, String tag) {
-		_dialog = _helper.hideProgressDialog(_dialog);
+		_helper.onConsumeContent();
 		Settings.handleError(throwable, this);
 		finish();
 	}

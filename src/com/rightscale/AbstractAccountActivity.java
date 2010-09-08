@@ -31,7 +31,7 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
     		_helper = new Helper(this, HARDCODED_ACCOUNT_ID);
     	}    	
 
-    	_dialog = _helper.showProgressDialog(this);    	
+    	_helper.onCreate();
     }
 
     @Override
@@ -41,16 +41,16 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
     }
 
     @Override
+    public void onPause() {
+    	super.onPause();
+    	_helper.onPause();
+    }
+    
+    @Override
     public void onResume() {
     	super.onResume();
     	_helper.onResume();
     	loadContent();
-    }
-
-    @Override
-    public void onPause() {
-    	super.onPause();
-    	_helper.onPause();
     }
 
     @Override
@@ -100,11 +100,11 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
 	abstract public Cursor produceContent(String tag) throws RestException;
 
 	public void consumeContent(Cursor c, String tag) {
-		_dialog = _helper.hideProgressDialog(_dialog);
+		_helper.onConsumeContent();
 	}
 
 	public void consumeContentError(Throwable t, String tag) {
-		_dialog = _helper.hideProgressDialog(_dialog);
+		_helper.onConsumeContent();
 
 		Settings.handleError(t, this);
 		finish();

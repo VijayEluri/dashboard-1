@@ -18,11 +18,14 @@ public class Helper {
 	protected String            _accountId;
 	protected Uri               _accountUri;
 	protected BroadcastReceiver _receiver;
+	protected ProgressDialog 	_spinner;
 	
 	public Helper(Context context, String accountId) {
 		_context    = context;
 		_accountId  = accountId;
 		_accountUri = Uri.withAppendedPath(Dashboard.BASE_CONTENT_URI, "accounts/" + getAccountId());
+		_spinner	= null;
+		_receiver	= null;
 	}
 	
 	public String getAccountId() {
@@ -37,15 +40,20 @@ public class Helper {
 		return Uri.withAppendedPath(_accountUri, pathSegment + "/" + resourceId);
 	}
 	
-	public ProgressDialog showProgressDialog(Context context) {
-		return ProgressDialog.show(context, "", "Loading. Please wait...", true);
+	protected void showSpinner() {
+		if (_spinner == null )
+		_spinner = ProgressDialog.show(_context, "", "Loading. Please wait...", true);
 	}
 	
-	public ProgressDialog hideProgressDialog(ProgressDialog dialog) {
-		if(dialog != null) {
-			dialog.dismiss();
+	protected void hideSpinner() {
+		if(_spinner!= null) {
+			_spinner.dismiss();
+			_spinner = null;
 		}
-		return null;
+		
+	}
+	public void onCreate(){
+		showSpinner();
 	}
 	
     public void onStart() {
@@ -75,6 +83,7 @@ public class Helper {
     }
 
     public void onPause() {
+    	hideSpinner();
     	if(BROADCAST_RECEIVERS_SUCK) {
     		return;
     	}
@@ -86,5 +95,8 @@ public class Helper {
     		return;
     	}
     	_context.stopService(new Intent(_context, DashboardFeed.class));
+    }
+    public void onConsumeContent(){
+    	hideSpinner();
     }
 }
