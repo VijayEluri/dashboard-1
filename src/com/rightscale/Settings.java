@@ -1,5 +1,6 @@
 package com.rightscale;
 
+import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestAuthException;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -15,8 +16,9 @@ import android.util.Log;
 import com.rightscale.provider.DashboardError;
 
 public class Settings extends PreferenceActivity {
-	public static final String ACTION_NOTIFY_ERROR = "notify_error";
-	
+	public static final String DEFAULT_SYSTEM = "my.rightscale.com";
+
+	public static final String ACTION_NOTIFY_ERROR = "notify_error";	
 	public static final int DIALOG_ERROR_ID      = 0;
 
 	DashboardError _error = null;
@@ -77,11 +79,18 @@ public class Settings extends PreferenceActivity {
 	}
 
 	public static String getSystem(Context context) {
-		return PreferenceManager.getDefaultSharedPreferences(context).getString("system", "my.rightscale.com");				
+		String system = PreferenceManager.getDefaultSharedPreferences(context).getString("system", DEFAULT_SYSTEM);
+		
+		if(system != null && system.endsWith("rightscale.com")) {
+			return system;
+		}
+		else {
+			return DEFAULT_SYSTEM;
+		}
 	}
 	
 	public static void handleError(Throwable t, Context context) {
-		if(t instanceof DashboardError) {
+		if(t instanceof DashboardError || t instanceof ProtocolError) {
 			Throwable cause = t.getCause() != null ? t.getCause() : t;
 			Log.e("DashboardError", cause.toString());
 			cause.printStackTrace();
