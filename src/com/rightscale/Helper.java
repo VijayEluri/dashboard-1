@@ -42,7 +42,6 @@ public class Helper {
 	}
 	
 	public void onCreate(){
-		showThrobber();
 	}
 	
     public void onStart() {
@@ -87,7 +86,11 @@ public class Helper {
     	_context.stopService(new Intent(_context, DashboardFeed.class));
     }
 
-    public void onConsumeContent(){
+    public void onLoadContent() {
+    	showThrobber();
+    }
+    
+    public void onConsumeContent() {
     	hideThrobber(false);
     }
     

@@ -179,6 +179,7 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 
     public void loadContent()
     {
+    	_helper.onLoadContent();
     	ContentTransfer.load(this, this, new Handler(), SERVER);
         ContentTransfer.load(this, this, new Handler(), SERVER_SETTINGS);    	
     }

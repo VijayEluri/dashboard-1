@@ -130,6 +130,7 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 
     public void loadContent()
     {
+    	_helper.onLoadContent();
 		ContentTransfer.load(this, this, new Handler(), MONITORS);
     }
     

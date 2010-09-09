@@ -92,6 +92,7 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
 
     public void loadContent()
     {
+    	_helper.onLoadContent();
         ContentTransfer.load(this, this, new Handler());        
     }
     

@@ -94,6 +94,7 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
     }
 
     public void loadContent() {
+    	_helper.onLoadContent();
 		ContentTransfer.load(this, this, new Handler(), ACCOUNTS);
     }
     
