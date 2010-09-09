@@ -17,7 +17,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 abstract public class AbstractResource {
+	static private final int MAX_RETRIES = 3;
+	
     abstract protected URI      getResourceURI(String relativePath, String query);
     
     private Session _session = null;
@@ -67,6 +71,25 @@ abstract public class AbstractResource {
 	public HttpEntity getEntity(String relativePath, String query)
 		throws RestException
 	{
+		int       tries = 0;
+		Throwable error = null;
+		
+		while(tries++ < MAX_RETRIES) {
+			try {
+				return getEntityNoRetry(relativePath, query);
+			}
+			catch(IOException e) {
+				Log.w("AbstractResource", "Retrying request due to " + e.toString());
+				error = e;
+			}
+		}
+		
+		throw new RestNetworkException(error);
+	}
+	
+	private HttpEntity getEntityNoRetry(String relativePath, String query)
+		throws RestException, IOException
+	{
 		URI uri = getResourceURI(relativePath, query);
 
 		_session.login();
@@ -76,32 +99,27 @@ abstract public class AbstractResource {
 		HttpResponse   response;		
 		int            statusCode;
 		
-		try {			
-			response = client.execute(get);
-			statusCode   = response.getStatusLine().getStatusCode();
-			
-			if(statusCode >= 200 && statusCode < 300) {
-				return response.getEntity();
-			}
-			
-			response.getEntity().consumeContent(); //We won't be using this...
-
-			if(statusCode >= 400 && statusCode < 500) {
-				_session.logout();
-				throw new RestAuthException("Authentication failed", statusCode);
-			}
-			else if(statusCode >= 500 && statusCode < 600) {
-				throw new RestServerException("Internal server error", statusCode);
-			}
-			else {
-				throw new RestException("Unrecognized HTTP status code", statusCode);			
-			}		
+		response = client.execute(get);
+		statusCode   = response.getStatusLine().getStatusCode();
+		
+		if(statusCode >= 200 && statusCode < 300) {
+			return response.getEntity();
 		}
-		catch(IOException e) {
-			throw new RestNetworkException(e);
+		
+		response.getEntity().consumeContent(); //An error occurred; we won't be using this...
+
+		if(statusCode >= 400 && statusCode < 500) {
+			_session.logout();
+			throw new RestAuthException("Authentication failed", statusCode);
+		}
+		else if(statusCode >= 500 && statusCode < 600) {
+			throw new RestServerException("Internal server error", statusCode);
+		}
+		else {
+			throw new RestException("Unrecognized HTTP status code", statusCode);			
 		}		
 	}
-	
+
 	public String get(String relativePath, String query)
 		throws RestException
 	{

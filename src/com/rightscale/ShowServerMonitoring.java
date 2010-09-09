@@ -58,8 +58,6 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.show_server_monitoring);
-
-		ContentTransfer.load(this, this, new Handler(), MONITORS);
 	}
 	
 	public void showGraph(String template, String size, String period) {
@@ -130,6 +128,11 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 		}		
 	}
 
+    public void loadContent()
+    {
+		ContentTransfer.load(this, this, new Handler(), MONITORS);
+    }
+    
 	public Cursor produceContent(String tag)
 		throws RestException
 	{
@@ -209,7 +212,7 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 
 	public void consumeContentError(Throwable t, String tag) {
 		//Our super would normally call this; call it ourselves since we don't call super
-		_helper.onConsumeContent();
+		_helper.onConsumeContentError(t);
 
 		//Monitoring API returns a 403 if monitoring isn't enabled. Treat this as a simple failure
 		//rather than yanking the user into Preferences (base class impl).
@@ -217,9 +220,6 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 	}
     
 	public void consumeImageError(Throwable error, String tag) {
-		//Our super would normally call this; call it ourselves since we don't call super
-		_helper.onConsumeContent();
-
 		consumeContentError(error, tag);
 	}    
 }

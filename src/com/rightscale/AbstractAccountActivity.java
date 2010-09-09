@@ -5,7 +5,6 @@ import net.xeger.rest.ui.ContentConsumer;
 import net.xeger.rest.ui.ContentProducer;
 import net.xeger.rest.ui.ContentTransfer;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
 	private static String HARDCODED_ACCOUNT_ID = "2951"; // 2951 = DEMO
 
 	protected Helper            _helper   = null;
-	protected ProgressDialog    _dialog   = null;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,9 +102,7 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
 	}
 
 	public void consumeContentError(Throwable t, String tag) {
-		_helper.onConsumeContent();
-
-		Settings.handleError(t, this);
+		_helper.onConsumeContentError(t);
 		finish();
 	}	
 }

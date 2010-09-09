@@ -7,7 +7,6 @@ import net.xeger.rest.ui.ContentConsumer;
 import net.xeger.rest.ui.ContentProducer;
 import net.xeger.rest.ui.ContentTransfer;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -35,7 +34,6 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 	static public final String SERVER_SETTINGS = "server_settings";
 
 	protected Helper         _helper = null;  
-	protected ProgressDialog _dialog = null;
 
 	protected Cursor _currentServer         = null;
 	protected Cursor _currentServerSettings = null;
@@ -45,7 +43,7 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         _helper = new Helper(this, Routes.getAccountId(getIntent().getData()));
-        _helper.onCreate(); //only show progress dialog on the first load    	
+        _helper.onCreate();    	
     }
 
     @Override
@@ -227,9 +225,7 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 	}
 
 	public void consumeContentError(Throwable t, String tag) {
-		_helper.onConsumeContent();
-		
-		Settings.handleError(t, getBaseContext());
+		_helper.onConsumeContentError(t);
 	}
 
     protected String getServerId() {

@@ -7,7 +7,6 @@ import net.xeger.rest.ui.ContentConsumer;
 import net.xeger.rest.ui.ContentProducer;
 import net.xeger.rest.ui.ContentTransfer;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
@@ -31,7 +30,6 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
     static private final int[]    TO   = {android.R.id.text1};
 
 	protected Helper         _helper;
-	protected ProgressDialog _dialog;
 	
 	protected Cursor         _cursor;
 	
@@ -137,8 +135,7 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
 	}
 
 	public void consumeContentError(Throwable throwable, String tag) {
-		_helper.onConsumeContent();
-		Settings.handleError(throwable, this);
+		_helper.onConsumeContentError(throwable);
 		finish();
 	}
 	
