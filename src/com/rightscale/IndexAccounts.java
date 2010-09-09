@@ -126,7 +126,6 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
 			    	Spinner spinner = (Spinner)findViewById(R.id.index_accounts_spinner);
 					_cursor.moveToPosition(spinner.getSelectedItemPosition());
 					int idxId = _cursor.getColumnIndexOrThrow(Dashboard.ID);
-					String fucker = _cursor.getString(idxId); 
 		        	Intent i = new Intent(Intent.ACTION_VIEW, Routes.indexDeployments(_cursor.getString(idxId)));
 		        	startActivity(i);					
 				}	    		

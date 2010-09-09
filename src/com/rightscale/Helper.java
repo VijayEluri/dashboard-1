@@ -19,10 +19,8 @@ public class Helper {
 	protected Uri               _accountUri;
 	protected BroadcastReceiver _receiver;
 
-	//All instances of this class share a single spinner. The lock is needed for thread-safe
-	//access to the static instance variable.
-	static private final Object     _spinnerLock = new Object();
-	static private ProgressDialog 	_spinner     = null;
+	private int                 _throbberCount = 0;
+	private ProgressDialog 	    _throbber      = null;
 	
 	public Helper(Context context, String accountId) {
 		_context    = context;
@@ -44,7 +42,7 @@ public class Helper {
 	}
 	
 	public void onCreate(){
-		showSpinner();
+		showThrobber();
 	}
 	
     public void onStart() {
@@ -81,7 +79,7 @@ public class Helper {
     }
 
     public void onStop() {
-    	hideSpinner();
+    	hideThrobber(true);
     	
     	if(BROADCAST_RECEIVERS_SUCK) {
     		return;
@@ -90,27 +88,32 @@ public class Helper {
     }
 
     public void onConsumeContent(){
-    	hideSpinner();
+    	hideThrobber(false);
     }
     
     public void onConsumeContentError(Throwable t) {
 		Settings.handleError(t, _context);    	
     }
 
-	protected void showSpinner() {
-		synchronized(_spinnerLock) {
-			if (_spinner == null) {
-				_spinner = ProgressDialog.show(_context, "", "Loading...", true);
-			}
+	public synchronized void showThrobber() {
+		_throbberCount++;
+		
+		if (_throbberCount > 0 && _throbber == null) {
+			_throbber = ProgressDialog.show(_context, "", "Loading...", true);
 		}
 	}
 	
-	protected void hideSpinner() {
-		synchronized(_spinnerLock) {
-			if(_spinner != null) {
-				_spinner.dismiss();
-				_spinner = null;
-			}
+	public synchronized void hideThrobber(boolean absolutely) {
+		if(absolutely) {
+			_throbberCount = 0;
+		}
+		else {
+			_throbberCount = (_throbberCount > 0) ? (_throbberCount - 1) : 0;
+		}
+
+		if(_throbberCount <= 0 && _throbber != null) {
+			_throbber.dismiss();
+			_throbber = null;
 		}
 	}	
 }
