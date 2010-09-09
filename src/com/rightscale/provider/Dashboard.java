@@ -88,6 +88,12 @@ public class Dashboard extends ContentProvider {
 		WHERE_ACCOUNT_AND_SERVER_TEMPLATE_AND_APPLY.add("server_template_id");
 		WHERE_ACCOUNT_AND_SERVER_TEMPLATE_AND_APPLY.add("apply");
 	}
+
+	/**
+	 * Session object that is shared among all callers of this class. Note that since a Context
+	 * is required to create a session, the first caller "wins".
+	 */
+	static private DashboardSession _session = null;
 	
 	/*
 	 * TODO figure out how to fit this better into Android's app framework, e.g.
@@ -115,6 +121,7 @@ public class Dashboard extends ContentProvider {
 
 		try {
 			DashboardSession session = createSession(context);
+			session.login();
 
 			if (mimeType.endsWith(ServersResource.MIME_TYPE)) {
 				ServersResource servers = new ServersResource(session, accountId);
@@ -158,6 +165,8 @@ public class Dashboard extends ContentProvider {
 			DashboardSession session = createSession(getContext());
 			String[] args = null;
 
+			session.login();
+			
 			if(segments.size() == 1 && segments.get(0).equals("accounts")) {
 				//Special case: asking for index of accounts
 				AccountsResource accounts = new AccountsResource(session);
@@ -330,18 +339,18 @@ public class Dashboard extends ContentProvider {
 	}
 	
 	static public HttpClient createClient(Context context) {
-		// TODO cache the session if it becomes stateful? use a pool?
-		DashboardSession session = new DashboardSession(Settings.getEmail(context), Settings.getPassword(context), Settings.getSystem(context));
 		// notice that we don't login the session (on purpose)
-		return session.createClient();
+		return createSession(context).createClient();
 	}
 
-	static public DashboardSession createSession(Context context)
-			throws RestException {
-		// TODO cache the session if it becomes stateful? use a pool?
-		DashboardSession session = new DashboardSession(Settings.getEmail(context), Settings.getPassword(context), Settings.getSystem(context));
-		session.login();
-		return session;
+	static public synchronized DashboardSession createSession(Context context)
+	{		
+		if(_session == null) {
+			// TODO cache the session if it becomes stateful? use a pool?
+			_session = new DashboardSession(Settings.getEmail(context), Settings.getPassword(context), Settings.getSystem(context));
+		}
+		
+		return _session;
 	}
 
 	static protected String _getType(Uri uri) {
