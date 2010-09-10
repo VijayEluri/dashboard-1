@@ -143,6 +143,7 @@ public class Dashboard extends ContentProvider {
 								+ uri.toString());
 			}
 		} catch (RestException e) {
+			forgetSession();
 			Error err = new DashboardError(e);
 			throw err;
 		}
@@ -252,7 +253,8 @@ public class Dashboard extends ContentProvider {
 			}
 		} catch (RuntimeException e) {
 			throw e;
-		} catch (Exception e) {
+		} catch (RestException e) {
+			forgetSession();
 			Error err = new DashboardError(e);
 			throw err;
 		}
@@ -353,6 +355,11 @@ public class Dashboard extends ContentProvider {
 		return _session;
 	}
 
+	static public synchronized void forgetSession()
+	{
+		_session = null;
+	}
+	
 	static protected String _getType(Uri uri) {
 		List<String> path = uri.getPathSegments();
 

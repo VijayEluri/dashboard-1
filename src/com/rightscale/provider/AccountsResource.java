@@ -5,6 +5,9 @@ import java.net.URISyntaxException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.http.client.HttpClient;
+
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import net.xeger.rest.AbstractResource;
@@ -41,12 +44,20 @@ class AccountsResource extends AbstractResource {
 		}    	    	
     }    
 
-    public Cursor index()
+    /**
+     * Create a cookie-authenticated client, overriding the default behavior of DashboardSession
+     * which is to create a basic-auth client.
+     */
+	protected HttpClient createClient() {
+		return ((DashboardSession)getSession()).createCookieClient();		
+	}
+
+	public Cursor index()
 		throws RestException
 	{
 		MatrixCursor result = new MatrixCursor(COLUMNS);
 		
-		String response = this.get("servers", null);		
+		String response = get("servers", null);		
 
 		if(response.contains(DashboardSession.LOGIN_PAGE_CANARY)) {
 			throw new RestAuthException("Authentication failed", 401);

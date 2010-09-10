@@ -91,10 +91,6 @@ public class Settings extends PreferenceActivity {
 	
 	public static void handleError(Throwable t, Context context) {
 		if(t instanceof DashboardError || t instanceof ProtocolError) {
-			Throwable cause = t.getCause() != null ? t.getCause() : t;
-			Log.e("DashboardError", cause.toString());
-			cause.printStackTrace();
-			
 			Intent intent = new Intent(Settings.ACTION_NOTIFY_ERROR, null, context, Settings.class);
 			intent.putExtra("error", t);
 			

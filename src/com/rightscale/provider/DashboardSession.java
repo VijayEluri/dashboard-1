@@ -1,5 +1,6 @@
 package com.rightscale.provider;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -13,14 +14,27 @@ import net.xeger.rest.Session;
 import net.xeger.rest.client.RetryHttpClient;
 import net.xeger.rest.client.SessionHttpClient;
 
+import org.apache.http.HttpException;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.AuthState;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.ExecutionContext;
+import org.apache.http.protocol.HttpContext;
 
 public class DashboardSession implements Session {
 	static public final String LOGIN_PAGE_CANARY = "New RightScale Session";
@@ -28,6 +42,10 @@ public class DashboardSession implements Session {
 	private String _username, _password;
 	private URI _baseURI;
 	
+	/**
+	 * Session cookie; only gets stored when a login request succeeds. Thus, the presence
+	 * of a session cookie in this variable doubles as an indicator that we are logged in.
+	 */
 	private Cookie _sessionCookie = null;
 
 	public DashboardSession(String username, String password, String system)
@@ -51,7 +69,6 @@ public class DashboardSession implements Session {
 		throws RestException
 	{
 		if(_sessionCookie != null) {
-			//TODO also check that it has a valid user ID!!!!
 			return;
 		}
 		
@@ -96,12 +113,29 @@ public class DashboardSession implements Session {
 	}
 	
 	public void logout() {
-		_username = _password = null;
 		_sessionCookie = null;
 	}
 
+	/**
+	 * Create a client that uses HTTP Basic authentication. Appropriate for most RightScale API requests.
+	 */
 	public HttpClient createClient()
 	{
+		DefaultHttpClient client = new DefaultHttpClient();
+		
+		if(_username != null && _password != null) {
+			//Wire up the client to perform HTTP basic authentication
+			setupBasicAuth(client);
+		}
+		
+		//Add some useful behaviors to the stock HTTP client
+		return new RetryHttpClient(new SessionHttpClient(client, this), 3);
+	}
+
+	/**
+	 * Create a client that uses cookie-based authentication. Appropriate for RightScale UI requests.
+	 */
+	public HttpClient createCookieClient() {
 		DefaultHttpClient client = new DefaultHttpClient();
 		
 		if(_sessionCookie != null) {
@@ -109,9 +143,19 @@ public class DashboardSession implements Session {
 		}
 
 		//Add some useful behaviors to the stock HTTP client
-		return new RetryHttpClient(new SessionHttpClient(client, this), 3);
+		return new RetryHttpClient(new SessionHttpClient(client, this), 3);		
 	}
-
+	
+	/**
+	 * Create an anonymous, unauthenticated client.
+	 */
+	public HttpClient createAnonymousClient() {
+		DefaultHttpClient client = new DefaultHttpClient();
+		
+		//Add some useful behaviors to the stock HTTP client
+		return new RetryHttpClient(client, 3);		
+	}
+	
     public HttpGet createGet(URI uri) {
     	HttpGet get = new HttpGet(uri.toString());
 		get.addHeader("Host", uri.getAuthority());
@@ -126,4 +170,31 @@ public class DashboardSession implements Session {
     	post.addHeader("X-API-Version", "1.0");
     	return post;
     }
+
+    private void setupBasicAuth(DefaultHttpClient client) {
+		AuthScope authScope = new AuthScope(_baseURI.getHost(), AuthScope.ANY_PORT, AuthScope.ANY_REALM);
+		UsernamePasswordCredentials creds = new UsernamePasswordCredentials(_username, _password);
+		client.getCredentialsProvider().setCredentials(authScope, creds);
+		client.addRequestInterceptor(createBasicAuthInterceptor(), 0);    	
+    }
+    
+	private HttpRequestInterceptor createBasicAuthInterceptor() {
+		return new HttpRequestInterceptor() {
+		    public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
+		        AuthState authState = (AuthState) context.getAttribute(ClientContext.TARGET_AUTH_STATE);
+		        CredentialsProvider credsProvider = (CredentialsProvider) context.getAttribute(
+		                ClientContext.CREDS_PROVIDER);
+		        HttpHost targetHost = (HttpHost) context.getAttribute(ExecutionContext.HTTP_TARGET_HOST);
+		        
+		        if (authState.getAuthScheme() == null) {
+		            AuthScope authScope = new AuthScope(targetHost.getHostName(), targetHost.getPort());
+		            Credentials creds = credsProvider.getCredentials(authScope);
+		            if (creds != null) {
+		                authState.setAuthScheme(new BasicScheme());
+		                authState.setCredentials(creds);
+		            }
+		        }
+		    }    
+		};		
+	}    
 }

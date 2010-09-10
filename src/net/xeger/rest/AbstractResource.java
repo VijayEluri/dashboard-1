@@ -9,21 +9,15 @@ import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 abstract public class AbstractResource {
-	static private final int MAX_RETRIES = 3;
-	
     abstract protected URI      getResourceURI(String relativePath, String query);
     
     private Session _session = null;
@@ -36,6 +30,10 @@ abstract public class AbstractResource {
     	return _session.getBaseURI();
     }
 
+    protected Session getSession() {
+    	return _session;
+    }
+    
     protected JSONObject getJsonObject(String relativePath)
     	throws RestException
     {
@@ -70,15 +68,15 @@ abstract public class AbstractResource {
 			}
 	}	
 
-	public HttpEntity getEntity(String relativePath, String query)
+	protected HttpEntity getEntity(String relativePath, String query)
 		throws RestException
 	{
 		URI uri = getResourceURI(relativePath, query);
 
 		_session.login();
 		
-		HttpClient client        = _session.createClient();		
-		HttpGet        get       = _session.createGet(uri);
+		HttpClient client        = createClient();		
+		HttpGet        get       = createGet(uri);
 		HttpResponse   response;		
 		int            statusCode;
 
@@ -110,7 +108,7 @@ abstract public class AbstractResource {
 		}		
 	}
 	
-	public String get(String relativePath, String query)
+	protected String get(String relativePath, String query)
 		throws RestException
 	{
 		try {
@@ -120,20 +118,19 @@ abstract public class AbstractResource {
 			throw new RestNetworkException(e);			
 		}
 	}
-	
-	public String post(String relativePath)
+	protected String post(String relativePath)
 		throws RestException
 	{
 		return post(relativePath, null);
 	}
 	
-	public String post(String relativePath, List<? extends NameValuePair> params)
+	protected String post(String relativePath, List<? extends NameValuePair> params)
 		throws RestException
 	{
 		URI uri = getResourceURI(relativePath, null);
 
-		HttpClient client        = _session.createClient();		
-		HttpPost       post      = _session.createPost(uri);
+		HttpClient client = createClient();		
+		HttpPost   post   = createPost(uri);
 		
 		if(params != null) {
 			UrlEncodedFormEntity entity;
@@ -173,8 +170,20 @@ abstract public class AbstractResource {
 			throw new RestException("Unrecognized HTTP status code", statusCode);			
 		}		
 	}
+
+	protected HttpClient createClient() {
+		return _session.createClient();		
+	}
 	
-    static public String readResponse(HttpEntity entity) throws IOException
+	protected HttpGet createGet(URI uri) {
+		return _session.createGet(uri);		
+	}
+	
+	protected HttpPost createPost(URI uri) {
+		return _session.createPost(uri);
+	}
+
+	static public String readResponse(HttpEntity entity) throws IOException
 	{
 	    String response = "";
 

@@ -95,6 +95,10 @@ public class Helper {
     }
     
     public void onConsumeContentError(Throwable t) {
+		Throwable cause = t.getCause() != null ? t.getCause() : t;
+		Log.e("DashboardError", cause.toString());
+		cause.printStackTrace();
+		
 		Settings.handleError(t, _context);    	
     }
 

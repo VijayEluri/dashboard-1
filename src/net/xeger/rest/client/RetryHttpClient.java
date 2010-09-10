@@ -14,8 +14,6 @@ import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
-import android.R.integer;
-
 public class RetryHttpClient implements HttpClient {
 	HttpClient _client      = null;
 	int        _maxGetTries = 3;
