@@ -9,6 +9,8 @@ import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -71,45 +73,33 @@ abstract public class AbstractResource {
 	public HttpEntity getEntity(String relativePath, String query)
 		throws RestException
 	{
-		int       tries = 0;
-		Throwable error = null;
-		
-		while(tries++ < MAX_RETRIES) {
-			try {
-				return getEntityNoRetry(relativePath, query);
-			}
-			catch(IOException e) {
-				Log.w("AbstractResource", "Retrying request due to " + e.toString());
-				error = e;
-			}
-		}
-		
-		throw new RestNetworkException(error);
-	}
-	
-	private HttpEntity getEntityNoRetry(String relativePath, String query)
-		throws RestException, IOException
-	{
 		URI uri = getResourceURI(relativePath, query);
 
 		_session.login();
 		
-		DefaultHttpClient client = _session.createClient();		
+		HttpClient client        = _session.createClient();		
 		HttpGet        get       = _session.createGet(uri);
 		HttpResponse   response;		
 		int            statusCode;
-		
-		response = client.execute(get);
-		statusCode   = response.getStatusLine().getStatusCode();
+
+		try {
+			response = client.execute(get);
+			statusCode   = response.getStatusLine().getStatusCode();
+		}
+		catch (Exception e) {
+			throw new RestNetworkException(e);
+		}
 		
 		if(statusCode >= 200 && statusCode < 300) {
 			return response.getEntity();
 		}
 		
-		response.getEntity().consumeContent(); //An error occurred; we won't be using this...
+		try {
+			response.getEntity().consumeContent(); //An error occurred; we won't be using this...
+		}
+		catch(IOException e) {}
 
 		if(statusCode >= 400 && statusCode < 500) {
-			_session.logout();
 			throw new RestAuthException("Authentication failed", statusCode);
 		}
 		else if(statusCode >= 500 && statusCode < 600) {
@@ -119,7 +109,7 @@ abstract public class AbstractResource {
 			throw new RestException("Unrecognized HTTP status code", statusCode);			
 		}		
 	}
-
+	
 	public String get(String relativePath, String query)
 		throws RestException
 	{
@@ -142,7 +132,7 @@ abstract public class AbstractResource {
 	{
 		URI uri = getResourceURI(relativePath, null);
 
-		DefaultHttpClient client = _session.createClient();		
+		HttpClient client        = _session.createClient();		
 		HttpPost       post      = _session.createPost(uri);
 		
 		if(params != null) {

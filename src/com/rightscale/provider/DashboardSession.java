@@ -10,8 +10,11 @@ import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestAuthException;
 import net.xeger.rest.RestException;
 import net.xeger.rest.Session;
+import net.xeger.rest.client.RetryHttpClient;
+import net.xeger.rest.client.SessionHttpClient;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -67,7 +70,7 @@ public class DashboardSession implements Session {
 			params.add(new BasicNameValuePair("password", _password));                
 			post.setEntity(new UrlEncodedFormEntity(params));
 	
-			DefaultHttpClient client = createClient();
+			DefaultHttpClient client = new DefaultHttpClient();
 			HttpResponse response = client.execute(post);
 			String body = AbstractResource.readResponse(response.getEntity());
 			
@@ -97,15 +100,16 @@ public class DashboardSession implements Session {
 		_sessionCookie = null;
 	}
 
-	public DefaultHttpClient createClient()
+	public HttpClient createClient()
 	{
 		DefaultHttpClient client = new DefaultHttpClient();
 		
 		if(_sessionCookie != null) {
 			client.getCookieStore().addCookie(_sessionCookie);
 		}
-		
-		return client;
+
+		//Add some useful behaviors to the stock HTTP client
+		return new RetryHttpClient(new SessionHttpClient(client, this), 3);
 	}
 
     public HttpGet createGet(URI uri) {

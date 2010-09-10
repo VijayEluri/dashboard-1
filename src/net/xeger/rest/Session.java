@@ -2,6 +2,7 @@ package net.xeger.rest;
 
 import java.net.URI;
 
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -22,7 +23,7 @@ public interface Session {
 	public void logout();
 	
 	public URI getBaseURI();
-	public DefaultHttpClient createClient();
+	public HttpClient createClient();
 	public HttpGet createGet(URI uri);
 	public HttpPost createPost(URI uri);
 }
