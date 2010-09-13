@@ -10,6 +10,9 @@
 		<service android:label="@string/feed" android:name="com.rightscale.service.DashboardFeed" android:enabled="true">
 		</service>
 		
+		<activity android:label="@string/login" android:name="Login" android:theme="@android:style/Theme.Dialog">
+		</activity>
+		
 		<activity android:label="@string/settings" android:name="Settings">
             <intent-filter>
                 <action android:name="notify_error" />

@@ -93,7 +93,10 @@ public class Dashboard extends ContentProvider {
 	 * Session object that is shared among all callers of this class. Note that since a Context
 	 * is required to create a session, the first caller "wins".
 	 */
-	static private DashboardSession _session = null;
+	static private DashboardSession _session         = null;
+	static private String           _sessionEmail    = null;
+	static private String           _sessionPassword = null;
+	static private String           _sessionSystem   = null;	
 	
 	/*
 	 * TODO figure out how to fit this better into Android's app framework, e.g.
@@ -346,12 +349,26 @@ public class Dashboard extends ContentProvider {
 	}
 
 	static public synchronized DashboardSession createSession(Context context)
-	{		
-		if(_session == null) {
-			// TODO cache the session if it becomes stateful? use a pool?
-			_session = new DashboardSession(Settings.getEmail(context), Settings.getPassword(context), Settings.getSystem(context));
+	{
+		String email    = Settings.getEmail(context),
+		       password = Settings.getPassword(context),
+		       system   = Settings.getSystem(context);
+		
+		if( (_sessionEmail != null && !_sessionEmail.equals(email)) || 
+			(_sessionPassword != null && !_sessionPassword.equals(password)) || 
+			(_sessionSystem != null && !_sessionSystem.equals(system)))
+		{
+			//Reset session if any relevant preferences have changed
+			_session = null;
 		}
 		
+		if(_session == null) {
+			_sessionEmail    = email;
+			_sessionPassword = password;
+			_sessionSystem   = system;		
+			_session         = new DashboardSession(email, password, system);
+		}
+
 		return _session;
 	}
 

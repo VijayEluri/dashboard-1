@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
-<EditTextPreference android:key="email" android:title="@string/email"></EditTextPreference>
-<EditTextPreference android:key="password" android:title="@string/password" android:password="true"></EditTextPreference>
-<EditTextPreference android:key="system" android:title="@string/system"></EditTextPreference>
+<EditTextPreference android:key="email" android:title="@string/email" android:inputType="textEmailAddress"></EditTextPreference>
+<EditTextPreference android:key="password" android:title="@string/password" android:inputType="textPassword"></EditTextPreference>
+<EditTextPreference android:key="system" android:title="@string/system" android:inputType="textUri"></EditTextPreference>
 </PreferenceScreen>

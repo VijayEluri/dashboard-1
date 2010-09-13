@@ -15,6 +15,7 @@ import net.xeger.rest.ui.ImageProducer;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
@@ -32,6 +33,7 @@ import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 import com.rightscale.provider.Dashboard;
+import com.rightscale.provider.DashboardSession;
 
 public class ShowServerMonitoring extends AbstractServerActivity implements ImageProducer, ImageConsumer {
     static private final String[] FROM = {"graph_name"};
@@ -151,6 +153,7 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
     	ImageView view = (ImageView)findViewById(R.id.show_server_monitoring_graph);
     	
     	if(bitmap != null) {
+    		view.setScaleType(ImageView.ScaleType.FIT_CENTER);
     		view.setImageBitmap(bitmap);
     	}
     	else {
@@ -188,10 +191,7 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 		try {
 			Session session = com.rightscale.provider.Dashboard.createSession(getBaseContext()); 
 			
-			DefaultHttpClient client = (DefaultHttpClient)session.createClient();
-			//don't send basic auth headers
-			client.clearRequestInterceptors();
-			client.getCredentialsProvider().clear();
+			HttpClient client = ((DashboardSession)session).createAnonymousClient();
 			
 			HttpGet        get      = session.createGet(uri);
 			HttpResponse   response = client.execute(get);			

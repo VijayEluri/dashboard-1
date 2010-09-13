@@ -99,7 +99,7 @@ public class Helper {
 		Log.e("DashboardError", cause.toString());
 		cause.printStackTrace();
 		
-		Settings.handleError(t, _context);    	
+		Login.handleError(t, _context);    	
     }
 
 	public synchronized void showThrobber() {

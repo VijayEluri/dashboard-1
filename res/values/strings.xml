@@ -10,13 +10,15 @@
     <string name="password">Password</string>
 	<string name="system">System</string>
 	
-<!--  Menu strings ("main" menu) -->
+<!--  Menu strings, activity labels, etc ("main" menu) -->
+	<string name="login">Login</string>
 	<string name="accounts">Accounts</string>
 	<string name="accounts_shortcut">a</string>
 	<string name="deployments">Deployments</string>
 	<string name="deployments_shortcut">d</string>
 	<string name="settings">Settings</string>
 	<string name="settings_shortcut">s</string>
+	<string name="sign_up">Sign Up</string>
 		
 <!--  IndexAccounts -->
 	<string name="connect">Connect</string>
@@ -41,11 +43,12 @@
 	<string name="terminate_server">Terminate</string>
 	<string name="reboot_server">Reboot</string>
 
-<!--  App-wide dialogs -->
-	<string name="auth_error_dialog_title">Not Authorized</string>
-	<string name="auth_error_dialog_message">Your request was denied, most likely because your username or password is incorrect. Please double-check their values.</string>
-	<string name="error_dialog_title">Error</string>
-	<string name="error_dialog_message">Oops! An error has occurred. Sorry about that.</string>
+<!--  App-wide dialogs and messages -->
+	<string name="initial_login_greeting">Welcome to RightScale! Enter your login information in Settings, or Sign Up for a new account.</string>
+	<string name="authentication_error_title">RightScale: Not Authorized</string>
+	<string name="authentication_error_message">Your request was rejected. Is your login information correct? Check it in Settings.</string>
+	<string name="generic_error_title">RightScale: Error</string>
+	<string name="generic_error_message">Oops! An error has occurred. Sorry about that.</string>
 
 <!--  Notifications, toasts and other popup-y things -->
 	<string name="notify_execution_requested">Script execution requested.</string>
