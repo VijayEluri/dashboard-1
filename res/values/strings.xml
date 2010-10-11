@@ -46,9 +46,9 @@
 <!--  App-wide dialogs and messages -->
 	<string name="initial_login_greeting">Welcome to RightScale! Enter your login information in Settings, or Sign Up for a new account.</string>
 	<string name="authentication_error_title">RightScale: Not Authorized</string>
-	<string name="authentication_error_message">Your request was rejected. Is your login information correct? Check it in Settings.</string>
+	<string name="authentication_error_message">Your request was rejected.\nIs your information correct?\nCheck your login information in Settings.</string>
 	<string name="generic_error_title">RightScale: Error</string>
-	<string name="generic_error_message">Oops! An error has occurred. Sorry about that.</string>
+	<string name="generic_error_message">Oops! An error has occurred.\nSorry about that.\nHit the Back button, or choose:</string>
 
 <!--  Notifications, toasts and other popup-y things -->
 	<string name="notify_execution_requested">Script execution requested.</string>

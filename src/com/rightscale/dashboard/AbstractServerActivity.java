@@ -50,6 +50,7 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     public void onStart() {
     	super.onStart();
     	_helper.onStart();
+        loadContent();
     }
 
     @Override
@@ -62,7 +63,6 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     public void onResume() {
     	super.onResume();
     	_helper.onResume();
-        loadContent();
     }
 
     @Override

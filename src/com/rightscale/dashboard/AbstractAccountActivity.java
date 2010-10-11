@@ -36,6 +36,7 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
     public void onStart() {
     	super.onStart();
     	_helper.onStart();
+    	loadContent();
     }
 
     @Override
@@ -48,7 +49,6 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
     public void onResume() {
     	super.onResume();
     	_helper.onResume();
-    	loadContent();
     }
 
     @Override
