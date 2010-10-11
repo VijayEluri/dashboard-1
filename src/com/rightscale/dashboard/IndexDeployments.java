@@ -1,4 +1,4 @@
-package com.rightscale;
+package com.rightscale.dashboard;
 
 import net.xeger.rest.ui.ContentTransfer;
 import android.content.ContentResolver;

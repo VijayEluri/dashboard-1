@@ -16,7 +16,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.rightscale.Settings;
+import com.rightscale.dashboard.Settings;
 import com.rightscale.provider.DashboardSession;
 
 public class DashboardFeed extends Service {

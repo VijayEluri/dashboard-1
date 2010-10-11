@@ -1,4 +1,4 @@
-package com.rightscale;
+package com.rightscale.dashboard;
 
 import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestAuthException;

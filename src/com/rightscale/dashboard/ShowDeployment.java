@@ -1,4 +1,4 @@
-package com.rightscale;
+package com.rightscale.dashboard;
 
 import java.util.List;
 

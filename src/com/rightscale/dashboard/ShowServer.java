@@ -1,4 +1,4 @@
-package com.rightscale;
+package com.rightscale.dashboard;
 
 import android.app.TabActivity;
 import android.content.Intent;
