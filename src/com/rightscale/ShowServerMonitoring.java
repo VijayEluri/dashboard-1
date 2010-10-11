@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.xeger.rest.RestAuthException;
 import net.xeger.rest.RestException;
 import net.xeger.rest.RestServerException;
 import net.xeger.rest.Session;
@@ -114,6 +115,7 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 	    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, cursor, FROM, TO);
 	    	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 	    	Spinner spinner = (Spinner)findViewById(R.id.show_server_monitoring_spinner);
+	    	spinner.setEnabled(true);
 	    	spinner.setAdapter(adapter);
 	    	spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 				public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -132,6 +134,7 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 
     public void loadContent()
     {
+    	//NOTE: we don't call super since most server info isn't needed
     	_helper.onLoadContent();
 		ContentTransfer.load(this, this, new Handler(), MONITORS);
     }
@@ -212,12 +215,21 @@ public class ShowServerMonitoring extends AbstractServerActivity implements Imag
 	}
 
 	public void consumeContentError(Throwable t, String tag) {
-		//Our super would normally call this; call it ourselves since we don't call super
-		_helper.onConsumeContentError(t);
+    	Spinner spinner = (Spinner)findViewById(R.id.show_server_monitoring_spinner);
+    	spinner.setEnabled(false);
 
-		//Monitoring API returns a 403 if monitoring isn't enabled. Treat this as a simple failure
-		//rather than yanking the user into Preferences (base class impl).
-		consumeImage(null, null);
+    	consumeImage(null, null);
+				
+		//We get RestException (422) when there is no monitoring for a server, and for some reason we see it
+		//as RestAuthException here. In this particular view, rather than displaying an error dialog, we
+		//just swallow the error (but hide the throbber).
+		if( t.getCause() instanceof RestException ) {
+			_helper.hideThrobber(true);
+		
+		}
+		else {
+			_helper.onConsumeContentError(t);
+		}
 	}
     
 	public void consumeImageError(Throwable error, String tag) {

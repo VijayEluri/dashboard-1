@@ -31,8 +31,10 @@ class ContentTransferThread implements Runnable {
 	protected String          _tag;
 	
 	protected Thread          _thread;
+	
 	protected Cursor          _content;
 	protected Throwable       _error;
+	protected boolean         _contentOrErrorProduced = false;         
 	
 	public ContentTransferThread(ContentConsumer consumer, ContentProducer producer, Handler handler, String tag) {
 		_consumer = consumer;
@@ -51,11 +53,11 @@ class ContentTransferThread implements Runnable {
 	}
 	
 	public void run() {
-		if(_content != null) {
+		if(_contentOrErrorProduced && _error == null) {
 			//We're in the Handler thread; callback to the consumer
 			_consumer.consumeContent(_content, _tag);
 		}
-		else if(_error != null) {
+		else if(_contentOrErrorProduced && _error != null) {
 			//We're in the Handler thread; callback to the consumer
 			_consumer.consumeContentError(_error, _tag);
 		}
@@ -63,10 +65,12 @@ class ContentTransferThread implements Runnable {
 			//We're in the worker thread; produce the content and post the callback
 			try {
 				_content = _producer.produceContent(_tag);
+				_contentOrErrorProduced = true;
 				_handler.post(this);
 			}
 			catch(Throwable t) {
 				_error = t;
+				_contentOrErrorProduced = true;
 				_handler.post(this);
 			}
 			
@@ -81,8 +85,10 @@ class ImageTransferThread implements Runnable {
 	protected String          _tag;
 	
 	protected Thread          _thread;
+
 	protected Bitmap          _bitmap;
 	protected Throwable       _error;
+	protected boolean         _imageOrErrorProduced = false;         
 	
 	public ImageTransferThread(ImageConsumer consumer, ImageProducer producer, Handler handler, String tag) {
 		_consumer = consumer;
@@ -101,11 +107,11 @@ class ImageTransferThread implements Runnable {
 	}
 	
 	public void run() {
-		if(_bitmap != null) {
+		if(_imageOrErrorProduced && _error == null) {
 			//We're in the Handler thread; callback to the consumer
 			_consumer.consumeImage(_bitmap, _tag);
 		}
-		else if(_error != null) {
+		else if(_imageOrErrorProduced && _error != null) {
 			//We're in the Handler thread; callback to the consumer
 			_consumer.consumeImageError(_error, _tag);
 		}
@@ -113,10 +119,12 @@ class ImageTransferThread implements Runnable {
 			//We're in the worker thread; produce the content and post the callback
 			try {
 				_bitmap = _producer.produceImage(_tag);
+				_imageOrErrorProduced = true;
 				_handler.post(this);
 			}
 			catch(Throwable t) {
 				_error = t;
+				_imageOrErrorProduced = true;
 				_handler.post(this);
 			}
 			

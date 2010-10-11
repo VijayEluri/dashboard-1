@@ -53,6 +53,8 @@ public class Helper {
     }
 
     public void onPause() {
+    	hideThrobber(true);
+    	
     	if(BROADCAST_RECEIVERS_SUCK) {
     		return;
     	}
@@ -78,8 +80,6 @@ public class Helper {
     }
 
     public void onStop() {
-    	hideThrobber(true);
-    	
     	if(BROADCAST_RECEIVERS_SUCK) {
     		return;
     	}
@@ -95,6 +95,8 @@ public class Helper {
     }
     
     public void onConsumeContentError(Throwable t) {
+    	hideThrobber(true);
+    	
 		Throwable cause = t.getCause() != null ? t.getCause() : t;
 		Log.e("DashboardError", cause.toString());
 		cause.printStackTrace();

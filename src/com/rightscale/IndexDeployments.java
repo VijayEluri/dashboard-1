@@ -1,9 +1,11 @@
 package com.rightscale;
 
+import net.xeger.rest.ui.ContentTransfer;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -26,7 +28,7 @@ public class IndexDeployments extends AbstractAccountActivity {
     	Intent i = new Intent(Intent.ACTION_VIEW, Routes.showDeployment(_helper.getAccountId(), new Long(id).toString()));
     	startActivity(i);
     }
-    
+
     public Cursor produceContent(String tag) {
 		ContentResolver cr = getContentResolver();
 		String[] whereArgs = { new Long(_helper.getAccountId()).toString() };

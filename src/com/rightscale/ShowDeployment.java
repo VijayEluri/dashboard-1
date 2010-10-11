@@ -35,8 +35,6 @@ public class ShowDeployment extends AbstractAccountActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.show_deployment);
-        ContentTransfer.load(this, this, new Handler(), DEPLOYMENT_TITLE);
-        ContentTransfer.load(this, this, new Handler(), SERVERS);
     }
 
     @Override
@@ -45,6 +43,13 @@ public class ShowDeployment extends AbstractAccountActivity {
     	startActivity(i);
     }
 
+    public void loadContent()
+    {
+    	super.loadContent();
+        ContentTransfer.load(this, this, new Handler(), DEPLOYMENT_TITLE);
+        ContentTransfer.load(this, this, new Handler(), SERVERS);    	
+    }
+    
     public Cursor produceContent(String tag)
     	throws RestException
     {

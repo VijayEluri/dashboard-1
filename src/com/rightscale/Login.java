@@ -24,8 +24,8 @@ public class Login extends Activity {
 	public static final String ACTION_NOTIFY_ERROR = "notify_error";	
 	public static final int DIALOG_ERROR_ID      = 0;
 
-	private DashboardError _error             = null;
-	private boolean        _errorAcknowledged = false; 
+	private Throwable _error             = null;
+	private boolean   _errorAcknowledged = false; 
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +48,7 @@ public class Login extends Activity {
 				Intent intent = new Intent(Intent.ACTION_VIEW, SIGN_UP_URI);
 				intent.addCategory(Intent.CATEGORY_BROWSABLE);
 				startActivity(intent);
+				_errorAcknowledged = true;
 			}			
 		});
 		
@@ -63,52 +64,23 @@ public class Login extends Activity {
 		}
 	}
 	
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		AlertDialog.Builder builder  = new AlertDialog.Builder(this);
-		
-		if(id == DIALOG_ERROR_ID && _error != null) {
-			if(_error.getCause() instanceof RestAuthException) {
-				builder.setTitle(R.string.authentication_error_title)
-				   .setMessage(R.string.authentication_error_message);				
-			}
-			else {
-				builder.setTitle(R.string.generic_error_title)
-				   .setMessage(R.string.generic_error_message);
-				
-			}
-		}
-		else {
-			return super.onCreateDialog(id);			
-		}
-
-       builder.setCancelable(false)
-       .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-           public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-           }
-       });
-       
-       return builder.create();
-	}
-
 	protected void explainErrors() {
 		boolean hasCreds = (Settings.getEmail(this) != null && Settings.getPassword(this) != null);
 		
 		if( (getIntent() != null) && (getIntent().getAction() != null) && getIntent().getAction().equals(ACTION_NOTIFY_ERROR) ) {
-			_error = (DashboardError)getIntent().getExtras().get("error");
+			_error = (Throwable)getIntent().getExtras().get("error");
 		}
+				
 		boolean wasError     = (_error != null);
 		boolean wasAuthError = (wasError && _error.getCause() instanceof RestAuthException);
 
 		String title = null, message = null;
 		
-		if(wasAuthError && hasCreds) {
+		if(hasCreds && wasAuthError) {
 			title = getString(R.string.authentication_error_title);
 			message = getString(R.string.authentication_error_message);
-			//this.showDialog(DIALOG_ERROR_ID);
 		}
-		else if(wasError && hasCreds) {
+		else if(hasCreds && wasError) {
 			title = getString(R.string.generic_error_title);
 			message = getString(R.string.generic_error_message);				
 		}

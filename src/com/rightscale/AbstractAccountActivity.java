@@ -90,10 +90,9 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
     	}
     }
 
-    public void loadContent()
-    {
+    public void loadContent() {
     	_helper.onLoadContent();
-        ContentTransfer.load(this, this, new Handler());        
+    	ContentTransfer.load(this, this, new Handler(), null);    	
     }
     
 	abstract public Cursor produceContent(String tag) throws RestException;
