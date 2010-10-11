@@ -22,7 +22,7 @@
 		
 <!--  IndexAccounts -->
 	<string name="connect">Connect</string>
-	
+	<string name="index_accounts_prompt">Choose an account to operate on:</string>
 <!--  IndexDeployments -->
 	<string name="rightscale_deployments">RightScale Deployments</string>
 	<string name="no_deployments"></string>

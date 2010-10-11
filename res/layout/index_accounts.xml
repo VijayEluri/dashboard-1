@@ -6,6 +6,12 @@
   android:orientation="vertical"
   android:padding="1dp"
   android:gravity="center">
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="@string/index_accounts_prompt"
+	android:gravity="center"
+	android:paddingBottom="4sp"></TextView>
 <Spinner android:id="@+id/index_accounts_spinner" android:layout_width="fill_parent" android:layout_height="wrap_content"></Spinner>
 <Button android:id="@+id/index_accounts_connect" android:text="@string/connect" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
 </LinearLayout>

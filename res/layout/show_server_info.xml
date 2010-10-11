@@ -140,7 +140,6 @@
 	                android:layout_height="wrap_content"
 	                android:layout_below="@id/show_server_info_pricing_label" />
 	
-	</TwoLineListItem>
-	
+	</TwoLineListItem>	
 </LinearLayout>
  
