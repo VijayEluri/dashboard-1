@@ -74,26 +74,26 @@ public class Login extends Activity {
 		boolean wasError     = (_error != null);
 		boolean wasAuthError = (wasError && _error.getCause() instanceof RestAuthException);
 
-		String title = null, message = null;
+		TextView text     = (TextView)findViewById(R.id.message);
+		Button   settings = (Button)findViewById(R.id.settings);
+		Button   signUp   = (Button)findViewById(R.id.sign_up);
 		
 		if(hasCreds && wasAuthError) {
-			title = getString(R.string.authentication_error_title);
-			message = getString(R.string.authentication_error_message);
+			setTitle(getString(R.string.authentication_error_title));
+			text.setText(getString(R.string.authentication_error_message));
+			settings.setVisibility(View.VISIBLE);
+			signUp.setVisibility(View.GONE);
 		}
 		else if(hasCreds && wasError) {
-			title = getString(R.string.generic_error_title);
-			message = getString(R.string.generic_error_message);				
+			setTitle(getString(R.string.generic_error_title));
+			text.setText(getString(R.string.generic_error_message));
+			settings.setVisibility(View.VISIBLE);
+			signUp.setVisibility(View.GONE);
 		}
 		else {
-			message = getString(R.string.initial_login_greeting);
-		}
-		
-		if(title != null) {
-			setTitle(title);
-		}
-		if(message != null) {
-			TextView text = (TextView)findViewById(R.id.message);
-			text.setText(message);
+			text.setText(getString(R.string.initial_login_greeting));
+			settings.setVisibility(View.VISIBLE);
+			signUp.setVisibility(View.VISIBLE);
 		}
 	}
 	

@@ -48,7 +48,7 @@
 	<string name="authentication_error_title">RightScale: Not Authorized</string>
 	<string name="authentication_error_message">Your request was rejected.\nIs your information correct?\nCheck your login information in Settings.</string>
 	<string name="generic_error_title">RightScale: Error</string>
-	<string name="generic_error_message">Oops! An error has occurred.\nSorry about that.\nHit the Back button, or choose:</string>
+	<string name="generic_error_message">Oops! An error has occurred.\nSorry about that.\n\nHit your phone\'s Back button to try again, or choose:</string>
 
 <!--  Notifications, toasts and other popup-y things -->
 	<string name="notify_execution_requested">Script execution requested.</string>
