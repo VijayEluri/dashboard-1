@@ -1,4 +1,4 @@
-package com.rightscale.dashboard;
+package com.rightscale.app.dashboard;
 
 import net.xeger.rest.RestException;
 import net.xeger.rest.ui.ContentConsumer;

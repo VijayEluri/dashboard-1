@@ -1,19 +1,10 @@
-package com.rightscale.dashboard;
+package com.rightscale.app.dashboard;
 
-import net.xeger.rest.ProtocolError;
-import net.xeger.rest.RestAuthException;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.util.Log;
-
-import com.rightscale.provider.DashboardError;
 
 public class Settings extends PreferenceActivity {
 	public static final String DEFAULT_SYSTEM = "my.rightscale.com";

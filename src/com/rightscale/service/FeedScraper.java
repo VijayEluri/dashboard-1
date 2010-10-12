@@ -18,7 +18,7 @@ import org.apache.http.HttpEntity;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
-import com.rightscale.dashboard.Routes;
+import com.rightscale.app.dashboard.Routes;
 
 import android.net.Uri;
 import android.util.Log;

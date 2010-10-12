@@ -1,4 +1,4 @@
-package com.rightscale.dashboard;
+package com.rightscale.app.dashboard;
 
 import android.database.Cursor;
 import android.os.Bundle;

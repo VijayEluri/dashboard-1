@@ -1,4 +1,4 @@
-package com.rightscale.dashboard;
+package com.rightscale.app.dashboard;
 
 import com.rightscale.provider.Dashboard;
 import com.rightscale.service.DashboardFeed;

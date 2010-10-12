@@ -1,4 +1,4 @@
-package com.rightscale.dashboard;
+package com.rightscale.app.dashboard;
 
 import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestAuthException;
@@ -6,10 +6,7 @@ import net.xeger.rest.RestAuthException;
 import com.rightscale.provider.DashboardError;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;

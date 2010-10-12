@@ -13,7 +13,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.rightscale.dashboard.Settings;
+import com.rightscale.app.dashboard.Settings;
 
 /**
  * The Android content provider used to retrieve REST resources from the

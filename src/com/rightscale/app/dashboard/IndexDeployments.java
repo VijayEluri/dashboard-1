@@ -1,11 +1,9 @@
-package com.rightscale.dashboard;
+package com.rightscale.app.dashboard;
 
-import net.xeger.rest.ui.ContentTransfer;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
