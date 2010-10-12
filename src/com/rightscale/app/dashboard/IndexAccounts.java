@@ -30,6 +30,7 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
     static private final int[]    TO   = {android.R.id.text1};
 
 	protected Helper         _helper;
+	protected boolean        _loaded = false;
 	
 	protected Cursor         _cursor;
 	
@@ -94,8 +95,10 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
     }
 
     public void loadContent() {
-    	_helper.onLoadContent();
-		ContentTransfer.load(this, this, new Handler(), ACCOUNTS);
+    	if(!_loaded) {
+    		_helper.onLoadContent();
+    		ContentTransfer.load(this, this, new Handler(), ACCOUNTS);
+    	}
     }
     
 	public Cursor produceContent(String tag) throws RestException {
@@ -110,6 +113,7 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
 	}
 
 	public void consumeContent(Cursor cursor, String tag) {
+		_loaded = true;
 		_helper.onConsumeContent();
 		
 		if(tag == ACCOUNTS) {

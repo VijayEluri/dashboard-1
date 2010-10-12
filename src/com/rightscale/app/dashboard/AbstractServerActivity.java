@@ -34,7 +34,8 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 	static public final String SERVER_SETTINGS = "server_settings";
 
 	protected Helper         _helper = null;  
-
+    protected boolean        _loaded = false;
+    
 	protected Cursor _currentServer         = null;
 	protected Cursor _currentServerSettings = null;
 	protected BroadcastReceiver _receiver   = null;
@@ -179,9 +180,11 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 
     public void loadContent()
     {
-    	_helper.onLoadContent();
-    	ContentTransfer.load(this, this, new Handler(), SERVER);
-        ContentTransfer.load(this, this, new Handler(), SERVER_SETTINGS);    	
+    	if(!_loaded) {
+    		_helper.onLoadContent();
+    		ContentTransfer.load(this, this, new Handler(), SERVER);
+    		ContentTransfer.load(this, this, new Handler(), SERVER_SETTINGS);
+    	}
     }
     
 	public Cursor produceContent(String tag)
@@ -205,6 +208,7 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 	}    
     
 	public void consumeContent(Cursor cursor, String tag) {
+		_loaded = true;
 		_helper.onConsumeContent();
 
 		if(tag == SERVER) {

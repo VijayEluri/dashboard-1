@@ -17,6 +17,7 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
 	private static String HARDCODED_ACCOUNT_ID = "2951"; // 2951 = DEMO
 
 	protected Helper            _helper   = null;
+	protected boolean           _loaded   = false;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,13 +92,16 @@ public abstract class AbstractAccountActivity extends ListActivity implements Co
     }
 
     public void loadContent() {
-    	_helper.onLoadContent();
-    	ContentTransfer.load(this, this, new Handler(), null);    	
+    	if(!_loaded) {
+    		_helper.onLoadContent();
+    		ContentTransfer.load(this, this, new Handler(), null);
+    	}
     }
     
 	abstract public Cursor produceContent(String tag) throws RestException;
 
 	public void consumeContent(Cursor c, String tag) {
+		_loaded = true;
 		_helper.onConsumeContent();
 	}
 
