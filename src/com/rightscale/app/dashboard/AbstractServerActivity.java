@@ -1,3 +1,19 @@
+// Dashboard: an Android front-end to the RightScale dashboard
+// Copyright (C) 2009 Tony Spataro <code@tracker.xeger.net>
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package com.rightscale.app.dashboard;
 
 import java.util.List;
@@ -131,7 +147,12 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     		sb.append("ssh://root@").append(address).append(":22/#").append("foo"); //TODO
     		Uri uri = Uri.parse(sb.toString());    		
 			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-			startActivity(intent);
+			try {
+				startActivity(intent);
+			}
+			catch(Exception e) {
+				/* TODO display some sort of error message */
+			}
 			break;
 			
     	case R.id.menu_launch_server:
