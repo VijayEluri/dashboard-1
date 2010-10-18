@@ -64,10 +64,15 @@ public class Login extends Activity {
 				_errorAcknowledged = true;
 			}			
 		});
-		
-		explainErrors();		
 	}
 
+	@Override
+	public void onStart() {
+		super.onStart();
+		explainErrors();		
+		
+	}
+	
 	@Override
 	public void onResume() {
 		super.onResume();

@@ -23,8 +23,10 @@ import net.xeger.rest.ui.ContentConsumer;
 import net.xeger.rest.ui.ContentProducer;
 import net.xeger.rest.ui.ContentTransfer;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -118,7 +120,7 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
     		menu.findItem(R.id.menu_reboot_server).setVisible(true);
     	}
 
-    	if(state.matches("stopped|bidding|pending|booting|stranded|operational|shutting-down|decommissioning")) {
+    	if(state.matches("bidding|pending|booting|stranded|operational|shutting-down|decommissioning")) {
     		menu.findItem(R.id.menu_terminate_server).setVisible(true);    		
     	}
     	
@@ -151,7 +153,16 @@ public class AbstractServerActivity extends Activity implements ContentConsumer,
 				startActivity(intent);
 			}
 			catch(Exception e) {
-				/* TODO display some sort of error message */
+				DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}					
+				};
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string.ssh_failure_title).setMessage(R.string.ssh_failure);
+				builder.setNeutralButton(R.string.ok, listener);
+				builder.show();
 			}
 			break;
 			
