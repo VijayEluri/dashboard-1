@@ -52,4 +52,9 @@
 
 <!--  Notifications, toasts and other popup-y things -->
 	<string name="notify_execution_requested">Script execution requested.</string>
+
+<!-- SSH integration messages -->
+	<string name="ssh_failure_title">Missing Required Software</string>
+	<string name="ssh_failure">You must install ConnectBot SSH client before you can create SSH sessions.</string>
+	<string name="ok">OK</string>
 </resources>
