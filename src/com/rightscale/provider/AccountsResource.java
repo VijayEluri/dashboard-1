@@ -26,6 +26,7 @@ import org.apache.http.client.HttpClient;
 
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.util.Log;
 import net.xeger.rest.AbstractResource;
 import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestAuthException;
@@ -35,7 +36,7 @@ import net.xeger.rest.Session;
 class AccountsResource extends AbstractResource {
 	public static final String MIME_TYPE = "vnd.rightscale.account";
 	
-	static final Pattern ACCOUNT_REGEX   = Pattern.compile("<option value=\"([0-9]+)\".*>(.*)</option>");
+	static final Pattern ACCOUNT_REGEX   = Pattern.compile("<option.*value=\"([0-9]+)\".*>(.*)</option>");
 
 	public static final String ID       = Dashboard.ID;
 	public static final String NICKNAME = "nickname";
@@ -93,7 +94,7 @@ class AccountsResource extends AbstractResource {
 		while( (found = match.find()) && match.start(0) < nStart) { }
 
 		//Eat the <option> tags
-		while(found && match.end(0) < nStop) {
+		while(found && match.end(0) <= nStop) {
 			String id   = match.group(1);
 			String name = match.group(2);
 			MatrixCursor.RowBuilder row = result.newRow();
