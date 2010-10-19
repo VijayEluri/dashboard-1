@@ -62,7 +62,7 @@ public class Helper {
 	
     public void onStart() {
     	if(BROADCAST_RECEIVERS_SUCK) {
-    		Log.w("Helper", "Not starting DashboardFeed since broadcast receivers are stupid and buggy :(");
+    		//Log.w("Helper", "Not starting DashboardFeed since broadcast receivers are stupid and buggy :(");
     		return;
     	}
         _context.startService(new Intent(_context, DashboardFeed.class));    	
@@ -85,7 +85,7 @@ public class Helper {
     		@Override
     		public void onReceive(Context context, Intent intent) {
     			Uri uri = intent.getData();
-    			Log.i("Receiver", uri.toString());
+    			//Log.i("Receiver", uri.toString());
     		}
     	};
     	
@@ -114,7 +114,7 @@ public class Helper {
     	hideThrobber(true);
     	
 		Throwable cause = t.getCause() != null ? t.getCause() : t;
-		Log.e("DashboardError", cause.toString());
+		//Log.e("DashboardError", cause.toString());
 		cause.printStackTrace();
 		
 		Login.handleError(t, _context);    	

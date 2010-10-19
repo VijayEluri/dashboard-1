@@ -60,7 +60,7 @@ public class DashboardFeed extends Service {
 
     @Override
     public void onStart(Intent intent, int startId) {
-        Log.i("LocalService", "Received start id " + startId + ": " + intent);
+        //Log.i("LocalService", "Received start id " + startId + ": " + intent);
 
         if(_scraper != null) {
         	return;
