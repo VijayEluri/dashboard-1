@@ -46,7 +46,7 @@ class DeploymentsResource extends DashboardResource {
 		MatrixCursor result = new MatrixCursor(COLUMNS);
 		JSONArray response = getJsonArray("deployments.js");		
 		
-		for(int i = 0; i < response.length(); i++) {
+		for( Integer i : sortJsonArray(response, "nickname") ) {
 			try {
 				JSONObject deployment = response.getJSONObject(i);
 				

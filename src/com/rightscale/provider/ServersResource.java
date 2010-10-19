@@ -144,7 +144,7 @@ class ServersResource extends DashboardResource {
 	{
 		MatrixCursor result = new MatrixCursor(COLUMNS);
 				
-		for(int i = 0; i < array.length(); i++) {
+		for( Integer i : sortJsonArray(array, "nickname") ) {
 			JSONObject object = array.getJSONObject(i);
 		
 			/* 

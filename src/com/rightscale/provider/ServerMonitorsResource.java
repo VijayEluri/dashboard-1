@@ -41,7 +41,7 @@ public class ServerMonitorsResource extends DashboardResource {
 		super(session, accountId);
 	}
 
-	public Cursor showForServer(String serverId)
+	public Cursor indexForServer(String serverId)
 	throws RestException
 {
 	try {

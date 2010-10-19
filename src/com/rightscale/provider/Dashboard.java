@@ -243,7 +243,7 @@ public class Dashboard extends ContentProvider {
 				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_SERVER)) != null) {
 					// SELECT ... FROM server_monitors WHERE server_id = ?
 					ServerMonitorsResource serverMonitors = new ServerMonitorsResource(session, args[0]);
-					return serverMonitors.showForServer(args[1]);
+					return serverMonitors.indexForServer(args[1]);
 				}
 				else {
 					throw new DashboardError("Unknown where-clause: " + where);									

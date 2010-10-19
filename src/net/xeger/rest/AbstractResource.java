@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -221,5 +223,39 @@ abstract public class AbstractResource {
 		response = sb.toString();
 		isr.close();
 	    return response;
+	}
+	
+	static private class KeySort implements Comparator<Integer>
+	{
+		JSONArray _array;
+		String    _key;
+		
+		public KeySort(JSONArray array, String key) {
+			_array = array;
+			_key   = key;
+		}
+		
+		public int compare(Integer a, Integer b) {
+			try {
+				String sa = _array.getJSONObject(a.intValue()).getString(_key);
+				String sb = _array.getJSONObject(b.intValue()).getString(_key);
+				return sa.compareTo(sb);
+			}
+			catch(JSONException e) {
+				throw new Error(e);
+			}
+		}		
+	}
+	
+	static public Integer[] sortJsonArray(JSONArray array, String key) {
+		Integer[] sorted = new Integer[array.length()];
+		
+		for(int i = 0; i < sorted.length; i++) {
+			sorted[i] = new Integer(i);
+		}
+		
+		KeySort comparator = new KeySort(array, key);		
+		Arrays.sort(sorted, comparator);
+		return sorted;
 	}
 }
