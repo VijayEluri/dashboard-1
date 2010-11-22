@@ -93,7 +93,7 @@ class FeedScraper extends AbstractResource implements Runnable {
 	    		interesting = parser.getNumInteresting();
 	    	}
 	    	catch(Exception e) {
-	    		Log.e("FeedScraper", e.getClass().getName());
+	    		//Log.
 				e.printStackTrace();
 				error = true;
 	    	}
@@ -129,7 +129,7 @@ class FeedScraper extends AbstractResource implements Runnable {
     	}
     	catch (ParseException e) {
 			e.printStackTrace();
-    		Log.e("FeedScraper", htmlContent);
+    		//Log.
 			return false;
 		}
 
@@ -144,12 +144,12 @@ class FeedScraper extends AbstractResource implements Runnable {
     			subjectUri = Routes.showServer(accountId, resourceId);
     		}
     		else {
-        		Log.w("FeedScraper", "Unknown resource type:\n" + htmlContent);
+        		//Log.
     			return false;    			
     		}
     	}
     	else {
-    		//Log.w("FeedScraper", "No RESOURCE_REGEX:\n" + htmlContent);
+    		////Log.
 			return false;
     	}
 
@@ -158,7 +158,7 @@ class FeedScraper extends AbstractResource implements Runnable {
     		summary = m.group(1);
     	}
     	else {
-    		//Log.w("FeedScraper", "No EVENT_REGEX:\n" + htmlContent);
+    		////Log.
 			return false;    		
     	}
 
