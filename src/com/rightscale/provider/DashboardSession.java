@@ -95,7 +95,7 @@ public class DashboardSession implements Session {
 		try {
 			// Can't use accounts-API login because we don't necessarily know an account ID.
 			// HACK: use UI login instead.
-			URI loginUri = new URI(_baseURI.toString() + "/sessions");
+			URI loginUri = new URI(_baseURI.toString() + "/session");
 			HttpPost post = createPost(loginUri);
 	
 			List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();

@@ -36,8 +36,10 @@ import net.xeger.rest.Session;
 class AccountsResource extends AbstractResource {
 	public static final String MIME_TYPE = "vnd.rightscale.account";
 	
-	static final Pattern ACCOUNT_REGEX   = Pattern.compile("<option.*value=\"([0-9]+)\".*>(.*)</option>");
-
+	static final Pattern ACCOUNT_REGEX   = Pattern.compile("<option.+value=\"([0-9]+)\".*>(.*)</option>");
+	//<select class="one_account" id="account" name="account" onchange="javascript:submit()">
+	static final Pattern ACCOUNT_SELECT_REGEX = Pattern.compile("<select");
+	
 	public static final String ID       = Dashboard.ID;
 	public static final String NICKNAME = "nickname";
 	
@@ -79,11 +81,13 @@ class AccountsResource extends AbstractResource {
 		if(response.contains(DashboardSession.LOGIN_PAGE_CANARY)) {
 			throw new RestAuthException("Authentication failed", 401);
 		}
+
 		
-		int nStart = response.indexOf("<select id=\"account\"");
-		if(nStart < 0) {
-			return null;
-		}
+		Matcher selectMatch = ACCOUNT_SELECT_REGEX.matcher(response);
+		if(!selectMatch.find()) {
+			throw new ProtocolError("Couldn't find accounts dropdown in dashboard UI!");
+		}		
+		int nStart = selectMatch.start();
 		int nStop  = response.indexOf("</select>", nStart);
 		
 		Matcher match = ACCOUNT_REGEX.matcher(response);
