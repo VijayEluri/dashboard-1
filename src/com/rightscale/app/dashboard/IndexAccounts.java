@@ -141,23 +141,23 @@ public class IndexAccounts extends Activity implements ContentProducer, ContentC
 	    	Spinner spinner = (Spinner)findViewById(R.id.index_accounts_spinner);
 	    	spinner.setAdapter(adapter);
 
-			if(_cursor.getCount() == 1) {
+	    	Button button = (Button)findViewById(R.id.index_accounts_connect);
+	    	button.setOnClickListener(new OnClickListener() {
+				public void onClick(View arg0) {
+			    	Spinner spinner = (Spinner)findViewById(R.id.index_accounts_spinner);
+					_cursor.moveToPosition(spinner.getSelectedItemPosition());
+					int idxId = _cursor.getColumnIndexOrThrow(Dashboard.ID);
+		        	Intent i = new Intent(Intent.ACTION_VIEW, Routes.indexDeployments(_cursor.getString(idxId)));
+		        	startActivity(i);					
+				}	    		
+	    	});	    		
+
+	    	//If the user has only one account, fast-forward them immediately over to that account
+	    	if(_cursor.getCount() == 1) {
 				_cursor.moveToFirst();
 				int idxId = _cursor.getColumnIndexOrThrow(Dashboard.ID);
 	        	Intent i = new Intent(Intent.ACTION_VIEW, Routes.indexDeployments(_cursor.getString(idxId)));
 	        	startActivity(i);						    	
-	    	}
-	    	else {
-		    	Button button = (Button)findViewById(R.id.index_accounts_connect);
-		    	button.setOnClickListener(new OnClickListener() {
-					public void onClick(View arg0) {
-				    	Spinner spinner = (Spinner)findViewById(R.id.index_accounts_spinner);
-						_cursor.moveToPosition(spinner.getSelectedItemPosition());
-						int idxId = _cursor.getColumnIndexOrThrow(Dashboard.ID);
-			        	Intent i = new Intent(Intent.ACTION_VIEW, Routes.indexDeployments(_cursor.getString(idxId)));
-			        	startActivity(i);					
-					}	    		
-		    	});	    		
 	    	}
 		}		
 	}
