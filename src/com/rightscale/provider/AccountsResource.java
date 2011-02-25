@@ -35,10 +35,14 @@ import net.xeger.rest.Session;
 
 class AccountsResource extends AbstractResource {
 	public static final String MIME_TYPE = "vnd.rightscale.account";
-	
-	static final Pattern ACCOUNT_REGEX   = Pattern.compile("<option.+value=\"([0-9]+)\".*>(.*)</option>");
-	//<select class="one_account" id="account" name="account" onchange="javascript:submit()">
-	static final Pattern ACCOUNT_SELECT_REGEX = Pattern.compile("<select");
+
+	//Release 3.12-3.14
+	//static final Pattern ACCOUNT_REGEX   = Pattern.compile("<option.+value=\"([0-9]+)\".*>(.*)</option>");
+	//static final Pattern ACCOUNT_SELECT_REGEX = Pattern.compile("<select");
+
+	//Release 3.15
+	static final Pattern ACCOUNT_SELECT_REGEX = Pattern.compile("<td id=\"accountSelectorContainer\">");
+	static final Pattern ACCOUNT_REGEX        = Pattern.compile("<a href=\"/session\\?account=([0-9]+)\" data-behaves=\"click:default\" data-method=\"put\" title=\"(.*)\">");
 	
 	public static final String ID       = Dashboard.ID;
 	public static final String NICKNAME = "nickname";
@@ -88,16 +92,16 @@ class AccountsResource extends AbstractResource {
 			throw new ProtocolError("Couldn't find accounts dropdown in dashboard UI!");
 		}		
 		int nStart = selectMatch.start();
-		int nStop  = response.indexOf("</select>", nStart);
+		int nStop  = response.indexOf("</td>", nStart);
 		
 		Matcher match = ACCOUNT_REGEX.matcher(response);
 
 		boolean found = false;
 		
-		//Advance beyond accounts <select>
+		//Advance beyond the element that serves as a container for accounts
 		while( (found = match.find()) && match.start(0) < nStart) { }
 
-		//Eat the <option> tags
+		//Find each tag that corresponds to an account
 		while(found && match.end(0) <= nStop) {
 			String id   = match.group(1);
 			String name = match.group(2);
