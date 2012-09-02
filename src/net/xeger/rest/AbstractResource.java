@@ -119,7 +119,7 @@ abstract public class AbstractResource {
 		try {
 		  errorString = readResponse(body);
 		  errorString = errorString.substring(0, Math.min(errorString.length(), 128));
-		  Log.e("AbstractResource", errorString);
+		  //Log.e("AbstractResource", errorString);
 		}
 		catch(IOException e) {
 		}
