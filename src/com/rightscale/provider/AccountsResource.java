@@ -26,7 +26,6 @@ import org.apache.http.client.HttpClient;
 
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.util.Log;
 import net.xeger.rest.AbstractResource;
 import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestAuthException;
@@ -40,10 +39,14 @@ class AccountsResource extends AbstractResource {
 	//static final Pattern ACCOUNT_REGEX   = Pattern.compile("<option.+value=\"([0-9]+)\".*>(.*)</option>");
 	//static final Pattern ACCOUNT_SELECT_REGEX = Pattern.compile("<select");
 
-	//Release 3.15
-	static final Pattern ACCOUNT_SELECT_REGEX = Pattern.compile("<td id=\"accountSelectorContainer\">");
-	static final Pattern ACCOUNT_REGEX        = Pattern.compile("<a href=\"/session\\?account=([0-9]+)\" data-behaves=\"click:default\" data-method=\"put\" title=\"(.*)\">");
+	//Release 3.15-4.0
+	//static final Pattern ACCOUNT_SELECT_REGEX = Pattern.compile("<td .*id=\"accountSelectorContainer\".*>");
+	//static final Pattern ACCOUNT_REGEX        = Pattern.compile("<a href=\"/session\\?account=([0-9]+)\" data-behaves=\"click:default\" data-method=\"put\" title=\"(.*)\">");
 	
+	//Release 4.0+
+	static final Pattern ACCOUNT_SELECT_REGEX = Pattern.compile("<td .*id=\"accountSelectorContainer\".*>");
+	static final Pattern ACCOUNT_REGEX        = Pattern.compile("<a href=\"/acct/([0-9]+)\" .+title=\"([^\"]*)\".*>");
+
 	public static final String ID       = Dashboard.ID;
 	public static final String NICKNAME = "nickname";
 	
@@ -106,7 +109,7 @@ class AccountsResource extends AbstractResource {
 			String id   = match.group(1);
 			String name = match.group(2);
 			MatrixCursor.RowBuilder row = result.newRow();
-			row.add(new Long(id).longValue());
+			row.add(Long.valueOf(id).longValue());
 			row.add(name);
 			found = match.find();
 		}
