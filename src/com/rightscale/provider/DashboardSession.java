@@ -101,6 +101,7 @@ public class DashboardSession implements Session {
 			List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
 			params.add(new BasicNameValuePair("email", _username));
 			params.add(new BasicNameValuePair("password", _password));                
+			params.add(new BasicNameValuePair("login_type", "rs"));                
 			post.setEntity(new UrlEncodedFormEntity(params));
 	
 			DefaultHttpClient client = new DefaultHttpClient();
@@ -113,7 +114,7 @@ public class DashboardSession implements Session {
 			
 			List<Cookie> cookies = client.getCookieStore().getCookies();
 			for(Cookie c : cookies) {
-				if(c.getName().equals("rs_gbl")) {
+				if(c.getName().startsWith("rs_gbl")) {
 					_sessionCookie = c;
 					break;
 				}

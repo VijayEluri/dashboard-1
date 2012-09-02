@@ -35,6 +35,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 abstract public class AbstractResource {
     abstract protected URI      getResourceURI(String relativePath, String query);
     
@@ -97,32 +99,38 @@ abstract public class AbstractResource {
 		HttpGet        get       = createGet(uri);
 		HttpResponse   response;		
 		int            statusCode;
-
+        HttpEntity     body;
+        
 		try {
-			response = client.execute(get);
-			statusCode   = response.getStatusLine().getStatusCode();
+			response   = client.execute(get);
+			statusCode = response.getStatusLine().getStatusCode();
+			body       = response.getEntity();
 		}
 		catch (Exception e) {
 			throw new RestNetworkException(e);
 		}
 		
 		if(statusCode >= 200 && statusCode < 300) {
-			return response.getEntity();
+			return body;
 		}
 		
+		String errorString = "Unknown RightScale API error!";
 		try {
-			response.getEntity().consumeContent(); //An error occurred; we won't be using this...
+		  errorString = readResponse(body);
+		  errorString = errorString.substring(0, Math.min(errorString.length(), 128));
+		  Log.e("AbstractResource", errorString);
 		}
-		catch(IOException e) {}
-
+		catch(IOException e) {
+		}
+		
 		if(statusCode >= 400 && statusCode < 500) {
-			throw new RestAuthException("Authentication failed", statusCode);
+			throw new RestAuthException("Authentication failed: " + errorString, statusCode);
 		}
 		else if(statusCode >= 500 && statusCode < 600) {
 			throw new RestServerException("Internal server error", statusCode);
 		}
 		else {
-			throw new RestException("Unrecognized HTTP status code", statusCode);			
+			throw new RestException("Unrecognized HTTP status code; body was: " + errorString, statusCode);			
 		}		
 	}
 	
@@ -251,7 +259,7 @@ abstract public class AbstractResource {
 		Integer[] sorted = new Integer[array.length()];
 		
 		for(int i = 0; i < sorted.length; i++) {
-			sorted[i] = new Integer(i);
+			sorted[i] = Integer.valueOf(i);
 		}
 		
 		KeySort comparator = new KeySort(array, key);		
