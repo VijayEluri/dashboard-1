@@ -23,19 +23,15 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
-public class RetryHttpClient implements HttpClient {
-	HttpClient _client      = null;
+public class RetryClient extends StatefulClient {
 	int        _maxGetTries = 3;
 	
-	public RetryHttpClient(HttpClient realClient, int maxGetTries) {
-		_client      = realClient;
+	public RetryClient(HttpClient realClient, int maxGetTries) {
+		super(realClient);
 		_maxGetTries = maxGetTries;
 	}
 	
@@ -93,11 +89,6 @@ public class RetryHttpClient implements HttpClient {
 		return response;
 	}
 
-	public <T> T execute(HttpUriRequest arg0, ResponseHandler<? extends T> arg1)
-			throws IOException, ClientProtocolException {
-		return _client.execute(arg0, arg1);
-	}
-
 	public HttpResponse execute(HttpHost arg0, HttpRequest arg1,
 			HttpContext arg2) throws IOException, ClientProtocolException {
 		int tries             = 0;
@@ -114,32 +105,6 @@ public class RetryHttpClient implements HttpClient {
 		}
 		
 		return response;
-	}
-
-	public <T> T execute(HttpUriRequest arg0,
-			ResponseHandler<? extends T> arg1, HttpContext arg2)
-			throws IOException, ClientProtocolException {
-		return _client.execute(arg0, arg1, arg2);
-	}
-
-	public <T> T execute(HttpHost arg0, HttpRequest arg1,
-			ResponseHandler<? extends T> arg2) throws IOException,
-			ClientProtocolException {
-		return _client.execute(arg0, arg1, arg2);
-	}
-
-	public <T> T execute(HttpHost arg0, HttpRequest arg1,
-			ResponseHandler<? extends T> arg2, HttpContext arg3)
-			throws IOException, ClientProtocolException {
-		return _client.execute(arg0, arg1, arg2, arg3);
-	}
-
-	public ClientConnectionManager getConnectionManager() {
-		return _client.getConnectionManager();
-	}
-
-	public HttpParams getParams() {
-		return _client.getParams();
 	}
 
 	protected boolean checkSuccess(HttpResponse response) {

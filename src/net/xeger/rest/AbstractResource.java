@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import net.xeger.rest.client.StatefulClient;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -41,11 +43,8 @@ abstract public class AbstractResource {
     abstract protected URI      getResourceURI(String relativePath, String query);
     
     private Session _session = null;
-    private boolean _basicAuth = false;
-    
     public AbstractResource(Session session, boolean basicAuth) {
     	_session = session;
-    	_basicAuth = basicAuth;
     }
     
     protected URI getBaseURI() {
@@ -97,7 +96,7 @@ abstract public class AbstractResource {
 
 		_session.login();
 		
-		HttpClient client  = createClient(_basicAuth);		
+		HttpClient client  = createClient();
 		HttpGet        get = createGet(uri);
 		HttpResponse   response;		
 		int            statusCode;
@@ -108,7 +107,7 @@ abstract public class AbstractResource {
 			statusCode = response.getStatusLine().getStatusCode();
 			body       = response.getEntity();
 		}
-		catch (Exception e) {
+		catch (IOException e) {
 			throw new RestNetworkException(e);
 		}
 		
@@ -157,7 +156,7 @@ abstract public class AbstractResource {
 	{
 		URI uri = getResourceURI(relativePath, null);
 
-		HttpClient client = createClient(_basicAuth);		
+		HttpClient client = createClient();		
 		HttpPost   post   = createPost(uri);
 		
 		if(params != null) {
@@ -199,8 +198,8 @@ abstract public class AbstractResource {
 		}		
 	}
 
-	protected HttpClient createClient(boolean basicAuth) {
-		return _session.createClient(basicAuth);		
+	protected StatefulClient createClient() {
+		return _session.createClient();		
 	}
 	
 	protected HttpGet createGet(URI uri) {

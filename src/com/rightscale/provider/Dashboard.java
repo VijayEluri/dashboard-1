@@ -201,11 +201,13 @@ public class Dashboard extends ContentProvider {
 			if (segments.get(2).equals("deployments")) {
 				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_ID)) != null) {
 					// SELECT ... FROM deployments WHERE id = ?
+					session.setCurrentAccount(args[0]);
 					DeploymentsResource deployments = new DeploymentsResource(session, args[0]);
 					return deployments.show(args[1]);
 				}
 				else if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT)) != null) {
 					// SELECT ... FROM deployments
+					session.setCurrentAccount(args[0]);
 					DeploymentsResource deployments = new DeploymentsResource(session, args[0]);
 					return deployments.index();
 				}
@@ -215,16 +217,19 @@ public class Dashboard extends ContentProvider {
 			} else if (segments.get(2).equals("servers")) {
 				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_DEPLOYMENT)) != null) {
 					// SELECT ... FROM servers WHERE deployment_id = ?
+					session.setCurrentAccount(args[0]);
 					ServersResource servers = new ServersResource(session, args[0]);
 					return servers.indexForDeployment(args[1]);
 				}
 				else if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_ID)) != null) {
 					// SELECT ... FROM servers WHERE id = ?
+					session.setCurrentAccount(args[0]);
 					ServersResource servers = new ServersResource(session, args[0]);
 					return servers.show(args[1]);
 				}
 				else if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT)) != null) {
 					// SELECT ... FROM servers
+					session.setCurrentAccount(args[0]);
 					ServersResource servers = new ServersResource(session, args[0]);
 					return servers.index();
 				}
@@ -234,6 +239,7 @@ public class Dashboard extends ContentProvider {
 			} else if (segments.get(2).equals("server_settings")) {
 				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_SERVER)) != null) {
 					// SELECT ... FROM server_settings WHERE server_id = ?
+					session.setCurrentAccount(args[0]);
 					ServerSettingsResource serverSettings = new ServerSettingsResource(session, args[0]);
 					return serverSettings.showForServer(args[1]);
 				}
@@ -243,6 +249,7 @@ public class Dashboard extends ContentProvider {
 			} else if (segments.get(2).equals("server_monitors")) {
 				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_SERVER)) != null) {
 					// SELECT ... FROM server_monitors WHERE server_id = ?
+					session.setCurrentAccount(args[0]);
 					ServerMonitorsResource serverMonitors = new ServerMonitorsResource(session, args[0]);
 					return serverMonitors.indexForServer(args[1]);
 				}
@@ -252,10 +259,12 @@ public class Dashboard extends ContentProvider {
 			} else if (segments.get(2).equals("server_templates")) {
 				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_ID)) != null) {
 					// SELECT ... FROM server_templates WHERE id = ?
+					session.setCurrentAccount(args[0]);
 					ServerTemplatesResource serverTemplates = new ServerTemplatesResource(session, args[0]);
 					return serverTemplates.show(args[1]);
 				}
 				else if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT)) != null) {
+					session.setCurrentAccount(args[0]);
 					ServerTemplatesResource serverTemplates = new ServerTemplatesResource(session, args[0]);
 					return serverTemplates.index();
 				}
@@ -264,6 +273,7 @@ public class Dashboard extends ContentProvider {
 				}
 			} else if (segments.get(2).equals("server_template_executables")) {
 				if ((args = parseWhereArgs(where, whereArgs, WHERE_ACCOUNT_AND_SERVER_TEMPLATE_AND_APPLY)) != null) {
+					session.setCurrentAccount(args[0]);
 					ServerTemplateExecutablesResource serverTemplates = new ServerTemplateExecutablesResource(session, args[0]);
 					return serverTemplates.indexForServerTemplate(args[1], args[2]);
 				}
@@ -360,9 +370,9 @@ public class Dashboard extends ContentProvider {
 		}
 	}
 	
-	static public HttpClient createClient(Context context, boolean basicAuth) {
+	static public HttpClient createClient(Context context) {
 		// notice that we don't login the session (on purpose)
-		return createSession(context).createClient(basicAuth);
+		return createSession(context).createClient();
 	}
 
 	static public synchronized DashboardSession createSession(Context context)

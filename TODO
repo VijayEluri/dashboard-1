@@ -1,0 +1,19 @@
+Get rid of unnecessary complexity in net.xeger.rest.client (StatefulClient et al)
+  - the decorator pattern doesn't mix well with Java
+  - come up with a dumbed-down client abstraction that supports middleware
+
+Handle sharding
+  - follow redirects during account-switch
+  - system becomes more of a hint
+  
+Prepare for API 1.5 support
+  - refactor provider into v1_0 submodule
+
+Overhaul authentication code
+  - stop saving email/password
+  - always use OAuth tokens
+  - persist accounts table to DB
+  - persist tokens table to DB
+  - capture tokens via QR code
+
+Implement API 1.5

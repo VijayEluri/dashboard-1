@@ -22,8 +22,6 @@ import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.http.client.HttpClient;
-
 import com.rightscale.provider.*;
 
 import android.database.Cursor;
@@ -33,6 +31,7 @@ import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestAuthException;
 import net.xeger.rest.RestException;
 import net.xeger.rest.Session;
+import net.xeger.rest.client.StatefulClient;
 
 public class AccountsResource extends AbstractResource {
 	public static final String MIME_TYPE = "vnd.rightscale.account";
@@ -76,8 +75,8 @@ public class AccountsResource extends AbstractResource {
      * Create a cookie-authenticated client, overriding the default behavior of DashboardSession
      * which is to create a basic-auth client.
      */
-	protected HttpClient createClient() {
-		return ((DashboardSession)getSession()).createCookieClient();		
+	protected StatefulClient createClient() {
+		return getSession().createClient();		
 	}
 
 	public Cursor index()

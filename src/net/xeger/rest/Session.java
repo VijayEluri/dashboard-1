@@ -18,7 +18,8 @@ package net.xeger.rest;
 
 import java.net.URI;
 
-import org.apache.http.client.HttpClient;
+import net.xeger.rest.client.StatefulClient;
+
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 
@@ -38,7 +39,7 @@ public interface Session {
 	public void logout();
 	
 	public URI getBaseURI();
-	public HttpClient createClient(boolean basicAuth);
-	public HttpGet createGet(URI uri);
-	public HttpPost createPost(URI uri);
+	public StatefulClient createClient();
+	public HttpGet        createGet(URI uri);
+	public HttpPost       createPost(URI uri);
 }

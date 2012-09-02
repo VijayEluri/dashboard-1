@@ -32,13 +32,14 @@ import org.apache.http.auth.AuthState;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.ExecutionContext;
@@ -49,8 +50,7 @@ import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestAuthException;
 import net.xeger.rest.RestException;
 import net.xeger.rest.Session;
-import net.xeger.rest.client.RetryHttpClient;
-import net.xeger.rest.client.SessionHttpClient;
+import net.xeger.rest.client.*;
 
 import com.rightscale.provider.*;
 
@@ -81,6 +81,40 @@ public class DashboardSession implements Session {
 	public URI getBaseURI()
 	{
 		return _baseURI;
+	}
+	
+	public void setCurrentAccount(String accountId)
+		throws RestException
+	{
+		login();
+
+		try {
+		    URI switchUri = new URI(_baseURI.toString() + "/acct/" + accountId);
+			HttpPut put = createPut(switchUri);
+		
+			StatefulClient client = createClient();
+			HttpResponse response = client.execute(put);
+			String body = AbstractResource.readResponse(response.getEntity());
+			
+			if(response.getStatusLine().getStatusCode() != 200 || body.contains(LOGIN_PAGE_CANARY)) {
+				throw new RestAuthException("UI account-switch request failed", response.getStatusLine().getStatusCode());
+			}
+			
+			List<Cookie> cookies = client.getCookieStore().getCookies();
+			for(Cookie c : cookies) {
+				if(c.getName().startsWith("rs_gbl")) {
+					_sessionCookie = c;
+					break;
+				}
+			}
+			if(_sessionCookie == null) {
+				throw new RestAuthException("UI account-switch response did not contain updated session cookie", 401);
+			}
+		}
+		catch(Exception e) {
+			//Nothing should go wrong here
+			throw new DashboardError(e);			
+		}
 	}
 	
 	public void login()
@@ -136,43 +170,37 @@ public class DashboardSession implements Session {
 	}
 
 	/**
-	 * Create a client that uses HTTP Basic authentication. Appropriate for most RightScale API requests.
+	 * Create .
 	 */
-	public HttpClient createClient(boolean basicAuth)
+	public StatefulClient createClient()
 	{
-		DefaultHttpClient client = new DefaultHttpClient();
-		
-		if(basicAuth) {
-			//Wire up the client to perform HTTP basic authentication
-			setupBasicAuth(client);
-		}
-		
-		//Add some useful behaviors to the stock HTTP client
-		return new RetryHttpClient(new SessionHttpClient(client, this), 3);
-	}
-
-	/**
-	 * Create a client that uses cookie-based authentication. Appropriate for RightScale UI requests.
-	 */
-	public HttpClient createCookieClient() {
-		DefaultHttpClient client = new DefaultHttpClient();
+		StatefulClient client = createAnonymousClient();
 		
 		if(_sessionCookie != null) {
 			client.getCookieStore().addCookie(_sessionCookie);
 		}
 
 		//Add some useful behaviors to the stock HTTP client
-		return new RetryHttpClient(new SessionHttpClient(client, this), 3);		
+		return new RetryClient(new SessionClient(client, this), 3);		
+	}
+
+	public StatefulClient createBasicAuthClient()
+	{
+		StatefulClient client = createAnonymousClient();
+		//Wire up the client to perform HTTP basic authentication
+		setupBasicAuth(client);
+		//Add some useful behaviors to the stock HTTP client
+		return new RetryClient(new SessionClient(client, this), 3);	
 	}
 	
 	/**
 	 * Create an anonymous, unauthenticated client.
 	 */
-	public HttpClient createAnonymousClient() {
+	public StatefulClient createAnonymousClient() {
 		DefaultHttpClient client = new DefaultHttpClient();
 		
 		//Add some useful behaviors to the stock HTTP client
-		return new RetryHttpClient(client, 3);		
+		return new RetryClient(client, 3);		
 	}
 	
     public HttpGet createGet(URI uri) {
@@ -190,11 +218,18 @@ public class DashboardSession implements Session {
     	return post;
     }
 
-    private void setupBasicAuth(DefaultHttpClient client) {
+    public HttpPut createPut(URI uri) {
+    	HttpPut put = new HttpPut(uri);
+    	put.addHeader("X-API-Version", "1.0");
+    	return put;
+    }
+    
+    private void setupBasicAuth(StatefulClient client) {
 		AuthScope authScope = new AuthScope(_baseURI.getHost(), AuthScope.ANY_PORT, AuthScope.ANY_REALM);
 		UsernamePasswordCredentials creds = new UsernamePasswordCredentials(_username, _password);
-		client.getCredentialsProvider().setCredentials(authScope, creds);
-		client.addRequestInterceptor(createBasicAuthInterceptor(), 0);    	
+		AbstractHttpClient realClient = (AbstractHttpClient)client.getRealClient();
+		realClient.getCredentialsProvider().setCredentials(authScope, creds);
+		realClient.addRequestInterceptor(createBasicAuthInterceptor(), 0);    	
     }
     
 	private HttpRequestInterceptor createBasicAuthInterceptor() {

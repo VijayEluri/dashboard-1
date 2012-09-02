@@ -30,7 +30,7 @@ public class DashboardResource extends net.xeger.rest.AbstractResource {
 	public DashboardResource(Session session, String accountId)
 	{
 		super(session, false);
-		
+
 		try {
 			_accountBaseURI = new URI(super.getBaseURI().toString() + "/api/acct/" + accountId);			
 		}
