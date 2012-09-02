@@ -22,13 +22,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.xeger.rest.RestException;
-import net.xeger.rest.RestServerException;
-import net.xeger.rest.Session;
-import net.xeger.rest.ui.ContentTransfer;
-import net.xeger.rest.ui.ImageConsumer;
-import net.xeger.rest.ui.ImageProducer;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
@@ -46,8 +39,15 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 
-import com.rightscale.provider.Dashboard;
-import com.rightscale.provider.DashboardSession;
+import net.xeger.rest.RestException;
+import net.xeger.rest.RestServerException;
+import net.xeger.rest.Session;
+import net.xeger.rest.ui.ContentTransfer;
+import net.xeger.rest.ui.ImageConsumer;
+import net.xeger.rest.ui.ImageProducer;
+
+import com.rightscale.provider.*;
+import com.rightscale.provider.rest.*;
 
 public class ShowServerMonitoring extends AbstractServerActivity implements ImageProducer, ImageConsumer {
     static private final String[] FROM = {"graph_name"};

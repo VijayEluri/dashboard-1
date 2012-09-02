@@ -14,21 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package com.rightscale.provider;
+package com.rightscale.provider.rest;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.xeger.rest.AbstractResource;
-import net.xeger.rest.ProtocolError;
-import net.xeger.rest.RestAuthException;
-import net.xeger.rest.RestException;
-import net.xeger.rest.Session;
-import net.xeger.rest.client.RetryHttpClient;
-import net.xeger.rest.client.SessionHttpClient;
 
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -51,6 +43,16 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
+
+import net.xeger.rest.AbstractResource;
+import net.xeger.rest.ProtocolError;
+import net.xeger.rest.RestAuthException;
+import net.xeger.rest.RestException;
+import net.xeger.rest.Session;
+import net.xeger.rest.client.RetryHttpClient;
+import net.xeger.rest.client.SessionHttpClient;
+
+import com.rightscale.provider.*;
 
 public class DashboardSession implements Session {
 	static public final String LOGIN_PAGE_CANARY = "New RightScale Session";

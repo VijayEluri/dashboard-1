@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.xeger.rest.RestException;
 import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
@@ -32,8 +31,9 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import net.xeger.rest.RestException;
 import com.rightscale.app.dashboard.Settings;
-import com.rightscale.provider.DashboardSession;
+import com.rightscale.provider.rest.*;
 
 public class DashboardFeed extends Service {
 	public static final String CATEGORY_EVENT = "com.rightscale.service.DashboardFeed.category.event";
@@ -111,7 +111,7 @@ public class DashboardFeed extends Service {
     synchronized boolean onDashboardEvent(Date when, Uri subject, String subjectName, String summary) {
     	StringBuffer sb = new StringBuffer(subject.toString());
     	sb.append(":");
-    	sb.append(new Long(when.getTime()).toString());
+    	sb.append(Long.valueOf(when.getTime()).toString());
     	String hash = sb.toString();
 
     	boolean likedIt = false;
