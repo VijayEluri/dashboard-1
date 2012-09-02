@@ -136,11 +136,11 @@ public class DashboardSession implements Session {
 	/**
 	 * Create a client that uses HTTP Basic authentication. Appropriate for most RightScale API requests.
 	 */
-	public HttpClient createClient()
+	public HttpClient createClient(boolean basicAuth)
 	{
 		DefaultHttpClient client = new DefaultHttpClient();
 		
-		if(_username != null && _password != null) {
+		if(basicAuth) {
 			//Wire up the client to perform HTTP basic authentication
 			setupBasicAuth(client);
 		}

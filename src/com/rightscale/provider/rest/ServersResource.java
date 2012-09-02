@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package com.rightscale.provider;
+package com.rightscale.provider.rest;
 
 import java.util.ArrayList;
 
@@ -27,10 +27,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.rightscale.provider.*;
+
 import android.database.Cursor;
 import android.database.MatrixCursor;
 
-class ServersResource extends DashboardResource {
+public class ServersResource extends DashboardResource {
 	public static final String MIME_TYPE = "vnd.rightscale.server";
 	
 	public static final String ID                 = Dashboard.ID;
@@ -105,7 +107,7 @@ class ServersResource extends DashboardResource {
 		throws RestException		
 	{
 		ArrayList<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-		params.add( new BasicNameValuePair("right_script", new Integer(scriptId).toString()) );
+		params.add( new BasicNameValuePair("right_script", Integer.valueOf(scriptId).toString()) );
 		post("servers/" + id + "/run_script", params);
 	}
 	
@@ -116,9 +118,9 @@ class ServersResource extends DashboardResource {
 		String deployment_href      = object.getString("deployment_href");
 		String server_template_href = object.getString("server_template_href");
 		
-		int id                 = new Integer(href.substring(href.lastIndexOf('/')+1)).intValue(); //TODO error handling
-		int deployment_id      = new Integer(deployment_href.substring(deployment_href.lastIndexOf('/')+1)).intValue(); //TODO error handling
-		int server_template_id = new Integer(server_template_href.substring(server_template_href.lastIndexOf('/')+1)).intValue(); //TODO error handling
+		int id                 = Integer.valueOf(href.substring(href.lastIndexOf('/')+1)).intValue(); //TODO error handling
+		int deployment_id      = Integer.valueOf(deployment_href.substring(deployment_href.lastIndexOf('/')+1)).intValue(); //TODO error handling
+		int server_template_id = Integer.valueOf(server_template_href.substring(server_template_href.lastIndexOf('/')+1)).intValue(); //TODO error handling
 		
 		String nickname = object.getString("nickname");
         String state    = object.getString("state");

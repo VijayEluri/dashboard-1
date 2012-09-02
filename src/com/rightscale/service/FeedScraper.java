@@ -55,7 +55,7 @@ class FeedScraper extends AbstractResource implements Runnable {
 	public FeedScraper(DashboardFeed context, Session session, URI uri)
 		throws URISyntaxException
 	{
-		super(session);
+		super(session, true);
 		_context = context;
 		_uri     = uri;  
 	}

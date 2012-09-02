@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package com.rightscale.provider;
+package com.rightscale.provider.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -22,12 +22,14 @@ import java.net.URISyntaxException;
 import net.xeger.rest.ProtocolError;
 import net.xeger.rest.Session;
 
+import com.rightscale.provider.*;
+
 public class DashboardResource extends net.xeger.rest.AbstractResource {
 	private URI _accountBaseURI = null;
 	
 	public DashboardResource(Session session, String accountId)
 	{
-		super(session);
+		super(session, false);
 		
 		try {
 			_accountBaseURI = new URI(super.getBaseURI().toString() + "/api/acct/" + accountId);			

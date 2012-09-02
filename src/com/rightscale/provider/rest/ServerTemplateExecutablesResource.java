@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package com.rightscale.provider;
+package com.rightscale.provider.rest;
 
 import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestException;
@@ -24,10 +24,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.rightscale.provider.*;
+
 import android.database.Cursor;
 import android.database.MatrixCursor;
 
-class ServerTemplateExecutablesResource extends DashboardResource {
+public class ServerTemplateExecutablesResource extends DashboardResource {
 	public static final String MIME_TYPE = "vnd.rightscale.server_template_executable";
 	
 	public static final String ID                 = Dashboard.ID;
@@ -87,7 +89,7 @@ class ServerTemplateExecutablesResource extends DashboardResource {
 			JSONObject right_script = object.getJSONObject("right_script");
 			String name       = right_script.getString("name");
 			String href       = right_script.getString("href");
-			int rightScriptId = new Integer(href.substring(href.lastIndexOf('/')+1)).intValue(); //TODO error handling
+			int rightScriptId = Integer.valueOf(href.substring(href.lastIndexOf('/')+1)).intValue(); //TODO error handling
 			row.add(name);
 			row.add(rightScriptId);
 		}

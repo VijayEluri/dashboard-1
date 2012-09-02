@@ -30,6 +30,7 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.rightscale.app.dashboard.Settings;
+import com.rightscale.provider.rest.*;
 
 /**
  * The Android content provider used to retrieve REST resources from the
@@ -359,9 +360,9 @@ public class Dashboard extends ContentProvider {
 		}
 	}
 	
-	static public HttpClient createClient(Context context) {
+	static public HttpClient createClient(Context context, boolean basicAuth) {
 		// notice that we don't login the session (on purpose)
-		return createSession(context).createClient();
+		return createSession(context).createClient(basicAuth);
 	}
 
 	static public synchronized DashboardSession createSession(Context context)

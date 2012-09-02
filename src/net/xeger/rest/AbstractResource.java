@@ -41,9 +41,11 @@ abstract public class AbstractResource {
     abstract protected URI      getResourceURI(String relativePath, String query);
     
     private Session _session = null;
+    private boolean _basicAuth = false;
     
-    public AbstractResource(Session session) {
+    public AbstractResource(Session session, boolean basicAuth) {
     	_session = session;
+    	_basicAuth = basicAuth;
     }
     
     protected URI getBaseURI() {
@@ -95,8 +97,8 @@ abstract public class AbstractResource {
 
 		_session.login();
 		
-		HttpClient client        = createClient();		
-		HttpGet        get       = createGet(uri);
+		HttpClient client  = createClient(_basicAuth);		
+		HttpGet        get = createGet(uri);
 		HttpResponse   response;		
 		int            statusCode;
         HttpEntity     body;
@@ -155,7 +157,7 @@ abstract public class AbstractResource {
 	{
 		URI uri = getResourceURI(relativePath, null);
 
-		HttpClient client = createClient();		
+		HttpClient client = createClient(_basicAuth);		
 		HttpPost   post   = createPost(uri);
 		
 		if(params != null) {
@@ -197,8 +199,8 @@ abstract public class AbstractResource {
 		}		
 	}
 
-	protected HttpClient createClient() {
-		return _session.createClient();		
+	protected HttpClient createClient(boolean basicAuth) {
+		return _session.createClient(basicAuth);		
 	}
 	
 	protected HttpGet createGet(URI uri) {

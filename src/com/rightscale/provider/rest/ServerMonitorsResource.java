@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package com.rightscale.provider;
+package com.rightscale.provider.rest;
 
 import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestException;
@@ -23,6 +23,8 @@ import net.xeger.rest.Session;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.rightscale.provider.*;
 
 import android.database.Cursor;
 import android.database.MatrixCursor;

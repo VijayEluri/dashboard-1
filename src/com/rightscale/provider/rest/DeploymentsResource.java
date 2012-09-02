@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package com.rightscale.provider;
+package com.rightscale.provider.rest;
 
 import net.xeger.rest.ProtocolError;
 import net.xeger.rest.RestException;
@@ -24,10 +24,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.rightscale.provider.*;
+
 import android.database.Cursor;
 import android.database.MatrixCursor;
 
-class DeploymentsResource extends DashboardResource {
+public class DeploymentsResource extends DashboardResource {
 	public static final String MIME_TYPE = "vnd.rightscale.deployment";
 	
 	public static final String ID       = Dashboard.ID;
@@ -51,7 +53,7 @@ class DeploymentsResource extends DashboardResource {
 				JSONObject deployment = response.getJSONObject(i);
 				
 				String href = deployment.getString("href");
-				int id = new Integer(href.substring(href.lastIndexOf('/')+1)).intValue(); //TODO error handling			
+				int id = Integer.valueOf(href.substring(href.lastIndexOf('/')+1)).intValue(); //TODO error handling			
 				String nickname = deployment.getString("nickname"); 
 	
 				MatrixCursor.RowBuilder row = result.newRow();

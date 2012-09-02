@@ -38,7 +38,7 @@ public interface Session {
 	public void logout();
 	
 	public URI getBaseURI();
-	public HttpClient createClient();
+	public HttpClient createClient(boolean basicAuth);
 	public HttpGet createGet(URI uri);
 	public HttpPost createPost(URI uri);
 }

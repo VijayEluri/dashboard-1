@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package com.rightscale.provider;
+package com.rightscale.provider.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
 
 import org.apache.http.client.HttpClient;
 
+import com.rightscale.provider.*;
+
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import net.xeger.rest.AbstractResource;
@@ -32,7 +34,7 @@ import net.xeger.rest.RestAuthException;
 import net.xeger.rest.RestException;
 import net.xeger.rest.Session;
 
-class AccountsResource extends AbstractResource {
+public class AccountsResource extends AbstractResource {
 	public static final String MIME_TYPE = "vnd.rightscale.account";
 
 	//Release 3.12-3.14
@@ -53,7 +55,7 @@ class AccountsResource extends AbstractResource {
 	public static final String[] COLUMNS = { ID, NICKNAME };
 
 	public AccountsResource(Session session) {
-		super(session);
+		super(session, true);
 	}
 	
     protected URI getResourceURI(String relativePath, String query) {
